@@ -3,6 +3,7 @@ name: Release
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -14,16 +15,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
+      - name: Linux packaging tools (rpm, deb)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
       - run: npm ci
       - run: npm run guard -- --all
+      # workspace packages resolve to their built output, so build before the tests
+      - run: npm run build
       - run: npm test
-      - name: Linux packaging tools (rpm)
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install -y rpm
       - name: Build installers (unsigned)
         run: npm run desktop:dist
         env:
@@ -41,6 +45,7 @@ jobs:
 
   publish:
     needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
