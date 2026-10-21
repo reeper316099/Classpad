@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
-  "description": "Classpad desktop app",
-  "author": "Classpad contributors",
+  "productName": "Classpad",
+  "description": "Classpad: a local-first student workspace",
+  "homepage": "https://github.com/reeper316099/Classpad",
+  "author": {
+    "name": "Classpad contributors",
+    "email": "classpad@users.noreply.github.com"
+  },
   "main": "dist/main.cjs",
   "type": "module",
   "scripts": {

@@ -227,22 +227,26 @@ describe('watching', () => {
   });
 });
 
-describe('watching a directory with files that cannot be watched', () => {
-  it('ignores Electron singleton files and never crashes on watcher errors', async () => {
-    const { createServer } = await import('node:net');
-    const sock = path.join(dir, 'SingletonSocket');
-    const srv = createServer();
-    await new Promise<void>((r) => srv.listen(sock, r)); // a real unix socket, like Chromium's
-    await store.watch();
-    const seen: string[] = [];
-    store.on('external-change', (e) => seen.push(e.rel));
-    store.on('watch-error', () => seen.push('watch-error'));
-    await new Promise((r) => setTimeout(r, 300)); // let the watcher settle
-    await writeFile(path.join(dir, 'ordinary.json'), '{"a":1}');
-    for (let i = 0; i < 40 && !seen.includes('ordinary.json'); i++)
-      await new Promise((r) => setTimeout(r, 100));
-    expect(seen).toContain('ordinary.json');
-    expect(seen).not.toContain('SingletonSocket');
-    await new Promise<void>((r) => srv.close(() => r()));
-  });
-});
+// Chromium's SingletonSocket is a Unix socket; Windows has no such file, so there is nothing to ignore there.
+describe.skipIf(process.platform === 'win32')(
+  'watching a directory with files that cannot be watched',
+  () => {
+    it('ignores Electron singleton files and never crashes on watcher errors', async () => {
+      const { createServer } = await import('node:net');
+      const sock = path.join(dir, 'SingletonSocket');
+      const srv = createServer();
+      await new Promise<void>((r) => srv.listen(sock, r)); // a real unix socket, like Chromium's
+      await store.watch();
+      const seen: string[] = [];
+      store.on('external-change', (e) => seen.push(e.rel));
+      store.on('watch-error', () => seen.push('watch-error'));
+      await new Promise((r) => setTimeout(r, 300)); // let the watcher settle
+      await writeFile(path.join(dir, 'ordinary.json'), '{"a":1}');
+      for (let i = 0; i < 40 && !seen.includes('ordinary.json'); i++)
+        await new Promise((r) => setTimeout(r, 100));
+      expect(seen).toContain('ordinary.json');
+      expect(seen).not.toContain('SingletonSocket');
+      await new Promise<void>((r) => srv.close(() => r()));
+    });
+  },
+);

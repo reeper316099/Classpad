@@ -11,6 +11,8 @@ files:
   - package.json
   - '!**/*.map'
 asar: true
+npmRebuild: false # everything is bundled; there are no native modules to rebuild
+nodeGypRebuild: false
 compression: normal
 extraMetadata:
   main: dist/main.cjs
@@ -18,24 +20,33 @@ mac:
   category: public.app-category.education
   icon: build/icon.png
   identity: null # unsigned for now; see docs/PACKAGING.md to add signing/notarization
+  hardenedRuntime: false
+  gatekeeperAssess: false
   target:
     - target: dmg
       arch: universal
 dmg:
   title: Classpad
+  sign: false
 win:
   icon: build/icon.png
   target:
     - nsis
     - portable
 nsis:
+  artifactName: ${productName}-${version}-win-${arch}-setup.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
+portable:
+  artifactName: ${productName}-${version}-win-${arch}-portable.${ext}
 linux:
+  # The default comes from the npm package name (@classpad/desktop), which is not a valid file name.
+  executableName: classpad
   icon: build/icon.png
   category: Education
-  maintainer: Classpad contributors
+  maintainer: Classpad contributors <classpad@users.noreply.github.com>
+  synopsis: Local-first student workspace
   target:
     - AppImage
     - deb
