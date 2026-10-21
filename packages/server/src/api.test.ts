@@ -246,10 +246,11 @@ describe('notes as Markdown files and search', () => {
     await call('DELETE', `/notes/${n.body.id}`);
     expect((await call('GET', `/search?q=velocity`)).body.hits).toHaveLength(0);
   });
-  it('JS frontmatter is never executed', async () => {
+  it('JS frontmatter is never executed (treated as plain text)', async () => {
     await writeFile(path.join(dir, 'data/notes/evil.md'), '---js\n{ title: "x" }\n---\nbody');
     await expect(app.ctx.notes.reloadFile('data/notes/evil.md')).resolves.toBe(true);
-    expect(app.ctx.notes.loadErrors.some((e) => e.rel.endsWith('evil.md'))).toBe(true);
+    const n = app.ctx.notes.list().find((x) => x.title === 'evil');
+    expect(n?.markdown).toContain('---js');
   });
 });
 

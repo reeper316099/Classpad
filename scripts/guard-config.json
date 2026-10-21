@@ -1,5 +1,11 @@
 {
   "comment": "Hashes of lowercase word tokens that must never appear in tracked text (third-party branding). Hashed so the repo itself never contains them.",
-  "deniedTokenHashes": ["af13426807e8c571498b546ea1432442c34ead3df02f6e4fceae4f063ec18540"],
+  "deniedTokenHashes": [
+    "af13426807e8c571498b546ea1432442c34ead3df02f6e4fceae4f063ec18540",
+    "b8a2c62b713b94364bd6089ce0352de1b7735c0f6fe1fd53e76baae38b213f10",
+    "103853f611feb60f87f1dd0847145db68ad778bc1d6fec44ae496e332e4c1d74",
+    "9d31fd37a1c39789098e7bd87d52ef1cbb3e52dd3baa30fa81dea50b3b4fadd1",
+    "a9bd026aa68c0299936be641eca03b3306e8b29bf1e1f66948b4b2d715c83bbb"
+  ],
   "allowedPrefixes": ["fixtures/synthetic/"]
 }

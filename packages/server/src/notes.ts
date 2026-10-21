@@ -1,6 +1,11 @@
 import type { JsonStore } from '@classpad/jsonstore';
-import { NoteSchema, newId, type Note } from '@classpad/shared';
-import matter from 'gray-matter';
+import {
+  NoteSchema,
+  newId,
+  parseFrontmatter,
+  stringifyFrontmatter,
+  type Note,
+} from '@classpad/shared';
 import path from 'node:path';
 import type { Bus } from './bus.js';
 import type { Collection } from './collection.js';
@@ -8,18 +13,6 @@ import { notFound } from './errors.js';
 import { slugify, uniqueSlug } from './slug.js';
 
 const NOTES_DIR = 'data/notes';
-// Frontmatter is YAML only: never evaluate embedded JS.
-const MATTER_OPTS = {
-  engines: {
-    js: () => {
-      throw new Error('JS frontmatter is disabled');
-    },
-    javascript: () => {
-      throw new Error('JS frontmatter is disabled');
-    },
-  },
-};
-
 const iso = (v: unknown): string | undefined =>
   v instanceof Date
     ? v.toISOString().slice(0, v.getUTCHours() || v.getUTCMinutes() ? 19 : 10)
@@ -48,7 +41,7 @@ export class NoteRepo implements Collection<Note> {
   }
 
   private parse(rel: string, text: string): Note {
-    const m = matter(text, MATTER_OPTS);
+    const m = parseFrontmatter(text);
     const d = m.data as Record<string, unknown>;
     const now = new Date().toISOString();
     return NoteSchema.parse({
@@ -64,7 +57,11 @@ export class NoteRepo implements Collection<Note> {
 
   private serialize(n: Note): string {
     const { markdown, ...fm } = n;
-    return matter.stringify(markdown, JSON.parse(JSON.stringify(fm)), MATTER_OPTS);
+    return stringifyFrontmatter(markdown, fm);
+  }
+
+  schemaForRestore() {
+    return NoteSchema;
   }
 
   owns(rel: string): boolean {
@@ -171,6 +168,39 @@ export class NoteRepo implements Collection<Note> {
       this.items.set(id, n);
       this.files.set(id, rel);
       this.bus.publish({ kind: 'updated', collection: this.name, entityId: id });
+      return n;
+    });
+  }
+
+  /** Insert or replace a whole note (import/undo/restore). */
+  put(note: Note): Promise<Note> {
+    return this.enqueue(async () => {
+      const n = NoteSchema.parse(note);
+      const oldRel = this.files.get(n.id);
+      const dir = this.dirFor(n);
+      const rel =
+        oldRel && path.posix.dirname(oldRel) === dir
+          ? oldRel
+          : this.freeFile(
+              dir,
+              oldRel ? path.posix.basename(oldRel, '.md') : slugify(n.title),
+              n.id,
+            );
+      await this.store.batch(
+        oldRel && rel !== oldRel
+          ? [
+              { type: 'write', rel, text: this.serialize(n) },
+              { type: 'remove', rel: oldRel },
+            ]
+          : [{ type: 'write', rel, text: this.serialize(n) }],
+      );
+      this.items.set(n.id, n);
+      this.files.set(n.id, rel);
+      this.bus.publish({
+        kind: oldRel ? 'updated' : 'created',
+        collection: this.name,
+        entityId: n.id,
+      });
       return n;
     });
   }

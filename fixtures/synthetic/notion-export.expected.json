@@ -1,0 +1,22 @@
+{
+  "note": "Expected importer results for fixtures/synthetic/notion-export (all data invented).",
+  "counts": {
+    "semesters": 3,
+    "classes": 5,
+    "assignments": 12,
+    "notes": 4,
+    "templates": 4,
+    "readings": 2,
+    "tasks": 3,
+    "attachments": 1
+  },
+  "parity": {
+    "mismatchClasses": [
+      "DOLOR 150"
+    ],
+    "okClasses": [
+      "LOREM 101",
+      "IPSUM 202"
+    ]
+  }
+}

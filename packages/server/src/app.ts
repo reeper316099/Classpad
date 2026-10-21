@@ -14,6 +14,16 @@ import {
 } from '@classpad/shared';
 import { z, ZodError, type ZodType } from 'zod';
 import { zodToJsonSchema } from 'zod-to-json-schema';
+import { CSV_COLLECTIONS, csvTemplate, type CsvCollection } from '@classpad/importers';
+import { AttachmentService, isInlineSafe } from './attachments.js';
+import {
+  exportCsv,
+  exportIcs,
+  exportJson,
+  exportMarkdownVault,
+  gradeReportHtml,
+} from './exportService.js';
+import { ImportService, STRATEGIES } from './importService.js';
 import type { Collection } from './collection.js';
 import { createContext, type Context } from './context.js';
 import { ApiError, notFound } from './errors.js';
@@ -408,6 +418,165 @@ export async function createApp(opts: AppOptions): Promise<App> {
       clearInterval(beat);
       bus.off('event', on);
     });
+  });
+
+  // ---- attachments ----
+  const atts = new AttachmentService(store, ctx.attachments);
+  const imports = new ImportService(ctx, atts);
+  const download = (
+    reply: import('fastify').FastifyReply,
+    type: string,
+    name: string,
+    body: string | Buffer,
+  ) =>
+    reply
+      .header('content-type', type)
+      .header('content-disposition', `attachment; filename="${name}"`)
+      .header('x-content-type-options', 'nosniff')
+      .send(body);
+  route('GET', '/attachments', 'List attachments', (r) =>
+    applyList(ctx.attachments.list(), r.query as Record<string, unknown>),
+  );
+  route('GET', '/attachments/:id', 'Attachment metadata', (r) => {
+    const { id } = Id.parse(r.params);
+    const a = ctx.attachments.get(id);
+    if (!a) throw notFound('attachment', id);
+    return a;
+  });
+  route('POST', '/attachments', 'Upload an attachment (base64)', async (r) => {
+    const b = z
+      .object({ filename: z.string().min(1).max(255), dataBase64: z.string().min(1) })
+      .parse(r.body);
+    return (await atts.add(b.filename, Buffer.from(b.dataBase64, 'base64'))).record;
+  });
+  route('DELETE', '/attachments/:id', 'Delete an attachment', async (r) => {
+    const { id } = Id.parse(r.params);
+    const a = ctx.attachments.get(id);
+    if (!a) throw notFound('attachment', id);
+    await atts.remove(a);
+  });
+  app.get(`${api}/attachments/:id/file`, async (req, reply) => {
+    const { id } = Id.parse(req.params);
+    const a = ctx.attachments.get(id);
+    if (!a) throw notFound('attachment', id);
+    const data = await atts.read(a);
+    const safe = isInlineSafe(a.mime);
+    return reply
+      .header('content-type', safe ? a.mime : 'application/octet-stream')
+      .header(
+        'content-disposition',
+        `${safe ? 'inline' : 'attachment'}; filename*=UTF-8''${encodeURIComponent(a.filename)}`,
+      )
+      .header('x-content-type-options', 'nosniff')
+      .header('content-security-policy', "default-src 'none'; sandbox")
+      .send(data);
+  });
+
+  // ---- import / export ----
+  app.addContentTypeParser(
+    ['application/octet-stream', 'application/zip'],
+    { parseAs: 'buffer', bodyLimit: 600 * 1024 * 1024 },
+    (_req, body, done) => done(null, body),
+  );
+  const Kinds = z.enum(['notion', 'csv', 'ics', 'markdown', 'json']);
+  const PreviewBody = z.object({
+    kind: Kinds,
+    collection: z.enum(CSV_COLLECTIONS as [CsvCollection, ...CsvCollection[]]).optional(),
+    text: z.string().optional(),
+    dataBase64: z.string().optional(),
+    icsAs: z.enum(['tasks', 'assignments']).optional(),
+    className: z.string().max(200).optional(),
+    dropTooltips: z.boolean().optional(),
+  });
+  routes.push({
+    method: 'POST',
+    path: `${api}/import/preview`,
+    summary: 'Parse an export and report what would be imported (no writes)',
+    body: PreviewBody,
+  });
+  app.post(`${api}/import/preview`, { bodyLimit: 600 * 1024 * 1024 }, async (req) => {
+    if (Buffer.isBuffer(req.body)) {
+      const q = z
+        .object({
+          kind: Kinds,
+          collection: PreviewBody.shape.collection,
+          icsAs: PreviewBody.shape.icsAs,
+          className: PreviewBody.shape.className,
+        })
+        .parse(req.query);
+      return imports.preview({ ...q, data: req.body });
+    }
+    const b = PreviewBody.parse(req.body);
+    return imports.preview({
+      ...b,
+      data: b.dataBase64 ? Buffer.from(b.dataBase64, 'base64') : undefined,
+    });
+  });
+  const Commit = z.object({
+    previewId: z.string().min(1).max(64),
+    strategy: z.enum(STRATEGIES).default('update_empty'),
+  });
+  route(
+    'POST',
+    '/import/commit',
+    'Apply a previewed import',
+    (r) => {
+      const b = Commit.parse(r.body);
+      return imports.commit(b.previewId, b.strategy);
+    },
+    Commit,
+  );
+  route('POST', '/import/undo/:id', 'Undo an import', (r) => imports.undo(Id.parse(r.params).id));
+  route('GET', '/import/history', 'Past imports', () => imports.history());
+  const Coll = z.object({
+    collection: z.enum(CSV_COLLECTIONS as [CsvCollection, ...CsvCollection[]]),
+  });
+  app.get(`${api}/import/templates/:collection`, async (req, reply) => {
+    const { collection } = Coll.parse(req.params);
+    return download(
+      reply,
+      'text/csv; charset=utf-8',
+      `${collection}-template.csv`,
+      csvTemplate(collection),
+    );
+  });
+  app.get(`${api}/export/csv/:collection`, async (req, reply) => {
+    const { collection } = Coll.parse(req.params);
+    return download(
+      reply,
+      'text/csv; charset=utf-8',
+      `${collection}.csv`,
+      exportCsv(ctx, collection),
+    );
+  });
+  app.get(`${api}/export/ics`, async (req, reply) => {
+    const { kind } = z
+      .object({ kind: z.enum(['deadlines', 'timetable', 'all']).default('all') })
+      .parse(req.query);
+    return download(
+      reply,
+      'text/calendar; charset=utf-8',
+      `classpad-${kind}.ics`,
+      exportIcs(ctx, kind),
+    );
+  });
+  app.get(`${api}/export/json`, async (_req, reply) =>
+    download(
+      reply,
+      'application/json',
+      'classpad-backup.json',
+      JSON.stringify(exportJson(ctx), null, 2),
+    ),
+  );
+  app.get(`${api}/export/markdown`, async (_req, reply) =>
+    download(reply, 'application/zip', 'classpad-notes.zip', await exportMarkdownVault(ctx)),
+  );
+  app.get(`${api}/export/report`, async (req, reply) => {
+    const { hide } = z.object({ hide: z.enum(['0', '1']).default('0') }).parse(req.query);
+    return reply
+      .header('content-type', 'text/html; charset=utf-8')
+      .header('x-content-type-options', 'nosniff')
+      .send(gradeReportHtml(ctx, { hideGrades: hide === '1' }));
   });
 
   if (opts.dev) {

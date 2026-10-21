@@ -1,0 +1,29 @@
+{
+  "name": "@classpad/importers",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b"
+  },
+  "dependencies": {
+    "@classpad/grades": "*",
+    "@classpad/shared": "*",
+    "adm-zip": "^0.6.1",
+    "ical.js": "^2.2.1",
+    "papaparse": "^5.7.0"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/papaparse": "^5.5.2"
+  }
+}

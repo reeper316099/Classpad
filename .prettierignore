@@ -3,3 +3,5 @@ dist
 coverage
 private-fixtures
 package-lock.json
+fixtures/synthetic/notion-export
+fixtures/synthetic/notion-export.expected.json

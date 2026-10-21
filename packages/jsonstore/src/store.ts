@@ -109,13 +109,13 @@ export class JsonStore extends EventEmitter {
     }
   }
 
-  private async rawWrite(rel: string, text: string): Promise<void> {
+  private async rawWrite(rel: string, text: string | Buffer): Promise<void> {
     const abs = this.resolve(rel);
     await fs.mkdir(path.dirname(abs), { recursive: true });
     const tmp = `${abs}.${process.pid}.${randomBytes(4).toString('hex')}.tmp`;
     const fh = await fs.open(tmp, 'w');
     try {
-      await fh.writeFile(text, 'utf8');
+      await fh.writeFile(text);
       await fh.sync();
     } finally {
       await fh.close();
@@ -136,7 +136,7 @@ export class JsonStore extends EventEmitter {
       await fs.rm(tmp, { force: true });
       throw e;
     }
-    this.selfWrites.set(abs, sha(text));
+    this.selfWrites.set(abs, sha(text.toString()));
   }
 
   private async rawRemove(rel: string): Promise<void> {
@@ -159,6 +159,20 @@ export class JsonStore extends EventEmitter {
 
   writeText(rel: string, text: string): Promise<void> {
     return this.withLocks([rel], () => this.rawWrite(rel, text));
+  }
+
+  /** Atomically write raw bytes (attachments). */
+  writeBinary(rel: string, data: Buffer): Promise<void> {
+    return this.withLocks([rel], () => this.rawWrite(rel, data));
+  }
+
+  async readBinary(rel: string): Promise<Buffer | null> {
+    try {
+      return await fs.readFile(this.resolve(rel));
+    } catch (e) {
+      if (isNotFound(e)) return null;
+      throw new StoreError(`cannot read ${rel}: ${(e as Error).message}`, 'IO', rel);
+    }
   }
 
   remove(rel: string): Promise<void> {

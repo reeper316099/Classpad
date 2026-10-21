@@ -19,7 +19,9 @@
     "test:watch": "vitest",
     "guard": "node scripts/guard-private.mjs",
     "build": "tsc -b",
-    "dev:server": "tsc -b && node packages/server/dist/dev.js"
+    "dev:server": "tsc -b && node packages/server/dist/dev.js",
+    "fixtures:generate": "node scripts/generate-fixtures.mjs",
+    "fixtures:check-leak": "node scripts/check-fixture-leak.mjs"
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/guard-private.mjs"

@@ -17,15 +17,17 @@
   },
   "dependencies": {
     "@classpad/grades": "*",
+    "@classpad/importers": "*",
     "@classpad/jsonstore": "*",
     "@classpad/shared": "*",
+    "adm-zip": "^0.6.1",
     "fastify": "^5.12.7",
-    "gray-matter": "^4.0.3",
     "minisearch": "^7.2.0",
     "zod": "^3.23.8",
     "zod-to-json-schema": "^3.25.2"
   },
   "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^26.6.5"
   }
 }

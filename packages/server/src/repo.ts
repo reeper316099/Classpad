@@ -51,6 +51,11 @@ export class Repo<T extends Base> implements Collection<T> {
     return this.spec.location.endsWith('.json');
   }
 
+  /** The entity schema, for validating restored backup entries. */
+  schemaForRestore(): ZodType<T> {
+    return this.spec.schema;
+  }
+
   owns(rel: string): boolean {
     return this.isFile()
       ? rel === this.spec.location
@@ -182,6 +187,22 @@ export class Repo<T extends Base> implements Collection<T> {
       this.spec.validate?.(e);
       await this.commit([e], []);
       this.bus.publish({ kind: 'updated', collection: this.name, entityId: id });
+      return e;
+    });
+  }
+
+  /** Insert or replace a whole entity (used by import/undo/backup restore). Keeps id and timestamps. */
+  put(entity: T): Promise<T> {
+    return this.enqueue(async () => {
+      const e = this.spec.schema.parse(entity);
+      this.spec.validate?.(e);
+      const existed = this.items.has(e.id);
+      await this.commit([e], []);
+      this.bus.publish({
+        kind: existed ? 'updated' : 'created',
+        collection: this.name,
+        entityId: e.id,
+      });
       return e;
     });
   }

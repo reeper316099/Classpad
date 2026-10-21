@@ -78,6 +78,8 @@ export const AssignmentSchema = z.object({
   categoryId: z.string().optional(),
   status: StatusSchema.default('not_started'),
   priority: PrioritySchema.default('mid'),
+  /** Original display label (may include emoji) from an import. */
+  priorityLabel: z.string().optional(),
   due: z.string().optional(),
   weight: z.number().min(0).max(100).optional(),
   pointsPossible: z.number().positive().optional(),
@@ -143,6 +145,16 @@ export const StudySessionSchema = z.object({
   kind: z.enum(['pomodoro', 'manual']).default('manual'),
 });
 
+export const AttachmentSchema = z.object({
+  ...base,
+  filename: z.string().min(1),
+  mime: z.string(),
+  size: z.number().nonnegative(),
+  hash: z.string(),
+  /** Path relative to the data directory, e.g. attachments/<hash>.pdf */
+  path: z.string(),
+});
+
 export const LetterCutoffSchema = z.object({
   letter: z.string(),
   min: z.number(),
@@ -191,6 +203,7 @@ export const GpaScaleSchema = z.object({
   notes: z.string().optional(),
 });
 
+export type Attachment = z.infer<typeof AttachmentSchema>;
 export type Semester = z.infer<typeof SemesterSchema>;
 export type ClassEntity = z.infer<typeof ClassSchema>;
 export type Assignment = z.infer<typeof AssignmentSchema>;

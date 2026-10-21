@@ -1,11 +1,13 @@
 import { JsonStore } from '@classpad/jsonstore';
 import {
   AssignmentSchema,
+  AttachmentSchema,
   ClassSchema,
   ReadingSchema,
   SemesterSchema,
   TaskSchema,
   type Assignment,
+  type Attachment,
   type ClassEntity,
   type Reading,
   type Semester,
@@ -30,6 +32,7 @@ export interface Context {
   tasks: Repo<Task>;
   readings: Repo<Reading>;
   notes: NoteRepo;
+  attachments: Repo<Attachment>;
   grading: GradingService;
   search: SearchIndex;
   searchDocs(): SearchDoc[];
@@ -107,9 +110,15 @@ export async function createContext(
     location: 'data/readings/readings.json',
     fileFor: () => 'data/readings/readings.json',
   });
+  const attachments = new Repo<Attachment>(store, bus, {
+    name: 'attachments',
+    schema: AttachmentSchema as never,
+    location: 'data/attachments.json',
+    fileFor: () => 'data/attachments.json',
+  });
   const notes = new NoteRepo(store, bus, (id) => (id ? classes.get(id)?.slug : undefined));
 
-  for (const r of [semesters, classes, assignments, tasks, readings]) await r.load();
+  for (const r of [semesters, classes, assignments, tasks, readings, attachments]) await r.load();
   await notes.load();
 
   const grading = new GradingService({
@@ -287,6 +296,7 @@ export async function createContext(
     tasks,
     readings,
     notes,
+    attachments,
     grading,
     search,
     searchDocs,
