@@ -6,6 +6,7 @@ import { App } from './App.js';
 import './styles/base.css';
 import './styles/components.css';
 import './styles/markdown.css';
+import './styles/editor.css';
 import { applyAppearance, useUi } from './lib/store.js';
 
 applyAppearance(useUi.getState());

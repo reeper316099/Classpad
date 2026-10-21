@@ -1,0 +1,595 @@
+/* The note editor: Markdown that looks finished while you type, in one view. */
+.cm-host .cm-editor {
+  --lp-code-bg: color-mix(in oklab, var(--text) 5.5%, transparent);
+  --lp-tint: color-mix(in oklab, var(--accent) 10%, transparent);
+  font-size: 1rem;
+}
+.cm-host .cm-scroller {
+  font-family: var(--font-sans);
+  line-height: 1.7;
+  padding: 28px 0 0;
+}
+.cm-host .cm-content {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 40px 42vh 64px;
+  caret-color: var(--text);
+}
+.cm-host .cm-line {
+  padding: 0 2px;
+}
+.cm-host .cm-cursor {
+  border-left: 2px solid var(--text);
+}
+
+/* paragraph rhythm: a blank line is a small gap, like the space between Notion blocks */
+.cm-host .cm-lp-blank {
+  line-height: 0.7em;
+  min-height: 0;
+}
+
+/* headings */
+.cm-host .cm-lp-h {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.cm-host .cm-lp-h1 {
+  font-size: 1.95em;
+  line-height: 1.25;
+  padding-top: 0.7em;
+}
+.cm-host .cm-lp-h2 {
+  font-size: 1.55em;
+  line-height: 1.3;
+  padding-top: 0.55em;
+}
+.cm-host .cm-lp-h3 {
+  font-size: 1.25em;
+  line-height: 1.35;
+  padding-top: 0.4em;
+}
+.cm-host .cm-lp-h4,
+.cm-host .cm-lp-h5,
+.cm-host .cm-lp-h6 {
+  font-size: 1.05em;
+  padding-top: 0.3em;
+}
+.cm-host .cm-lp-toggle.cm-lp-h1 {
+  padding-top: 0.35em;
+}
+.cm-host .cm-lp-toggle.cm-lp-h2,
+.cm-host .cm-lp-toggle.cm-lp-h3 {
+  padding-top: 0.2em;
+}
+.cm-host .cm-lp-h:first-child {
+  padding-top: 0;
+}
+
+/* marks the caret is inside of: dim, so you see what you are editing */
+.cm-host .cm-lp-syntax {
+  color: var(--text-muted);
+  opacity: 0.75;
+  font-weight: 400;
+  font-style: normal;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+}
+.cm-host .cm-lp-strong {
+  font-weight: 700;
+}
+.cm-host .cm-lp-em {
+  font-style: italic;
+}
+.cm-host .cm-lp-strike {
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+.cm-host .cm-lp-icode,
+.cm-host .cm-lp-math-src {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  background: var(--lp-code-bg);
+  border-radius: 5px;
+  padding: 0.12em 0.34em;
+  color: var(--secondary);
+}
+.cm-host .cm-lp-link {
+  color: var(--info);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.cm-host .cm-lp-wiki,
+.cm-host .cm-lp-file {
+  color: var(--primary);
+  background: var(--lp-tint);
+  border-radius: 6px;
+  padding: 0.04em 0.4em;
+  cursor: pointer;
+  font-weight: 500;
+}
+.cm-host .cm-lp-wiki-raw {
+  color: var(--primary);
+}
+.cm-host .cm-lp-file {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.cm-host .cm-lp-cloze {
+  background: color-mix(in oklab, var(--warning) 20%, transparent);
+  border-bottom: 2px solid var(--warning);
+  border-radius: 3px;
+  padding: 0 0.15em;
+}
+
+/* lists: bullets and checkboxes are real widgets, wrapped lines hang under the text */
+.cm-host .cm-lp-li,
+.cm-host .cm-lp-li-cont {
+  padding-left: calc(var(--lp-list, 0px) + var(--lp-toggle, 0px));
+}
+.cm-host .cm-lp-li {
+  text-indent: -1.5em;
+}
+.cm-host .cm-lp-li-active {
+  padding-left: var(--lp-toggle, 0px);
+  text-indent: 0;
+}
+.cm-host .cm-lp-bullet,
+.cm-host .cm-lp-number,
+.cm-host .cm-lp-check-wrap {
+  display: inline-block;
+  width: 1.5em;
+  text-indent: 0;
+  text-align: center;
+  color: var(--text);
+  user-select: none;
+}
+.cm-host .cm-lp-number {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  padding-right: 0.4em;
+  box-sizing: border-box;
+}
+.cm-host .cm-lp-check {
+  display: inline-block;
+  box-sizing: border-box;
+  width: 1.05em;
+  height: 1.05em;
+  margin: 0;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 4px;
+  vertical-align: -0.12em;
+  line-height: 1;
+  font-size: 0.85em;
+  cursor: pointer;
+  background: transparent;
+  color: var(--on-primary);
+  text-align: center;
+  transition: background 0.12s var(--ease);
+}
+.cm-host .cm-lp-check.on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.cm-host .cm-lp-check:hover {
+  border-color: var(--primary);
+}
+.cm-host .cm-lp-done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+/* quotes and callouts */
+.cm-host .cm-lp-quote {
+  border-left: 3px solid var(--text);
+  padding-left: 14px;
+  margin-left: 2px;
+}
+.cm-host .cm-lp-callout {
+  border-left: 0;
+  background: color-mix(in oklab, var(--text) 6%, transparent);
+  padding: 0.15em 14px;
+  margin-left: 0;
+}
+.cm-host .cm-lp-hr {
+  display: block;
+  height: 0;
+  border-top: 1px solid var(--border-strong);
+  margin: 0.9em 0;
+}
+
+/* code blocks */
+.cm-host .cm-lp-code-line {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  line-height: 1.6;
+  background: var(--lp-code-bg);
+  padding-left: 16px;
+  padding-right: 16px;
+}
+.cm-host .cm-lp-code-open {
+  border-radius: 10px 10px 0 0;
+}
+.cm-host .cm-lp-code-close {
+  border-radius: 0 0 10px 10px;
+}
+.cm-host .cm-lp-fence {
+  font-size: 0;
+  line-height: 0;
+  padding-top: 0;
+}
+.cm-host .cm-lp-fence-end {
+  font-size: 0;
+  line-height: 0;
+  height: 10px;
+  min-height: 10px;
+}
+.cm-host .cm-lp-fence-raw {
+  color: var(--text-muted);
+}
+.cm-host .cm-lp-fence-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 30px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  line-height: 30px;
+  color: var(--text-muted);
+  text-indent: 0;
+}
+.cm-host .cm-lp-fence-copy {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.12s var(--ease);
+}
+.cm-host .cm-lp-code-open:hover .cm-lp-fence-copy,
+.cm-host .cm-lp-fence-copy:focus-visible {
+  opacity: 1;
+}
+.cm-host .cm-lp-fence-copy:hover {
+  background: color-mix(in oklab, var(--text) 8%, transparent);
+  color: var(--text);
+}
+
+/* toggles */
+.cm-host .cm-lp-intoggle {
+  padding-left: var(--lp-toggle, 0px);
+}
+.cm-host .cm-lp-toggle {
+  font-weight: 500;
+}
+.cm-host .cm-lp-toggle.cm-lp-h {
+  font-weight: 700;
+}
+.cm-host .cm-lp-chevron {
+  display: inline-block;
+  width: 1.5em;
+  text-align: center;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.15s var(--ease);
+  font-size: 0.8em;
+  vertical-align: 0.1em;
+}
+.cm-host .cm-lp-chevron.open {
+  transform: rotate(90deg);
+}
+.cm-host .cm-lp-chevron:hover {
+  color: var(--text);
+}
+.cm-host .cm-lp-hidden {
+  height: 0;
+  overflow: hidden;
+}
+
+/* equations, tables, images */
+.cm-host .cm-lp-math-block {
+  display: block;
+  text-align: center;
+  padding: 0.5em 0;
+  overflow-x: auto;
+  cursor: text;
+}
+.cm-host .cm-lp-math-raw {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--lp-code-bg);
+  padding-left: 16px;
+}
+.cm-host .cm-lp-table-wrap {
+  overflow-x: auto;
+  margin: 0.3em 0;
+  cursor: text;
+}
+.cm-host .cm-lp-table {
+  border-collapse: collapse;
+  min-width: 50%;
+}
+.cm-host .cm-lp-table th,
+.cm-host .cm-lp-table td {
+  border: 1px solid var(--border-strong);
+  padding: 6px 12px;
+  text-align: left;
+  min-width: 80px;
+  vertical-align: top;
+}
+.cm-host .cm-lp-table th {
+  background: color-mix(in oklab, var(--text) 5%, transparent);
+  font-weight: 600;
+}
+.cm-host .cm-lp-table-raw {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--lp-code-bg);
+  white-space: pre;
+}
+.cm-host .cm-lp-img {
+  display: block;
+  margin: 0.4em 0;
+  cursor: text;
+}
+.cm-host .cm-lp-img-el {
+  max-width: 100%;
+  max-height: 560px;
+  border-radius: 8px;
+  display: block;
+}
+.cm-host .cm-lp-img-off {
+  padding: 8px 12px;
+  background: var(--lp-code-bg);
+  color: var(--text-muted);
+  border-radius: 8px;
+  font-size: 0.9em;
+}
+
+/* selection and tooltips */
+.cm-host .cm-selectionBackground,
+.cm-host .cm-focused .cm-selectionBackground {
+  background: color-mix(in oklab, var(--accent) 28%, transparent) !important;
+}
+.cm-host .cm-activeLine {
+  background: transparent;
+}
+
+/* hover handles: + to add a block, the grip to drag or open the block menu */
+.cm-host .lp-handle {
+  position: absolute;
+  z-index: 4;
+  display: none;
+  align-items: center;
+  gap: 1px;
+  height: 24px;
+}
+.cm-host .lp-plus,
+.cm-host .lp-grip {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: grab;
+  opacity: 0.8;
+}
+.cm-host .lp-plus {
+  cursor: pointer;
+  font-size: 18px;
+}
+.cm-host .lp-grip {
+  font-size: 12px;
+  letter-spacing: -2px;
+  touch-action: none;
+}
+.cm-host .lp-plus:hover,
+.cm-host .lp-grip:hover,
+.cm-host .lp-handle.dragging .lp-grip {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+  color: var(--text);
+  opacity: 1;
+}
+.cm-host .lp-drop {
+  position: absolute;
+  display: none;
+  height: 3px;
+  background: var(--primary);
+  border-radius: 2px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* menus (grip menu, right-click, selection toolbar) */
+.lp-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 232px;
+  max-width: 320px;
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  padding: 6px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  color: var(--text);
+  outline: none;
+  font-size: 0.9rem;
+}
+.lp-menu-section {
+  padding: 8px 8px 4px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.lp-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+.lp-menu-item.active {
+  background: color-mix(in oklab, var(--accent) 16%, transparent);
+}
+.lp-menu-item.danger {
+  color: var(--danger);
+}
+.lp-menu-item.disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.lp-menu-glyph {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.lp-menu-label {
+  flex: 1;
+}
+.lp-menu-shortcut {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+.lp-bubble {
+  position: fixed;
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  box-shadow: var(--shadow-lg);
+}
+.lp-bub-btn {
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.lp-bub-btn:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+}
+.lp-bub-btn.i {
+  font-style: italic;
+}
+.lp-bub-btn.s {
+  text-decoration: line-through;
+}
+.lp-bub-btn.mono {
+  font-family: var(--font-mono);
+}
+.lp-bub-turn {
+  font-weight: 500;
+}
+.lp-bub-sep {
+  width: 1px;
+  height: 18px;
+  background: var(--border-strong);
+  margin: 0 3px;
+}
+
+/* the "/" menu */
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash {
+  padding: 6px;
+  min-width: 320px;
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash > ul {
+  max-height: 380px;
+  font-family: var(--font-sans);
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash > ul > completion-section {
+  display: block;
+  padding: 8px 8px 4px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border: 0;
+  opacity: 1;
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash > ul > li.lp-slash-opt {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  line-height: 1.3;
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash > ul > li.lp-slash-opt[aria-selected] {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  color: var(--text);
+}
+.lp-slash-glyph {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--surface-2);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash .cm-completionLabel {
+  font-weight: 500;
+  order: 2;
+}
+.cm-editor .cm-tooltip.cm-tooltip-autocomplete.lp-slash .cm-completionDetail {
+  order: 3;
+  margin-left: auto;
+  font-style: normal;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+.lp-slash-hint {
+  display: none;
+}
+
+.cm-host .cm-lp-fence-lang {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  padding: 2px 8px;
+  margin-left: -8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.cm-host .cm-lp-fence-lang:hover {
+  background: color-mix(in oklab, var(--text) 8%, transparent);
+  color: var(--text);
+}

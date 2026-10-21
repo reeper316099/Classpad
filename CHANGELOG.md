@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Note editor: one view, like Notion
+
+- Edit and preview are now a single live view. The page looks finished as you type; Markdown syntax shows only where your caret is. The file on disk is never reshaped (opening a note leaves it byte-for-byte unchanged).
+- Type `/` for blocks (text, headings, to-do, lists, toggle list and toggle headings, quote, callout, code, equation, table, divider, image or file). Hover handles to add a block or drag to reorder; right-click or click the grip for Turn into, Duplicate, Move and Delete; select text for a floating formatting toolbar.
+- Enter starts a new block; lists continue and step out the way you expect; Tab nests and moves between table cells; `[] ` becomes a to-do and a typed code fence closes itself.
+- Code blocks have a language picker and a Copy button. Equations, tables, images and attachments render in place.
+- The tidy header: title, class/date/tags, save status and a single `⋯` menu (outline, focus mode, source mode, flashcard from selection, delete). See [docs/EDITOR.md](docs/EDITOR.md).
+
 ### Notes
 
 - Collapsible toggles like Notion's: toggle list and toggle headings 1, 2 and 3 (stored as portable `<details>`, nestable). Insert them from the new **Toggle** menu in the note toolbar.

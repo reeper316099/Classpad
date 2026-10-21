@@ -47,28 +47,32 @@ test('class page tabs are real, and notes get code blocks and toggles', async ()
   await dlg.getByLabel('Title').fill('E2E Toolbar Note');
   await dlg.getByRole('button', { name: 'Create note' }).click();
 
-  // editor: a code block in Python and a toggle heading
+  // the editor is one view: pick blocks from the "/" menu and see them as you type
   const editor = page.locator('.cm-content');
+  const menu = page.locator('.cm-tooltip.lp-slash li[aria-selected]');
   await editor.click();
+  await page.keyboard.type('/code');
+  await expect(menu).toContainText('Code');
+  await page.waitForTimeout(150);
+  await page.keyboard.press('Enter');
   await page.keyboard.type('print("hi")');
-  await page.keyboard.press('ControlOrMeta+a');
-  await page.getByLabel('Code block language').selectOption('python');
-  await page.getByRole('button', { name: /^Code block/ }).click();
   await page.keyboard.press('ControlOrMeta+End');
   await page.keyboard.press('Enter');
-  await page.getByLabel('Insert a toggle').selectOption('2');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('/toggle h');
+  await expect(page.locator('.cm-tooltip.lp-slash li')).toHaveCount(3);
+  await page.waitForTimeout(250);
+  await page.keyboard.press('ArrowDown'); // Toggle heading 2
+  await page.keyboard.press('Enter');
   await page.keyboard.type('My dropdown');
-  await expect(editor).toContainText('```python');
-  await expect(editor).toContainText('<h2>');
+  await page.keyboard.press('ControlOrMeta+Home');
 
-  await page.getByRole('button', { name: 'Preview', exact: true }).click();
-  await expect(page.locator('.md pre code')).toContainText('print("hi")');
-  const summary = page.locator('.md details > summary');
-  await expect(summary).toHaveText('My dropdown');
-  await expect(summary).toHaveClass(/toggle-h2/);
-  await expect(page.locator('.md details')).not.toHaveAttribute('open', '');
-  await summary.click();
-  await expect(page.locator('.md details')).toHaveAttribute('open', '');
+  await expect(page.locator('.cm-lp-code-line').first()).toBeVisible();
+  const summary = page.locator('.cm-lp-toggle.cm-lp-h2');
+  await expect(summary).toContainText('My dropdown');
+  await expect(page.locator('.cm-lp-chevron')).toHaveAttribute('aria-expanded', 'true'); // new toggles start open
+  await page.locator('.cm-lp-chevron').click();
+  await expect(page.locator('.cm-lp-chevron')).toHaveAttribute('aria-expanded', 'false');
 
   // back on the class: the note is listed under its class
   await page.locator('aside.sidebar').getByRole('link', { name: 'Classes', exact: true }).click();

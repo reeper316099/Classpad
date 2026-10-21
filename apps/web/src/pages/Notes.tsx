@@ -1,17 +1,9 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  Suspense,
-  lazy,
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Icon } from '../components/Icon.js';
-import { Markdown, slugHeading } from '../components/Markdown.js';
+import { slugHeading } from '../components/Markdown.js';
+import { FloatingMenu, type MenuItem } from '../components/Menu.js';
 import { MarkdownEditor, type EditorHandle } from '../components/MarkdownEditor.js';
 import { Empty, Skeleton, classStyle } from '../components/ui.js';
 import { get, patch, post } from '../lib/api.js';
@@ -26,20 +18,17 @@ import {
   useSelectedSemester,
 } from '../lib/hooks.js';
 import { outline, wordStats } from '../lib/notes.js';
-import { CODE_LANGUAGES } from '../lib/noteBlocks.js';
 import { useUi } from '../lib/store.js';
 import type { ClassEntity, Note, SearchHit } from '../lib/types.js';
 
 const PdfViewer = lazy(() =>
   import('../components/PdfViewer.js').then((m) => ({ default: m.PdfViewer })),
 );
-type Mode = 'edit' | 'split' | 'preview';
-const readMode = (): Mode => {
+const readSource = () => {
   try {
-    const v = localStorage.getItem('classpad-notes-view');
-    return v === 'edit' || v === 'preview' ? v : 'split';
+    return localStorage.getItem('classpad-notes-source') === '1';
   } catch {
-    return 'split';
+    return false;
   }
 };
 
@@ -314,26 +303,25 @@ function NoteEditor({
   const { data: assignments = [] } = useAssignments();
   const remove = useDeleteWithUndo<Note>('notes', (n) => `“${n.title}”`);
   const editor = useRef<EditorHandle>(null);
-  const previewBox = useRef<HTMLDivElement>(null);
   const modules = useUi((s) => s.modules);
-  const [codeLang, setCodeLang] = useState('');
   const [draft, setDraft] = useState<Draft>(() => toDraft(note));
   const [status, setStatus] = useState<'saved' | 'saving' | 'dirty' | 'error'>('saved');
   const [conflict, setConflict] = useState(false);
-  const [mode, setModeState] = useState<Mode>(readMode);
+  const [source, setSourceState] = useState(readSource);
   const [pdf, setPdf] = useState<{ hash: string; name: string } | null>(null);
   const [workW, workRef] = useElementWidth<HTMLDivElement>();
   const [side, setSide] = useState(true);
+  const [more, setMore] = useState<{ x: number; y: number } | null>(null);
   const [tagText, setTagText] = useState('');
   const draftRef = useRef(draft);
   draftRef.current = draft;
   const base = useRef(note.updatedAt);
   const dirty = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
-  const setMode = (m: Mode) => {
-    setModeState(m);
+  const setSource = (v: boolean) => {
+    setSourceState(v);
     try {
-      localStorage.setItem('classpad-notes-view', m);
+      localStorage.setItem('classpad-notes-source', v ? '1' : '0');
     } catch {
       /* optional */
     }
@@ -412,7 +400,6 @@ function NoteEditor({
   }, [note]);
 
   const cls = classes.find((c) => c.id === draft.classId);
-  const deferred = useDeferredValue(draft.markdown);
   const heads = useMemo(() => outline(draft.markdown), [draft.markdown]);
   const stats = useMemo(() => wordStats(draft.markdown), [draft.markdown]);
   const { data: backlinks = [] } = useQuery({
@@ -454,24 +441,16 @@ function NoteEditor({
     a.download = name;
     a.click();
   };
-  const scrollPreview = (slug: string) =>
-    previewBox.current
-      ?.querySelector(`#h-${CSS.escape(slug)}`)
-      ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   useEffect(() => {
     const h = sp.get('h');
     if (h) {
       const t = setTimeout(() => {
-        scrollPreview(h);
+        editor.current?.goToHeading(h);
         setSp({}, { replace: true });
       }, 250);
       return () => clearTimeout(t);
     }
   }, [sp]); // eslint-disable-line react-hooks/exhaustive-deps
-  const gotoHeading = (h: { line: number; text: string }) => {
-    if (effMode !== 'preview') editor.current?.goToLine(h.line);
-    if (effMode !== 'edit') scrollPreview(slugHeading(h.text));
-  };
 
   const addTag = () => {
     const t = tagText.trim().replace(/^#/, '').toLowerCase().replace(/\s+/g, '-');
@@ -485,26 +464,113 @@ function NoteEditor({
   const linkable = assignments.filter(
     (a) => (!draft.classId || a.classId === draft.classId) && !draft.assignmentIds.includes(a.id),
   );
-  // Only show what fits: split needs ~640px for the panes, the side panel ~260px more.
+  // Only show what fits: the side panel needs ~260px, a PDF pane another ~420px.
   const sideOk = side && !focus && workW >= 780;
   const paneW = workW - (sideOk ? 262 : 0);
-  const effMode: Mode = mode === 'split' && (paneW < 640 || (pdf && paneW < 960)) ? 'edit' : mode;
-  const showEditor = effMode !== 'preview';
-  const showPreview = effMode !== 'edit';
-  const cols = [showEditor, showPreview, !!pdf].filter(Boolean).length;
+  const cols = pdf && paneW >= 760 ? 2 : 1;
 
-  const tb = (label: string, title: string, run: () => void) => (
-    <button key={label} className="btn ghost sm tb" title={title} aria-label={title} onClick={run}>
-      {label}
-    </button>
-  );
+  const moreItems: MenuItem[] = [
+    {
+      id: 'side',
+      label: 'Outline & links',
+      glyph: '☰',
+      section: 'View',
+      checked: side,
+      onSelect: () => setSide(!side),
+    },
+    {
+      id: 'focus',
+      label: focus ? 'Leave focus mode' : 'Focus mode',
+      glyph: '◎',
+      checked: focus,
+      onSelect: () => setFocus(!focus),
+    },
+    {
+      id: 'source',
+      label: 'Source mode (raw Markdown)',
+      glyph: '{ }',
+      checked: source,
+      onSelect: () => setSource(!source),
+    },
+    ...(modules.flashcards
+      ? [
+          {
+            id: 'card',
+            label: 'Flashcard from selection',
+            glyph: '🃏',
+            section: 'Note',
+            onSelect: () => {
+              const t = editor.current?.getSelection().trim();
+              if (!t) return useUi.getState().toast('Select some text first');
+              void post('/flashcards', {
+                front: t,
+                back: '',
+                noteId: note.id,
+                classId: draft.classId || null,
+              }).then(() => useUi.getState().toast('Flashcard added. Add the back in Flashcards.'));
+            },
+          } satisfies MenuItem,
+        ]
+      : []),
+    {
+      id: 'delete',
+      label: 'Delete note',
+      glyph: '🗑',
+      danger: true,
+      section: 'Note',
+      onSelect: async () => {
+        await remove(note);
+        nav('/notes');
+      },
+    },
+  ];
+
   return (
     <div className="note-editor" style={classStyle(cls?.color)}>
-      <header className="note-head card">
-        <div className="row">
-          <button className="btn ghost sm back-btn" onClick={() => nav('/notes')}>
-            ← Notes
-          </button>
+      <div className="note-top row">
+        <button className="btn ghost sm back-btn" onClick={() => nav('/notes')}>
+          ← Notes
+        </button>
+        {cls && <span className="muted small note-crumb">/ {cls.name}</span>}
+        <span className="grow" />
+        <span
+          className={`muted small note-status ${status === 'error' ? 'bad' : ''}`}
+          role="status"
+        >
+          {status === 'saved'
+            ? 'Saved'
+            : status === 'saving'
+              ? 'Saving…'
+              : status === 'error'
+                ? 'Not saved'
+                : 'Unsaved changes'}
+        </span>
+        <button
+          className="btn ghost sm icon"
+          aria-label="Note options"
+          aria-haspopup="menu"
+          aria-expanded={!!more}
+          onClick={(e) => {
+            const r = e.currentTarget.getBoundingClientRect();
+            setMore({ x: r.right - 250, y: r.bottom + 4 });
+          }}
+        >
+          <span aria-hidden="true" style={{ fontSize: 18, lineHeight: 1 }}>
+            ⋯
+          </span>
+        </button>
+        {more && (
+          <FloatingMenu
+            at={more}
+            items={moreItems}
+            label="Note options"
+            onClose={() => setMore(null)}
+          />
+        )}
+      </div>
+
+      {!focus && (
+        <header className="note-head">
           <input
             className="note-title"
             aria-label="Note title"
@@ -512,39 +578,7 @@ function NoteEditor({
             onChange={(e) => change({ title: e.target.value })}
             placeholder="Untitled"
           />
-          <span
-            className={`badge ${status === 'error' ? 'danger' : status === 'saved' ? 'success' : ''}`}
-            role="status"
-          >
-            {status === 'saved'
-              ? 'Saved'
-              : status === 'saving'
-                ? 'Saving…'
-                : status === 'error'
-                  ? 'Not saved'
-                  : 'Unsaved changes'}
-          </span>
-          <button
-            className="btn ghost sm"
-            onClick={() => setFocus(!focus)}
-            aria-pressed={focus}
-            title="Focus mode (Esc to exit)"
-          >
-            {focus ? 'Exit focus' : 'Focus'}
-          </button>
-          <button
-            className="btn ghost sm danger icon"
-            aria-label="Delete note"
-            onClick={async () => {
-              await remove(note);
-              nav('/notes');
-            }}
-          >
-            <Icon name="trash" size={16} />
-          </button>
-        </div>
-        {!focus && (
-          <div className="row tight">
+          <div className="row tight note-props">
             <select
               className="select sm"
               style={{ width: 'auto' }}
@@ -602,140 +636,55 @@ function NoteEditor({
               ))}
             </datalist>
           </div>
-        )}
-        {conflict && (
-          <div className="badge warning row tight" role="alert">
-            This note changed on disk while you were editing.{' '}
-            <button
-              className="btn sm"
-              onClick={() => {
-                base.current = note.updatedAt;
-                dirty.current = false;
-                setDraft(toDraft(note));
-                setConflict(false);
-                setStatus('saved');
-              }}
-            >
-              Load disk version
-            </button>
-            <button
-              className="btn sm"
-              onClick={() => {
-                base.current = note.updatedAt;
-                setConflict(false);
-                change({});
-              }}
-            >
-              Keep mine
-            </button>
-          </div>
-        )}
-      </header>
-
-      <div className="row note-toolbar">
-        <div className="segmented" role="group" aria-label="View">
-          {(['edit', 'split', 'preview'] as Mode[]).map((m) => (
-            <button key={m} aria-pressed={mode === m} onClick={() => setMode(m)}>
-              {m[0]!.toUpperCase() + m.slice(1)}
-            </button>
-          ))}
-        </div>
-        {showEditor && (
-          <div className="row tight">
-            {tb('B', 'Bold (Ctrl/⌘ B)', () => editor.current?.wrap('**'))}
-            {tb('I', 'Italic (Ctrl/⌘ I)', () => editor.current?.wrap('*'))}
-            {tb('<>', 'Inline code', () => editor.current?.wrap('`'))}
-            {tb('{ }', 'Code block (uses the language chosen next to it)', () =>
-              editor.current?.codeBlock(codeLang),
-            )}
-            <select
-              className="select sm tb-select"
-              aria-label="Code block language"
-              title="Code block language"
-              value={codeLang}
-              onChange={(e) => setCodeLang(e.target.value)}
-            >
-              {CODE_LANGUAGES.map(([k, label]) => (
-                <option key={k} value={k}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <select
-              className="select sm tb-select"
-              aria-label="Insert a toggle"
-              title="Insert a collapsible toggle"
-              value=""
-              onChange={(e) => {
-                if (e.target.value) editor.current?.toggle(Number(e.target.value) as 0 | 1 | 2 | 3);
-              }}
-            >
-              <option value="">Toggle ▾</option>
-              <option value="0">Toggle list</option>
-              <option value="1">Toggle heading 1</option>
-              <option value="2">Toggle heading 2</option>
-              <option value="3">Toggle heading 3</option>
-            </select>
-            {tb('Σ', 'Inline math', () => editor.current?.wrap('$'))}
-            {tb('☑', 'Task list', () => editor.current?.prefixLines('- [ ] '))}
-            {tb('❝', 'Quote', () => editor.current?.prefixLines('> '))}
-            {tb('[[ ]]', 'Link to a note', () => editor.current?.wrap('[[', ']]'))}
-            {tb('{{c}}', 'Cloze deletion for flashcards', () => editor.current?.cloze())}
-            {modules.flashcards &&
-              tb('Card', 'Make a flashcard from the selected text (front = selection)', () => {
-                const t = editor.current?.getSelection().trim();
-                if (!t) return useUi.getState().toast('Select some text first');
-                void post('/flashcards', {
-                  front: t,
-                  back: '',
-                  noteId: note.id,
-                  classId: draft.classId || null,
-                }).then(() =>
-                  useUi.getState().toast('Flashcard added. Add the back in Flashcards.'),
-                );
-              })}
-          </div>
-        )}
-        <span className="grow" />
-        <span className="muted small" aria-label="Word count">
-          {effMode !== mode ? 'Window too narrow for split view · ' : ''}
-          {stats.words} words · {stats.minutes ? `${stats.minutes} min read` : '—'}
-        </span>
-        {!focus && (
-          <button className="btn ghost sm" aria-pressed={side} onClick={() => setSide(!side)}>
-            Outline & links
-          </button>
-        )}
-      </div>
+          {conflict && (
+            <div className="badge warning row tight" role="alert">
+              This note changed on disk while you were editing.{' '}
+              <button
+                className="btn sm"
+                onClick={() => {
+                  base.current = note.updatedAt;
+                  dirty.current = false;
+                  setDraft(toDraft(note));
+                  setConflict(false);
+                  setStatus('saved');
+                }}
+              >
+                Load disk version
+              </button>
+              <button
+                className="btn sm"
+                onClick={() => {
+                  base.current = note.updatedAt;
+                  setConflict(false);
+                  change({});
+                }}
+              >
+                Keep mine
+              </button>
+            </div>
+          )}
+        </header>
+      )}
 
       <div className="note-work" ref={workRef}>
         <div
           className="note-body"
-          style={{ gridTemplateColumns: `repeat(${Math.max(cols, 1)}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
         >
-          {showEditor && (
-            <div className="note-pane card editor-pane">
-              <MarkdownEditor
-                ref={editor}
-                value={draft.markdown}
-                onChange={(v) => change({ markdown: v })}
-                getTitles={() => titles.current}
-              />
+          <div className="note-pane card editor-pane">
+            <MarkdownEditor
+              ref={editor}
+              value={draft.markdown}
+              onChange={(v) => change({ markdown: v })}
+              getTitles={() => titles.current}
+              sourceMode={source}
+              onOpenWiki={openWiki}
+              onOpenAttachment={openAttachment}
+            />
+            <div className="note-foot muted small" aria-label="Word count">
+              {stats.words} words · {stats.minutes ? `${stats.minutes} min read` : '—'}
             </div>
-          )}
-          {showPreview && (
-            <div className="note-pane card preview-pane" ref={previewBox}>
-              {deferred.trim() ? (
-                <Markdown
-                  source={deferred}
-                  onWikiLink={openWiki}
-                  onOpenAttachment={openAttachment}
-                />
-              ) : (
-                <p className="muted">Nothing to preview yet.</p>
-              )}
-            </div>
-          )}
+          </div>
           {pdf && (
             <div className="note-pane card">
               <Suspense fallback={<Skeleton h={300} />}>
@@ -756,7 +705,11 @@ function NoteEditor({
                     key={i}
                     className="outline-item"
                     style={{ paddingLeft: 6 + (h.level - 1) * 12 }}
-                    onClick={() => gotoHeading(h)}
+                    onClick={() =>
+                      editor.current?.goToHeading(slugHeading(h.text))
+                        ? undefined
+                        : editor.current?.goToLine(h.line)
+                    }
                   >
                     {h.text}
                   </button>

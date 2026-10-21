@@ -180,6 +180,10 @@ async function boot(): Promise<void> {
     });
     return r.canceled ? null : (r.filePaths[0] ?? null);
   });
+  ipcMain.handle('classpad:paste', (e) => {
+    if (!trusted(e)) throw new Error('untrusted sender');
+    e.sender.paste();
+  });
   ipcMain.handle('classpad:open-report', (e, hide: unknown) => {
     if (!trusted(e)) throw new Error('untrusted sender');
     return openReportWindow(hide === true);

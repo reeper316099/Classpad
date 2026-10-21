@@ -1,42 +1,33 @@
-import {
-  autocompletion,
-  closeBrackets,
-  closeBracketsKeymap,
-  completionKeymap,
-  type CompletionContext,
-} from '@codemirror/autocomplete';
+import { closeBrackets, closeBracketsKeymap, completionKeymap } from '@codemirror/autocomplete';
 import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 import { markdown, markdownKeymap, markdownLanguage } from '@codemirror/lang-markdown';
 import { languages } from '@codemirror/language-data';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
-import { EditorSelection, EditorState, type Extension } from '@codemirror/state';
-import {
-  EditorView,
-  drawSelection,
-  highlightActiveLine,
-  keymap,
-  placeholder,
-} from '@codemirror/view';
+import { Compartment, EditorSelection, EditorState, type Extension } from '@codemirror/state';
+import { EditorView, drawSelection, keymap, placeholder } from '@codemirror/view';
 import { tags as t } from '@lezer/highlight';
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { BubbleBar, EditorMenu, type BubbleState, type MenuState } from './EditorMenus.js';
+import { blockHandles, handleHooks } from '../editor/handle.js';
+import { editorKeys, wrap } from '../editor/keys.js';
+import { liveCallbacks, liveEnabled, livePreview } from '../editor/live.js';
+import { editorActions, slashMenu } from '../editor/slash.js';
 import { uploadForMarkdown } from '../lib/attachments.js';
-import { codeBlock, toggleBlock, type Insert, type ToggleLevel } from '../lib/noteBlocks.js';
+import { slugHeading } from './Markdown.js';
 import { useUi } from '../lib/store.js';
 
 export interface EditorHandle {
   /** Wrap the selection (or insert the pair) e.g. wrap('**') or wrap('$', '$'). */
   wrap(before: string, after?: string): void;
   insert(text: string): void;
-  /** Prefix each selected line, e.g. '- [ ] '. */
-  prefixLines(prefix: string): void;
   cloze(): void;
-  /** Insert a fenced code block (wrapping the selection). */
-  codeBlock(lang: string): void;
-  /** Insert a collapsible toggle: 0 = toggle list, 1-3 = toggle heading. */
-  toggle(level: ToggleLevel): void;
   getSelection(): string;
   goToLine(line: number): void;
+  /** Scroll to the heading whose slug matches (outline clicks, `[[Note#Heading]]` links). */
+  goToHeading(slug: string): boolean;
   focus(): void;
+  /** The underlying view, for menus that act on blocks. */
+  view(): EditorView | null;
 }
 
 interface Props {
@@ -44,9 +35,25 @@ interface Props {
   onChange: (v: string) => void;
   getTitles?: () => string[];
   onCursorLine?: (line: number) => void;
+  /** Show the raw Markdown instead of the live view. */
+  sourceMode?: boolean;
+  onOpenWiki?: (target: string, heading?: string) => void;
+  onOpenAttachment?: (hash: string, ext: string, name: string) => void;
+  /** Called when the view is created or replaced, so menus can attach to it. */
+  onView?: (v: EditorView | null) => void;
 }
 
-const style = HighlightStyle.define([
+/** Token colours for code inside code blocks (always on). */
+const codeStyle = HighlightStyle.define([
+  { tag: [t.keyword, t.operator], color: 'var(--primary)' },
+  { tag: [t.string, t.regexp], color: 'var(--success)' },
+  { tag: [t.number, t.bool, t.atom], color: 'var(--warning)' },
+  { tag: t.comment, color: 'var(--text-muted)', fontStyle: 'italic' },
+  { tag: [t.function(t.variableName), t.className, t.typeName], color: 'var(--info)' },
+]);
+
+/** Extra colouring only for source mode (the live view styles these itself). */
+const sourceStyle = HighlightStyle.define([
   { tag: t.heading, color: 'var(--primary)', fontWeight: '650' },
   { tag: t.strong, fontWeight: '700' },
   { tag: t.emphasis, fontStyle: 'italic' },
@@ -55,111 +62,67 @@ const style = HighlightStyle.define([
   { tag: t.monospace, fontFamily: 'var(--font-mono)', color: 'var(--secondary)' },
   { tag: t.quote, color: 'var(--text-muted)', fontStyle: 'italic' },
   { tag: [t.processingInstruction, t.meta, t.contentSeparator], color: 'var(--text-muted)' },
-  { tag: [t.keyword, t.operator], color: 'var(--primary)' },
-  { tag: [t.string, t.regexp], color: 'var(--success)' },
-  { tag: [t.number, t.bool, t.atom], color: 'var(--warning)' },
-  { tag: t.comment, color: 'var(--text-muted)', fontStyle: 'italic' },
 ]);
 
 const theme = EditorView.theme({
-  '&': {
-    color: 'var(--text)',
-    backgroundColor: 'transparent',
-    height: '100%',
-    fontSize: '0.95rem',
-  },
+  '&': { color: 'var(--text)', backgroundColor: 'transparent', height: '100%' },
   '&.cm-focused': { outline: 'none' },
-  '.cm-scroller': { fontFamily: 'var(--font-sans)', lineHeight: '1.7', padding: '8px 4px' },
-  '.cm-content': { caretColor: 'var(--primary)', padding: '0 12px' },
-  '.cm-cursor': { borderLeftColor: 'var(--primary)', borderLeftWidth: '2px' },
-  '.cm-activeLine': { backgroundColor: 'color-mix(in oklab, var(--accent) 6%, transparent)' },
-  '&.cm-focused .cm-selectionBackground, .cm-selectionBackground': {
-    backgroundColor: 'color-mix(in oklab, var(--accent) 30%, transparent) !important',
-  },
   '.cm-placeholder': { color: 'var(--text-muted)' },
   '.cm-tooltip': {
     background: 'var(--surface-solid)',
     border: '1px solid var(--border-strong)',
-    borderRadius: '10px',
-    boxShadow: 'var(--shadow-md)',
-    color: 'var(--text)',
-  },
-  '.cm-tooltip-autocomplete ul li[aria-selected]': {
-    background: 'color-mix(in oklab, var(--accent) 22%, transparent)',
+    borderRadius: '12px',
+    boxShadow: 'var(--shadow-lg)',
     color: 'var(--text)',
   },
 });
 
-/** Replace the selection with a block, starting on its own line, and select what the block says to. */
-const insertBlock = (view: EditorView, make: (selection: string) => Insert) => {
-  const { from, to } = view.state.selection.main;
-  const ins = make(view.state.sliceDoc(from, to));
-  const lead = from > 0 && view.state.sliceDoc(from - 1, from) !== '\n' ? '\n' : '';
-  view.dispatch({
-    changes: { from, to, insert: lead + ins.text },
-    selection: EditorSelection.range(
-      from + lead.length + ins.select[0],
-      from + lead.length + ins.select[1],
-    ),
-    scrollIntoView: true,
-  });
-  view.focus();
-};
-
-const wrapSel = (view: EditorView, before: string, after = before) => {
-  view.dispatch(
-    view.state.changeByRange((r) => {
-      const sel = view.state.sliceDoc(r.from, r.to);
-      // toggle off when already wrapped
-      if (
-        sel.length >= before.length + after.length &&
-        sel.startsWith(before) &&
-        sel.endsWith(after)
-      ) {
-        const inner = sel.slice(before.length, sel.length - after.length);
-        return {
-          changes: { from: r.from, to: r.to, insert: inner },
-          range: EditorSelection.range(r.from, r.from + inner.length),
-        };
-      }
-      return {
-        changes: { from: r.from, to: r.to, insert: before + sel + after },
-        range: r.empty
-          ? EditorSelection.cursor(r.from + before.length)
-          : EditorSelection.range(r.from + before.length, r.to + before.length),
-      };
-    }),
-  );
-  view.focus();
-};
-
 export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownEditor(
-  { value, onChange, getTitles, onCursorLine },
+  {
+    value,
+    onChange,
+    getTitles,
+    onCursorLine,
+    sourceMode = false,
+    onOpenWiki,
+    onOpenAttachment,
+    onView,
+  },
   ref,
 ) {
   const host = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
-  const latest = useRef({ onChange, getTitles, onCursorLine });
-  latest.current = { onChange, getTitles, onCursorLine };
+  const latest = useRef({
+    onChange,
+    getTitles,
+    onCursorLine,
+    onOpenWiki,
+    onOpenAttachment,
+    onView,
+  });
+  latest.current = { onChange, getTitles, onCursorLine, onOpenWiki, onOpenAttachment, onView };
   const own = useRef(value);
   const toast = useUi((s) => s.toast);
+  const mode = useRef(new Compartment());
+  const [menu, setMenu] = useState<MenuState>(null);
+  const [bubble, setBubble] = useState<BubbleState | null>(null);
+  const [cur, setCur] = useState<EditorView | null>(null);
+  const flashcards = useUi((s) => !!s.modules.flashcards);
+  const menuOpen = useRef(false);
+  menuOpen.current = !!menu;
 
   useImperativeHandle(ref, () => ({
-    wrap: (b, a) => view.current && wrapSel(view.current, b, a),
+    wrap: (b, a) => {
+      const v = view.current;
+      if (v) {
+        wrap(b, a)(v);
+        v.focus();
+      }
+    },
     insert: (text) => {
       const v = view.current;
       if (!v) return;
       v.dispatch(v.state.replaceSelection(text));
-      v.focus();
-    },
-    prefixLines: (prefix) => {
-      const v = view.current;
-      if (!v) return;
-      const { from, to } = v.state.selection.main;
-      const changes = [];
-      for (let ln = v.state.doc.lineAt(from).number; ln <= v.state.doc.lineAt(to).number; ln++)
-        changes.push({ from: v.state.doc.line(ln).from, insert: prefix });
-      v.dispatch({ changes });
       v.focus();
     },
     cloze: () => {
@@ -167,7 +130,8 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       if (!v) return;
       const used = [...v.state.doc.toString().matchAll(/\{\{c(\d+)::/g)].map((m) => Number(m[1]));
       const n = (used.length ? Math.max(...used) : 0) + 1;
-      wrapSel(v, `{{c${n}::`, '}}');
+      wrap(`{{c${n}::`, '}}')(v);
+      v.focus();
     },
     getSelection: () => {
       const v = view.current;
@@ -175,8 +139,6 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       const { from, to } = v.state.selection.main;
       return v.state.sliceDoc(from, to);
     },
-    codeBlock: (lang) => view.current && insertBlock(view.current, (s) => codeBlock(s, lang)),
-    toggle: (level) => view.current && insertBlock(view.current, (s) => toggleBlock(s, level)),
     goToLine: (line) => {
       const v = view.current;
       if (!v) return;
@@ -187,7 +149,26 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       });
       v.focus();
     },
+    goToHeading: (slug) => {
+      const v = view.current;
+      if (!v) return false;
+      let fence = false;
+      for (let n = 1; n <= v.state.doc.lines; n++) {
+        const l = v.state.doc.line(n);
+        if (/^\s*(```|~~~)/.test(l.text)) fence = !fence;
+        const m = !fence && /^#{1,6}\s+(.*?)\s*#*\s*$/.exec(l.text);
+        if (m && slugHeading(m[1]!) === slug) {
+          v.dispatch({
+            selection: { anchor: l.from },
+            effects: EditorView.scrollIntoView(l.from, { y: 'start', yMargin: 24 }),
+          });
+          return true;
+        }
+      }
+      return false;
+    },
     focus: () => view.current?.focus(),
+    view: () => view.current,
   }));
 
   useEffect(() => {
@@ -198,13 +179,39 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
           const md = await uploadForMarkdown(f);
           const head = v.state.selection.main.head;
           const atLineStart = v.state.doc.lineAt(head).from === head;
-          v.dispatch(v.state.replaceSelection((atLineStart ? '' : '\n') + md + '\n'));
+          v.dispatch(v.state.replaceSelection((atLineStart ? '' : '\n\n') + md + '\n'));
         } catch (e) {
           toast(`Could not add ${f.name || 'file'}: ${(e as Error).message}`);
         }
       }
     };
-    const wikiSource = (ctx: CompletionContext) => {
+    const pickFiles = (v: EditorView) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.multiple = true;
+      input.onchange = () => void files(v, [...(input.files ?? [])]);
+      input.click();
+    };
+    let raf = 0;
+    const updateBubble = (v: EditorView) => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const s = v.state.selection.main;
+        if (s.empty || (!v.hasFocus && !menuOpen.current) || s.to - s.from > 5000)
+          return setBubble(null);
+        const a = v.coordsAtPos(s.from);
+        const b = v.coordsAtPos(s.to);
+        if (!a || !b) return setBubble(null);
+        const sameLine = Math.abs(a.top - b.top) < 4;
+        const x = sameLine ? (a.left + b.right) / 2 : a.left + 60;
+        setBubble((p) =>
+          p && Math.abs(p.x - x) < 1 && Math.abs(p.top - a.top) < 1
+            ? p
+            : { x, top: a.top, pos: s.from },
+        );
+      });
+    };
+    const wikiSource = (ctx: import('@codemirror/autocomplete').CompletionContext) => {
       const m = ctx.matchBefore(/\[\[[^\]\n]*$/);
       if (!m) return null;
       const typed = m.text.slice(2).toLowerCase();
@@ -220,17 +227,32 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
     const extensions: Extension[] = [
       history(),
       drawSelection(),
-      highlightActiveLine(),
       EditorView.lineWrapping,
       closeBrackets(),
-      markdown({ base: markdownLanguage, codeLanguages: languages }),
-      syntaxHighlighting(style),
+      // our own Enter/Backspace handling goes first; the stock Markdown keymap is added below as a fallback
+      markdown({ base: markdownLanguage, codeLanguages: languages, addKeymap: false }),
+      syntaxHighlighting(codeStyle),
+      mode.current.of([
+        liveEnabled.of(!sourceMode),
+        sourceMode ? syntaxHighlighting(sourceStyle) : [],
+      ]),
+      livePreview(),
+      liveCallbacks.of({
+        openWiki: (target, heading) => latest.current.onOpenWiki?.(target, heading),
+        openAttachment: (h, e, n) => latest.current.onOpenAttachment?.(h, e, n),
+        openLanguageMenu: (at, codeFrom) => setMenu({ kind: 'lang', at, pos: codeFrom }),
+      }),
+      editorActions.of({ pickFiles }),
       theme,
-      placeholder('Start writing… Markdown, $math$, [[links]], paste images'),
-      autocompletion({ override: [wikiSource], icons: false }),
+      placeholder('Write something, or type / for blocks'),
+      slashMenu([wikiSource]),
+      editorKeys(),
+      blockHandles(),
+      handleHooks.of({
+        openBlockMenu: (at, pos) => setMenu({ kind: 'block', at, pos }),
+        openContextMenu: (at, pos) => setMenu({ kind: 'context', at, pos }),
+      }),
       keymap.of([
-        { key: 'Mod-b', run: (v) => (wrapSel(v, '**'), true) },
-        { key: 'Mod-i', run: (v) => (wrapSel(v, '*'), true) },
         ...closeBracketsKeymap,
         ...markdownKeymap,
         ...completionKeymap,
@@ -243,10 +265,24 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
           const fs = [...(e.clipboardData?.files ?? [])].filter((f) =>
             /^(image\/|application\/pdf)/.test(f.type),
           );
-          if (!fs.length) return false;
-          e.preventDefault();
-          void files(v, fs);
-          return true;
+          if (fs.length) {
+            e.preventDefault();
+            void files(v, fs);
+            return true;
+          }
+          // pasting a link over selected text makes it a link
+          const text = e.clipboardData?.getData('text/plain')?.trim() ?? '';
+          const sel = v.state.selection.main;
+          if (!sel.empty && /^https?:\/\/\S+$/.test(text)) {
+            e.preventDefault();
+            const s = v.state.sliceDoc(sel.from, sel.to);
+            v.dispatch({
+              changes: { from: sel.from, to: sel.to, insert: `[${s}](${text})` },
+              userEvent: 'input.paste',
+            });
+            return true;
+          }
+          return false;
         },
         drop: (e, v) => {
           const fs = [...(e.dataTransfer?.files ?? [])].filter((f) =>
@@ -267,17 +303,34 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
         }
         if (u.selectionSet || u.docChanged)
           latest.current.onCursorLine?.(u.state.doc.lineAt(u.state.selection.main.head).number);
+        if (u.selectionSet || u.docChanged || u.focusChanged || u.geometryChanged)
+          updateBubble(u.view);
       }),
     ];
     view.current = new EditorView({
       state: EditorState.create({ doc: value, extensions }),
       parent: host.current,
     });
+    latest.current.onView?.(view.current);
+    setCur(view.current);
     return () => {
+      cancelAnimationFrame(raf);
+      setCur(null);
+      latest.current.onView?.(null);
       view.current?.destroy();
       view.current = null;
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // live view <-> source mode
+  useEffect(() => {
+    view.current?.dispatch({
+      effects: mode.current.reconfigure([
+        liveEnabled.of(!sourceMode),
+        sourceMode ? syntaxHighlighting(sourceStyle) : [],
+      ]),
+    });
+  }, [sourceMode]);
 
   // accept external changes (switching notes, file changed on disk)
   useEffect(() => {
@@ -286,10 +339,35 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       own.current = value;
       v.dispatch({
         changes: { from: 0, to: v.state.doc.length, insert: value },
-        selection: { anchor: 0 },
+        selection: EditorSelection.single(0),
       });
     }
   }, [value]);
 
-  return <div ref={host} className="cm-host" />;
+  const paste = () => {
+    if (window.classpad?.paste) void window.classpad.paste();
+    else
+      void navigator.clipboard
+        ?.readText()
+        .then((t) => cur?.dispatch(cur.state.replaceSelection(t)));
+  };
+  return (
+    <>
+      <div ref={host} className="cm-host" />
+      {cur && menu && (
+        <EditorMenu view={cur} state={menu} paste={paste} onClose={() => setMenu(null)} />
+      )}
+      {cur && bubble && !sourceMode && (
+        <BubbleBar
+          view={cur}
+          at={bubble}
+          flashcards={flashcards}
+          onCard={() => wrap('{{c1::', '}}')(cur)}
+          onTurn={(r) =>
+            setMenu({ kind: 'turn', at: { x: r.left, y: r.bottom + 4 }, pos: bubble.pos })
+          }
+        />
+      )}
+    </>
+  );
 });

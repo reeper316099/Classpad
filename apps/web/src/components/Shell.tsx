@@ -35,6 +35,13 @@ const SHORTCUTS: [string, string][] = [
   ['T', 'New task'],
   ['?', 'This help'],
   ['Esc', 'Close dialogs'],
+  ['/ in a note', 'Insert a block (heading, list, toggle, code…)'],
+  ['Ctrl/⌘ B · I · E', 'Bold · italic · code, in a note'],
+  ['Ctrl/⌘ K in a note', 'Make a link'],
+  ['Ctrl/⌘ Alt 1 · 2 · 3', 'Heading 1 · 2 · 3'],
+  ['Ctrl/⌘ Shift ↑ ↓', 'Move the block up or down'],
+  ['Ctrl/⌘ D', 'Duplicate the block'],
+  ['Ctrl/⌘ Enter', 'Check or uncheck a to-do'],
 ];
 
 export function Shell() {
@@ -55,6 +62,7 @@ export function Shell() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented) return; // the note editor already used this key (for example Ctrl/⌘ K inserts a link there)
       const meta = e.metaKey || e.ctrlKey;
       if (meta && e.key.toLowerCase() === 'k') {
         e.preventDefault();

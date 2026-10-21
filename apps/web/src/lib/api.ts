@@ -14,6 +14,7 @@ declare global {
       onMenu(cb: (action: string) => void): () => void;
       openDataFolder(): Promise<void>;
       chooseFolder(): Promise<string | null>;
+      paste(): Promise<void>;
       openReport(hide?: boolean): Promise<void>;
       saveReportPdf(): Promise<{ saved: boolean; path?: string }>;
     };

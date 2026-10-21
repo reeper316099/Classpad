@@ -140,7 +140,8 @@ test('notes: write math, then find it by search', async () => {
   const editor = page.locator('.cm-content');
   await editor.click();
   await page.keyboard.type('Euler: $e^{i\\pi} + 1 = 0$ and a [[Ipsum sampling notes]] link');
-  await expect(page.locator('.preview-pane .katex').first()).toBeVisible();
+  // the equation renders in place, in the same view you type in
+  await expect(page.locator('.cm-content .cm-lp-math .katex').first()).toBeVisible();
   await expect(page.getByText('Saved', { exact: true })).toBeVisible();
 
   await page.getByLabel('Search notes').fill('Euler');
