@@ -16,6 +16,7 @@ import { useUi } from '../lib/store.js';
 import type { Assignment, ClassEntity, GradingScheme, Semester } from '../lib/types.js';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { get } from '../lib/api.js';
+import { NewNoteDialog } from './NoteDialogs.js';
 import { Dialog, Field } from './ui.js';
 
 const TYPES = [
@@ -41,6 +42,7 @@ export function Dialogs() {
       <AssignmentDialog />
       <ClassDialog />
       <SemesterDialog />
+      <NewNoteDialog />
     </>
   );
 }

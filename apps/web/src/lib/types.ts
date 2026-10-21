@@ -125,6 +125,7 @@ export interface SearchHit {
   title: string;
   classId?: string;
   score: number;
+  snippet?: string;
 }
 
 export type ScoreInput =

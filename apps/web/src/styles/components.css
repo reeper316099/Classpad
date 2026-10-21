@@ -859,3 +859,243 @@ dialog.dlg[open] {
   height: auto;
   min-height: 0;
 }
+
+/* ---------- notes ---------- */
+.notes-layout {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--space-4);
+  height: calc(100vh - 104px);
+  min-height: 480px;
+}
+.notes-layout.focus {
+  grid-template-columns: minmax(0, 1fr);
+  height: calc(100vh - 32px);
+}
+.notes-main {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.notes-tree {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: var(--space-3);
+}
+.tree-scroll {
+  overflow: auto;
+  margin-top: 8px;
+  flex: 1;
+}
+.tree-group {
+  margin-bottom: 6px;
+}
+.tree-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.tree-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 6px 10px 6px 30px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+}
+.tree-item:hover {
+  background: color-mix(in oklab, var(--accent) 9%, transparent);
+}
+.tree-item.active {
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  font-weight: 600;
+}
+.notes-tree .stack > .tree-item {
+  padding-left: 10px;
+}
+.snippet {
+  white-space: normal;
+  font-weight: 400;
+}
+.note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-height: 0;
+  height: 100%;
+}
+.note-head {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--space-3) var(--space-4);
+  border-top: 3px solid var(--cc, var(--primary));
+}
+.note-title {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-size: var(--text-xl);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  outline: none;
+}
+.note-title:focus-visible {
+  box-shadow: none;
+  border-bottom: 2px solid var(--primary);
+}
+.note-toolbar {
+  gap: 8px;
+}
+.tb {
+  min-width: 30px;
+  font-weight: 700;
+}
+.note-work {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: var(--space-3);
+}
+.note-body {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+.note-pane {
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  padding: var(--space-3);
+}
+.editor-pane {
+  padding: 0;
+}
+.cm-host {
+  height: 100%;
+}
+.cm-host .cm-editor {
+  height: 100%;
+}
+.preview-pane {
+  padding: var(--space-4) var(--space-5);
+}
+.note-side {
+  width: 250px;
+  flex: none;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: var(--space-3);
+}
+.note-side h3 {
+  margin-top: 8px;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+.outline-item {
+  text-align: left;
+  border: 0;
+  background: none;
+  padding: 3px 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--text);
+  font: inherit;
+  font-size: var(--text-sm);
+}
+.outline-item:hover {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+}
+.pdf-pane {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.pdf-scroll {
+  overflow: auto;
+  flex: 1;
+  text-align: center;
+}
+.pdf-scroll canvas {
+  max-width: none;
+  box-shadow: var(--shadow-md);
+  border-radius: 4px;
+  background: #fff;
+}
+.pdf-bar {
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+html.focus-mode .sidebar,
+html.focus-mode .topbar {
+  display: none;
+}
+html.focus-mode .app {
+  grid-template-columns: 1fr;
+}
+html.focus-mode .content {
+  max-width: 1000px;
+  padding-top: 16px;
+}
+@media (max-width: 1180px) {
+  .notes-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .notes-layout.has-note .notes-tree {
+    display: none;
+  }
+  .notes-layout:not(.has-note) .notes-main {
+    display: none;
+  }
+  .back-btn {
+    display: inline-flex !important;
+  }
+}
+.back-btn {
+  display: none;
+}
+.tree-head .btn.ghost.grow {
+  text-align: left;
+}
+.note-title {
+  min-width: 120px;
+}
+@media (max-width: 980px) {
+  .notes-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .notes-tree {
+    max-height: 260px;
+  }
+  .note-work {
+    flex-direction: column;
+  }
+  .note-side {
+    width: auto;
+  }
+  .note-body {
+    grid-template-columns: 1fr !important;
+  }
+  .note-pane {
+    min-height: 360px;
+  }
+}

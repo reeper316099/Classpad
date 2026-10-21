@@ -5,6 +5,7 @@ import { useSelectedSemester } from '../lib/hooks.js';
 import { applyAppearance, useUi } from '../lib/store.js';
 import { CommandPalette } from './CommandPalette.js';
 import { Dialogs } from './Dialogs.js';
+import { QuickOpen } from './NoteDialogs.js';
 import { Icon, type IconName } from './Icon.js';
 import { Dialog, Toasts } from './ui.js';
 
@@ -12,11 +13,11 @@ const NAV: [string, string, IconName][] = [
   ['/', 'Dashboard', 'home'],
   ['/classes', 'Classes', 'classes'],
   ['/assignments', 'Assignments', 'assignments'],
+  ['/notes', 'Notes', 'notes'],
   ['/grades', 'Grades', 'grades'],
   ['/gpa', 'GPA', 'gpa'],
 ];
 const SOON: [string, string, IconName][] = [
-  ['/notes', 'Notes', 'notes'],
   ['/planner', 'Planner', 'planner'],
   ['/study', 'Study', 'study'],
 ];
@@ -26,7 +27,8 @@ const SHORTCUTS: [string, string][] = [
   ['/', 'Search'],
   ['A', 'New assignment'],
   ['G', 'Grades'],
-  ['N', 'Notes (coming soon)'],
+  ['N', 'New note'],
+  ['Ctrl/⌘ P', 'Open a note by title'],
   ['T', 'Planner (coming soon)'],
   ['?', 'This help'],
   ['Esc', 'Close dialogs'],
@@ -50,6 +52,11 @@ export function Shell() {
         ui.setPalette(!useUi.getState().paletteOpen);
         return;
       }
+      if (meta && e.key.toLowerCase() === 'p') {
+        e.preventDefault();
+        dialogs.setQuickOpen(true);
+        return;
+      }
       if (meta || e.altKey) return;
       const t = e.target as HTMLElement;
       if (t.closest('input, textarea, select, [contenteditable="true"], dialog[open]')) return;
@@ -62,8 +69,10 @@ export function Shell() {
         e.preventDefault();
         dialogs.openAssignment();
       } else if (k.toLowerCase() === 'g') nav('/grades');
-      else if (k.toLowerCase() === 'n') nav('/notes');
-      else if (k.toLowerCase() === 't') nav('/planner');
+      else if (k.toLowerCase() === 'n') {
+        e.preventDefault();
+        dialogs.openNote();
+      } else if (k.toLowerCase() === 't') nav('/planner');
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -167,6 +176,7 @@ export function Shell() {
       </div>
       <CommandPalette />
       <Dialogs />
+      <QuickOpen />
       <Dialog
         open={ui.helpOpen}
         onClose={() => ui.setHelp(false)}

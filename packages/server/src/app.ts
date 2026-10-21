@@ -24,6 +24,8 @@ import {
   gradeReportHtml,
 } from './exportService.js';
 import { clearDemo, hasDemo, loadDemo } from './demo.js';
+import { backlinksFor, resolveLink } from './noteTools.js';
+import { TemplateService } from './templates.js';
 import { ImportService, STRATEGIES } from './importService.js';
 import { settingsPath } from './config.js';
 import type { Collection } from './collection.js';
@@ -129,12 +131,12 @@ export async function createApp(opts: AppOptions): Promise<App> {
         .status(status)
         .send({ error: { code, message, requestId, ...(details ? { details } : {}) } });
     if (err instanceof ApiError) return send(err.status, err.code, err.message, err.details);
-    if (err instanceof ZodError)
+    if (err instanceof ZodError || (err as { name?: string })?.name === 'ZodError')
       return send(
         422,
         'VALIDATION',
         'request failed validation',
-        err.issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
+        (err as ZodError).issues.map((i) => ({ path: i.path.join('.'), message: i.message })),
       );
     if (err instanceof StoreError)
       return send(
@@ -424,6 +426,48 @@ export async function createApp(opts: AppOptions): Promise<App> {
       clearInterval(beat);
       bus.off('event', on);
     });
+  });
+
+  // ---- note links and templates ----
+  const templates = new TemplateService(store);
+  await templates.seed();
+  route('GET', '/notes/resolve', 'Resolve a [[wiki link]] to a note', (r) => {
+    const q = z
+      .object({ title: z.string().min(1).max(300), classId: z.string().max(64).optional() })
+      .parse(r.query);
+    const n = resolveLink(notes.list(), q.title, q.classId);
+    return n ? { id: n.id, title: n.title, classId: n.classId } : null;
+  });
+  route('GET', '/notes/:id/backlinks', 'Notes that link to this note', (r) => {
+    const { id } = Id.parse(r.params);
+    const n = notes.get(id);
+    if (!n) throw notFound('notes', id);
+    return backlinksFor(notes.list(), n);
+  });
+  const TplBody = z.object({ name: z.string().min(1).max(80), markdown: z.string().max(200_000) });
+  route('GET', '/templates/notes', 'Note templates', () => templates.list());
+  route(
+    'POST',
+    '/templates/notes',
+    'Create a note template',
+    (r) => {
+      const b = TplBody.parse(r.body);
+      return templates.save(b.name, b.markdown);
+    },
+    TplBody,
+  );
+  route(
+    'PUT',
+    '/templates/notes/:id',
+    'Update a note template',
+    (r) => {
+      const b = TplBody.parse(r.body);
+      return templates.save(b.name, b.markdown, Id.parse(r.params).id);
+    },
+    TplBody,
+  );
+  route('DELETE', '/templates/notes/:id', 'Delete a note template', async (r) => {
+    await templates.remove(Id.parse(r.params).id);
   });
 
   // ---- settings, demo data, about ----

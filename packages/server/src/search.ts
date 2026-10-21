@@ -18,6 +18,7 @@ export interface SearchHit {
   title: string;
   classId?: string;
   score: number;
+  snippet?: string;
 }
 
 const OPERATORS = /\b(class|type|tag|due):("[^"]*"|\S+)/gi;
@@ -110,10 +111,30 @@ export class SearchIndex {
         .slice(0, limit)
         .map((d) => ({ id: d.id, kind: d.kind, title: d.title, classId: d.classId, score: 0 }));
     }
+    const terms = text.toLowerCase().split(/\s+/).filter(Boolean);
+    const snippet = (id: string): string | undefined => {
+      const body = this.docs.get(id)?.body;
+      if (!body) return undefined;
+      const lower = body.toLowerCase();
+      const at = terms
+        .map((t) => lower.indexOf(t))
+        .filter((i) => i >= 0)
+        .sort((a, b) => a - b)[0];
+      if (at === undefined) return undefined;
+      const from = Math.max(0, at - 50);
+      return (
+        (from > 0 ? '…' : '') +
+        body
+          .slice(from, at + 90)
+          .replace(/\s+/g, ' ')
+          .trim()
+      );
+    };
     return this.ms
       .search(text, { filter: (r) => ok(this.docs.get(r.id)!) })
       .slice(0, limit)
       .map((r) => ({
+        snippet: snippet(r.id),
         id: r.id,
         kind: r.kind as Kind,
         title: r.title as string,

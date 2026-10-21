@@ -9,6 +9,7 @@ import { ClassPage, ClassesPage } from './pages/Classes.js';
 import { DashboardPage } from './pages/Dashboard.js';
 import { GradesPage } from './pages/Grades.js';
 import { ImportExportPage } from './pages/ImportExport.js';
+import { NotesPage } from './pages/Notes.js';
 import { SettingsPage } from './pages/Settings.js';
 import { SoonPage } from './pages/Soon.js';
 
@@ -60,7 +61,7 @@ export function App() {
             />
             <Route path="import" element={<ImportExportPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route path="notes" element={<SoonPage which="notes" />} />
+            <Route path="notes/:id?" element={<NotesPage />} />
             <Route path="planner" element={<SoonPage which="planner" />} />
             <Route path="study" element={<SoonPage which="study" />} />
             <Route path="*" element={<DashboardPage />} />

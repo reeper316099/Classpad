@@ -1,0 +1,145 @@
+.md {
+  line-height: 1.7;
+  font-size: var(--text-md);
+  overflow-wrap: anywhere;
+}
+.md > :first-child {
+  margin-top: 0;
+}
+.md h1 {
+  font-size: 1.7rem;
+  margin: 1.4em 0 0.5em;
+}
+.md h2 {
+  font-size: 1.35rem;
+  margin: 1.3em 0 0.4em;
+}
+.md h3 {
+  font-size: 1.15rem;
+  margin: 1.2em 0 0.3em;
+}
+.md h4,
+.md h5,
+.md h6 {
+  margin: 1em 0 0.3em;
+}
+.md p {
+  margin: 0.6em 0;
+}
+.md ul,
+.md ol {
+  padding-left: 1.4em;
+  margin: 0.5em 0;
+}
+.md li.task-list-item {
+  list-style: none;
+  margin-left: -1.2em;
+}
+.md input[type='checkbox'] {
+  accent-color: var(--primary);
+  margin-right: 6px;
+}
+.md blockquote {
+  margin: 0.8em 0;
+  padding: 0.3em 1em;
+  border-left: 4px solid var(--primary);
+  background: color-mix(in oklab, var(--accent) 7%, transparent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+.md blockquote > :first-child {
+  margin-top: 0;
+}
+.md blockquote > :last-child {
+  margin-bottom: 0;
+}
+.md code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: color-mix(in oklab, var(--text-muted) 16%, transparent);
+  padding: 0.1em 0.35em;
+  border-radius: 6px;
+}
+.md pre {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  overflow-x: auto;
+}
+.md pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.85em;
+}
+.md table {
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  display: block;
+  overflow-x: auto;
+}
+.md th,
+.md td {
+  border: 1px solid var(--border-strong);
+  padding: 6px 12px;
+}
+.md th {
+  background: color-mix(in oklab, var(--accent) 8%, transparent);
+}
+.md img {
+  max-width: 100%;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+.md hr {
+  border: 0;
+  border-top: 1px solid var(--border-strong);
+  margin: 1.4em 0;
+}
+.md a.wikilink {
+  background: color-mix(in oklab, var(--accent) 14%, transparent);
+  padding: 0 0.35em;
+  border-radius: 6px;
+  text-decoration: none;
+}
+.md a.wikilink.missing {
+  color: var(--warning);
+  background: color-mix(in oklab, var(--warning) 14%, transparent);
+}
+.md a.attachment-link::before {
+  content: '📎 ';
+}
+.md .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+/* code highlighting (theme-aware, no external CSS) */
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-literal,
+.hljs-built_in {
+  color: var(--primary);
+  font-weight: 600;
+}
+.hljs-string,
+.hljs-attr,
+.hljs-regexp {
+  color: var(--success);
+}
+.hljs-number,
+.hljs-symbol {
+  color: var(--warning);
+}
+.hljs-comment,
+.hljs-quote {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.hljs-title,
+.hljs-function {
+  color: var(--info);
+}
+.hljs-type,
+.hljs-class {
+  color: var(--secondary);
+}

@@ -40,7 +40,17 @@ export function Dialog({
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (open && !d.open) d.showModal();
+    if (open && !d.open) {
+      d.showModal();
+      // land on the first field, not the close button
+      requestAnimationFrame(() =>
+        d
+          .querySelector<HTMLElement>(
+            '.dlg-body input:not([type=hidden]):not([disabled]), .dlg-body textarea, .dlg-body select',
+          )
+          ?.focus(),
+      );
+    }
     if (!open && d.open) d.close();
   }, [open]);
   return (
