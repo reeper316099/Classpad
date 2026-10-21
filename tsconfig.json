@@ -1,0 +1,9 @@
+{
+  "files": [],
+  "references": [
+    { "path": "packages/shared" },
+    { "path": "packages/grades" },
+    { "path": "packages/jsonstore" },
+    { "path": "packages/server" }
+  ]
+}

@@ -1,0 +1,5 @@
+{
+  "comment": "Hashes of lowercase word tokens that must never appear in tracked text (third-party branding). Hashed so the repo itself never contains them.",
+  "deniedTokenHashes": ["af13426807e8c571498b546ea1432442c34ead3df02f6e4fceae4f063ec18540"],
+  "allowedPrefixes": ["fixtures/synthetic/"]
+}
