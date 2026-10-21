@@ -10,6 +10,7 @@ import {
   NoteSchema,
   ReadingSchema,
   SemesterSchema,
+  StudySessionSchema,
   TaskSchema,
 } from '@classpad/shared';
 import { z, ZodError, type ZodType } from 'zod';
@@ -24,6 +25,7 @@ import {
   gradeReportHtml,
 } from './exportService.js';
 import { clearDemo, hasDemo, loadDemo } from './demo.js';
+import { agenda, deadlines, stats, timetable } from './planner.js';
 import { backlinksFor, resolveLink } from './noteTools.js';
 import { TemplateService } from './templates.js';
 import { ImportService, STRATEGIES } from './importService.js';
@@ -72,6 +74,13 @@ function applyList<T extends Base>(items: T[], query: Record<string, unknown>) {
     Record<string, unknown>;
   let out = items.filter((it) =>
     Object.entries(filters).every(([k, v]) => {
+      if (
+        (k === 'from' || k === 'to') &&
+        typeof (it as Record<string, unknown>).start === 'string'
+      ) {
+        const d = String((it as Record<string, unknown>).start).slice(0, 10);
+        return k === 'from' ? d >= String(v) : d <= String(v);
+      }
       const f = (it as Record<string, unknown>)[k];
       if (Array.isArray(f)) return f.map(String).includes(String(v));
       return String(f ?? '') === String(v);
@@ -241,6 +250,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
     config,
     store,
     bus,
+    study,
   } = ctx;
 
   // cascades: removing a parent never leaves dangling children
@@ -319,6 +329,53 @@ export async function createApp(opts: AppOptions): Promise<App> {
   crud('/tasks', tasks, TaskSchema.omit({ id: true, createdAt: true, updatedAt: true }));
   crud('/readings', readings, ReadingSchema.omit({ id: true, createdAt: true, updatedAt: true }));
   crud('/notes', notes, NoteSchema.omit({ id: true, createdAt: true, updatedAt: true }));
+
+  crud(
+    '/study-sessions',
+    study,
+    StudySessionSchema.omit({ id: true, createdAt: true, updatedAt: true }),
+  );
+
+  // ---- planner and stats ----
+  const Day = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+  const WeekStart = z.enum(['mon', 'sun']).default('mon');
+  route('GET', '/agenda', 'Deadlines, tasks, classes and study sessions in a date range', (r) => {
+    const q = z.object({ from: Day, to: Day }).parse(r.query);
+    return agenda(ctx, q.from, q.to);
+  });
+  route('GET', '/timetable', 'One week of classes and deadlines', (r) => {
+    const q = z.object({ week: Day, weekStart: WeekStart }).parse(r.query);
+    return timetable(ctx, q.week, q.weekStart);
+  });
+  route('GET', '/deadlines', 'Open deadlines with urgency', () => deadlines(ctx));
+  route(
+    'GET',
+    '/stats/overview',
+    'Dashboard data: study vs targets, workload forecast, grade trends',
+    (r) => stats(ctx, new Date(), z.object({ weekStart: WeekStart }).parse(r.query).weekStart),
+  );
+  const Timer = z.object({
+    classId: z.string().max(64).optional(),
+    taskId: z.string().max(64).optional(),
+    assignmentId: z.string().max(64).optional(),
+    kind: z.enum(['pomodoro', 'manual']).default('pomodoro'),
+  });
+  route('GET', '/study-sessions/active', 'The running study timer (or null)', () => study.active);
+  route(
+    'POST',
+    '/study-sessions/start',
+    'Start a study timer',
+    (r) => study.startTimer(Timer.parse(r.body)),
+    Timer,
+  );
+  route('POST', '/study-sessions/stop', 'Stop the timer and log the session', async (r) => {
+    // `at` lets a client that was closed while a Pomodoro ended log its true end time (never in the future)
+    const b = z
+      .object({ at: z.string().datetime({ offset: true }).optional() })
+      .parse(r.body ?? {});
+    const at = b.at ? new Date(Math.min(Date.parse(b.at), Date.now())) : new Date();
+    return { session: await study.stopTimer(at) };
+  });
 
   // grades & GPA
   const needed = z.object({

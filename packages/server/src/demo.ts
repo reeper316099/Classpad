@@ -65,6 +65,7 @@ export async function loadDemo(ctx: Context, now = new Date()) {
     });
   const c1 = await mk('Intro to Lorem Studies', 'LOR 101', '#6366f1', {
     credits: 4,
+    studyTargetHours: 5,
     type: 'core',
     delivery: 'in_person',
     location: 'Hall A-12',
@@ -77,6 +78,7 @@ export async function loadDemo(ctx: Context, now = new Date()) {
   });
   const c2 = await mk('Ipsum Methods', 'IPS 210', '#ec4899', {
     credits: 3,
+    studyTargetHours: 4,
     type: 'gen_ed',
     delivery: 'hybrid',
     gradingSchemeId: 'demo-categories',
@@ -88,6 +90,7 @@ export async function loadDemo(ctx: Context, now = new Date()) {
   });
   const c3 = await mk('Dolor Lab Practice', 'DOL 150', '#10b981', {
     credits: 3,
+    studyTargetHours: 3,
     type: 'elective',
     delivery: 'in_person',
     gradingSchemeId: 'points',
@@ -317,6 +320,37 @@ export async function loadDemo(ctx: Context, now = new Date()) {
     pagesRead: 120,
     importRef: `${REF}reading:2`,
   });
+  // study sessions over the last three weeks (local time, 25-90 minutes)
+  const plan: [number, number, string, number][] = [
+    [0, 16, c1.id, 50],
+    [-1, 19, c2.id, 45],
+    [-1, 15, c1.id, 25],
+    [-2, 18, c3.id, 60],
+    [-3, 20, c1.id, 90],
+    [-4, 14, c2.id, 30],
+    [-5, 17, c4.id, 40],
+    [-6, 11, c1.id, 75],
+    [-7, 16, c2.id, 50],
+    [-8, 19, c3.id, 45],
+    [-9, 15, c1.id, 25],
+    [-10, 18, c2.id, 60],
+    [-12, 16, c1.id, 50],
+    [-14, 17, c3.id, 40],
+    [-15, 19, c2.id, 55],
+    [-17, 15, c1.id, 70],
+    [-19, 18, c4.id, 35],
+  ];
+  for (const [i, [off, hour, classId, mins]] of plan.entries()) {
+    const st = new Date(now.getFullYear(), now.getMonth(), now.getDate() + off, hour, 0, 0);
+    await ctx.study.create({
+      start: st.toISOString(),
+      end: new Date(st.getTime() + mins * 60_000).toISOString(),
+      minutes: mins,
+      classId,
+      kind: i % 3 === 0 ? 'manual' : 'pomodoro',
+      importRef: `${REF}study:${i}`,
+    });
+  }
   void lorIds;
   return { alreadyLoaded: false, semesterId: sem.id };
 }
@@ -327,6 +361,7 @@ export async function clearDemo(ctx: Context) {
     xs.filter((x) => x.importRef?.startsWith(REF)).map((x) => x.id);
   await ctx.store.backup('pre-clear-demo');
   for (const id of mine(ctx.notes.list())) await ctx.notes.delete(id);
+  await ctx.study.deleteMany(mine(ctx.study.list()));
   await ctx.tasks.deleteMany(mine(ctx.tasks.list()));
   await ctx.readings.deleteMany(mine(ctx.readings.list()));
   await ctx.assignments.deleteMany(mine(ctx.assignments.list()));

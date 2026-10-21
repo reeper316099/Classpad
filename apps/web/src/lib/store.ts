@@ -1,5 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { setHour12Default } from './format.js';
+import { DEFAULT_POMODORO, type PomodoroConfig } from './pomodoro.js';
 
 export type Theme = 'system' | 'light' | 'dark';
 export type Density = 'comfortable' | 'compact';
@@ -17,11 +19,29 @@ interface UiState {
   density: Density;
   hideGrades: boolean;
   semesterId: string | null;
+  weekStart: 'mon' | 'sun';
+  hour12: boolean;
+  /** Minutes before a deadline at which to notify (empty = never). */
+  notifyLeads: number[];
+  pomodoro: PomodoroConfig;
   paletteOpen: boolean;
   helpOpen: boolean;
   toasts: Toast[];
   set: (
-    patch: Partial<Pick<UiState, 'theme' | 'accent' | 'density' | 'hideGrades' | 'semesterId'>>,
+    patch: Partial<
+      Pick<
+        UiState,
+        | 'theme'
+        | 'accent'
+        | 'density'
+        | 'hideGrades'
+        | 'semesterId'
+        | 'weekStart'
+        | 'hour12'
+        | 'notifyLeads'
+        | 'pomodoro'
+      >
+    >,
   ) => void;
   setPalette: (open: boolean) => void;
   setHelp: (open: boolean) => void;
@@ -41,6 +61,10 @@ export const useUi = create<UiState>()(
       density: 'comfortable',
       hideGrades: false,
       semesterId: null,
+      weekStart: 'mon',
+      hour12: true,
+      notifyLeads: [],
+      pomodoro: DEFAULT_POMODORO,
       paletteOpen: false,
       helpOpen: false,
       toasts: [],
@@ -67,6 +91,10 @@ export const useUi = create<UiState>()(
         density: s.density,
         hideGrades: s.hideGrades,
         semesterId: s.semesterId,
+        weekStart: s.weekStart,
+        hour12: s.hour12,
+        notifyLeads: s.notifyLeads,
+        pomodoro: s.pomodoro,
       }),
     },
   ),
@@ -82,3 +110,6 @@ export function applyAppearance(
   root.style.setProperty('--accent', s.accent);
   root.classList.toggle('hide-grades', s.hideGrades);
 }
+
+setHour12Default(useUi.getState().hour12);
+useUi.subscribe((s) => setHour12Default(s.hour12));

@@ -17,6 +17,7 @@ import type { Assignment, ClassEntity, GradingScheme, Semester } from '../lib/ty
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { get } from '../lib/api.js';
 import { NewNoteDialog } from './NoteDialogs.js';
+import { TaskDialog } from './TaskDialog.js';
 import { Dialog, Field } from './ui.js';
 
 const TYPES = [
@@ -43,6 +44,7 @@ export function Dialogs() {
       <ClassDialog />
       <SemesterDialog />
       <NewNoteDialog />
+      <TaskDialog />
     </>
   );
 }
@@ -347,6 +349,7 @@ function ClassDialog() {
       passFail: !!c?.passFail,
       includeInGpa: c?.includeInGpa ?? true,
       quickNotes: c?.quickNotes ?? '',
+      studyTarget: c?.studyTargetHours != null ? String(c.studyTargetHours) : '',
     });
     setDays(
       Object.fromEntries(
@@ -383,6 +386,8 @@ function ClassDialog() {
           code: String(f.code).trim() || null,
           semesterId: f.semesterId,
           credits,
+          studyTargetHours:
+            String(f.studyTarget ?? '').trim() === '' ? null : Number(f.studyTarget),
           type: f.type || null,
           delivery: f.delivery || null,
           instructor: String(f.instructor).trim() || null,
@@ -474,6 +479,14 @@ function ClassDialog() {
               inputMode="decimal"
               value={String(f.credits ?? '')}
               onChange={set('credits')}
+            />
+          </Field>
+          <Field label="Study goal (hours/week)">
+            <input
+              className="input num"
+              inputMode="decimal"
+              value={String(f.studyTarget ?? '')}
+              onChange={set('studyTarget')}
             />
           </Field>
         </div>

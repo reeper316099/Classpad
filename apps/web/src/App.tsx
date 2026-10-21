@@ -10,10 +10,11 @@ import { DashboardPage } from './pages/Dashboard.js';
 import { GradesPage } from './pages/Grades.js';
 import { ImportExportPage } from './pages/ImportExport.js';
 import { NotesPage } from './pages/Notes.js';
+import { PlannerPage } from './pages/Planner.js';
 import { SettingsPage } from './pages/Settings.js';
-import { SoonPage } from './pages/Soon.js';
 
 // the chart library is only needed on the GPA page
+const StudyPage = lazy(() => import('./pages/Study.js').then((m) => ({ default: m.StudyPage })));
 const GpaPage = lazy(() => import('./pages/Gpa.js').then((m) => ({ default: m.GpaPage })));
 
 const client = new QueryClient({
@@ -62,8 +63,15 @@ export function App() {
             <Route path="import" element={<ImportExportPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="notes/:id?" element={<NotesPage />} />
-            <Route path="planner" element={<SoonPage which="planner" />} />
-            <Route path="study" element={<SoonPage which="study" />} />
+            <Route path="planner" element={<PlannerPage />} />
+            <Route
+              path="study"
+              element={
+                <Suspense fallback={null}>
+                  <StudyPage />
+                </Suspense>
+              }
+            />
             <Route path="*" element={<DashboardPage />} />
           </Route>
         </Routes>

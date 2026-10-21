@@ -85,6 +85,130 @@ export function SettingsPage() {
         </label>
       </section>
       <section className="card stack">
+        <h2>Calendar & time</h2>
+        <div className="row">
+          <span className="label" style={{ width: 120 }}>
+            Week starts on
+          </span>
+          <div className="segmented" role="group" aria-label="Week starts on">
+            {(['mon', 'sun'] as const).map((d) => (
+              <button
+                key={d}
+                aria-pressed={ui.weekStart === d}
+                onClick={() => ui.set({ weekStart: d })}
+              >
+                {d === 'mon' ? 'Monday' : 'Sunday'}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="row">
+          <span className="label" style={{ width: 120 }}>
+            Time format
+          </span>
+          <div className="segmented" role="group" aria-label="Time format">
+            {[true, false].map((h) => (
+              <button
+                key={String(h)}
+                aria-pressed={ui.hour12 === h}
+                onClick={() => ui.set({ hour12: h })}
+              >
+                {h ? '12-hour' : '24-hour'}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="card stack">
+        <h2>Reminders</h2>
+        <p className="muted small">
+          Desktop notifications for deadlines and dated tasks, generated on this computer. Nothing
+          is sent anywhere.
+        </p>
+        <div className="row">
+          {[
+            [1440, '1 day before'],
+            [60, '1 hour before'],
+            [15, '15 minutes before'],
+          ].map(([m, label]) => (
+            <label key={m} className="check">
+              <input
+                type="checkbox"
+                checked={ui.notifyLeads.includes(m as number)}
+                onChange={(e) =>
+                  ui.set({
+                    notifyLeads: e.target.checked
+                      ? [...ui.notifyLeads, m as number]
+                      : ui.notifyLeads.filter((x) => x !== m),
+                  })
+                }
+              />{' '}
+              {label}
+            </label>
+          ))}
+        </div>
+        <div className="row">
+          <span className="muted small">
+            Permission:{' '}
+            {typeof Notification === 'undefined' ? 'not supported here' : Notification.permission}
+          </span>
+          {typeof Notification !== 'undefined' && Notification.permission !== 'granted' && (
+            <button
+              className="btn sm"
+              onClick={async () => {
+                await Notification.requestPermission();
+                ui.set({});
+              }}
+            >
+              Allow notifications
+            </button>
+          )}
+          {typeof Notification !== 'undefined' && Notification.permission === 'granted' && (
+            <button
+              className="btn sm"
+              onClick={() => new Notification('Classpad', { body: 'Reminders are working.' })}
+            >
+              Send a test
+            </button>
+          )}
+          {ui.notifyLeads.length > 0 &&
+            typeof Notification !== 'undefined' &&
+            Notification.permission !== 'granted' && (
+              <span className="muted small">
+                Without permission you will see in-app messages instead.
+              </span>
+            )}
+        </div>
+      </section>
+      <section className="card stack">
+        <h2>Pomodoro timer</h2>
+        <div className="form-grid">
+          {(
+            [
+              ['focusMin', 'Focus (min)'],
+              ['shortMin', 'Short break (min)'],
+              ['longMin', 'Long break (min)'],
+              ['longEvery', 'Long break every'],
+            ] as const
+          ).map(([k, label]) => (
+            <label key={k} className="field">
+              <span className="label">{label}</span>
+              <input
+                className="input num"
+                type="number"
+                min={1}
+                max={k === 'longEvery' ? 12 : 180}
+                value={ui.pomodoro[k]}
+                onChange={(e) => {
+                  const n = Math.round(Number(e.target.value));
+                  if (n >= 1) ui.set({ pomodoro: { ...ui.pomodoro, [k]: n } });
+                }}
+              />
+            </label>
+          ))}
+        </div>
+      </section>
+      <section className="card stack">
         <h2>Grading schemes</h2>
         <p className="muted small">
           Each class picks one. “Assignment weights” matches a weighted-percent system normalized

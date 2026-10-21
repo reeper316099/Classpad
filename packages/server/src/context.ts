@@ -19,6 +19,7 @@ import { ApiError } from './errors.js';
 import { GradingService } from './grading.js';
 import { NoteRepo } from './notes.js';
 import { Repo } from './repo.js';
+import { StudyRepo } from './study.js';
 import { SearchIndex, type SearchDoc } from './search.js';
 import { slugify, uniqueSlug } from './slug.js';
 
@@ -33,6 +34,7 @@ export interface Context {
   readings: Repo<Reading>;
   notes: NoteRepo;
   attachments: Repo<Attachment>;
+  study: StudyRepo;
   grading: GradingService;
   search: SearchIndex;
   searchDocs(): SearchDoc[];
@@ -116,10 +118,12 @@ export async function createContext(
     location: 'data/attachments.json',
     fileFor: () => 'data/attachments.json',
   });
+  const study = new StudyRepo(store, bus);
   const notes = new NoteRepo(store, bus, (id) => (id ? classes.get(id)?.slug : undefined));
 
   for (const r of [semesters, classes, assignments, tasks, readings, attachments]) await r.load();
   await notes.load();
+  await study.load();
 
   const grading = new GradingService({
     config,
@@ -268,6 +272,7 @@ export async function createContext(
       for (const r of [semesters, classes, assignments, tasks, readings])
         handled = (await r.reloadFile(rel)) || handled;
       handled = (await notes.reloadFile(rel)) || handled;
+      handled = (await study.reloadFile(rel)) || handled;
       if (rel.startsWith('config/')) {
         await config.load();
         handled = true;
@@ -297,6 +302,7 @@ export async function createContext(
     readings,
     notes,
     attachments,
+    study,
     grading,
     search,
     searchDocs,

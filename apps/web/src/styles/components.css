@@ -1099,3 +1099,306 @@ html.focus-mode .content {
     min-height: 360px;
   }
 }
+
+/* ---------- planner ---------- */
+.week {
+  padding: 0;
+  overflow: auto;
+}
+.week-head,
+.week-allday,
+.week-body {
+  display: grid;
+  grid-template-columns: 56px repeat(7, minmax(110px, 1fr));
+  min-width: 860px;
+}
+.week-head {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background: var(--surface-solid);
+  border-bottom: 1px solid var(--border);
+}
+.week-dayhead {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0;
+  gap: 2px;
+}
+.week-dayhead b {
+  font-size: var(--text-lg);
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.week-dayhead.today b {
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+  box-shadow: var(--glow-accent);
+}
+.week-allday {
+  border-bottom: 1px solid var(--border);
+  align-items: stretch;
+}
+.week-allday > .muted {
+  padding: 8px 6px;
+  align-self: center;
+}
+.week-allcell {
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-left: 1px solid var(--border);
+  min-height: 36px;
+}
+.week-body {
+  position: relative;
+}
+.week-hours {
+  display: flex;
+  flex-direction: column;
+}
+.week-hours > div {
+  padding: 0 6px;
+  text-align: right;
+  transform: translateY(-8px);
+}
+.week-col {
+  position: relative;
+  border-left: 1px solid var(--border);
+  background-image: linear-gradient(var(--border) 1px, transparent 1px);
+  background-repeat: repeat-y;
+}
+.week-col.today {
+  background-color: color-mix(in oklab, var(--accent) 5%, transparent);
+}
+.week-block {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border: 0;
+  border-left: 4px solid var(--cc, var(--primary));
+  border-radius: 8px;
+  padding: 4px 8px;
+  overflow: hidden;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  background: color-mix(in oklab, var(--cc, var(--primary)) 20%, var(--surface-solid));
+  color: var(--cc-fg, var(--text));
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.12s var(--ease);
+}
+.week-block:hover {
+  transform: scale(1.02);
+  z-index: 2;
+}
+.week-block b {
+  font-size: var(--text-sm);
+  line-height: 1.2;
+}
+.week-block span {
+  opacity: 0.85;
+}
+.week-block.deadline,
+.week-block.task {
+  border-left-style: dashed;
+}
+.week-block.done {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+.now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--danger);
+  z-index: 1;
+}
+.now-line::before {
+  content: '';
+  position: absolute;
+  left: -4px;
+  top: -3px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--danger);
+}
+.cal-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  border: 0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: var(--text-xs);
+  cursor: pointer;
+  text-align: left;
+  background: color-mix(in oklab, var(--cc, var(--primary)) 18%, transparent);
+  color: var(--cc-fg, var(--text));
+  overflow: hidden;
+}
+.cal-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cal-chip.done {
+  opacity: 0.5;
+  text-decoration: line-through;
+}
+.cal-chip.task {
+  background: transparent;
+  border: 1px dashed color-mix(in oklab, var(--cc, var(--primary)) 60%, transparent);
+}
+.month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding: 0;
+  overflow: hidden;
+}
+.month-head {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+.month-cell {
+  min-height: 104px;
+  padding: 4px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  cursor: pointer;
+}
+.month-cell:nth-child(7n + 7) {
+  border-right: 0;
+}
+.month-cell.out {
+  opacity: 0.45;
+}
+.month-cell.sel {
+  background: color-mix(in oklab, var(--accent) 10%, transparent);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+.month-num {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.month-cell.today .month-num {
+  background: var(--gradient-primary);
+  color: var(--on-primary);
+}
+.agenda-row {
+  padding: 4px 8px;
+  border-left: 3px solid var(--cc, var(--primary));
+  border-radius: 6px;
+}
+.agenda-row.done {
+  opacity: 0.55;
+}
+.agenda-time {
+  width: 92px;
+  flex: none;
+}
+.agenda-row input[type='checkbox'] {
+  accent-color: var(--primary);
+  width: 16px;
+  height: 16px;
+}
+.load-banner.heavy {
+  border-color: color-mix(in oklab, var(--danger) 50%, var(--border));
+  background: color-mix(in oklab, var(--danger) 8%, var(--surface));
+}
+.load-bars {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 10px;
+  align-items: end;
+  height: 200px;
+}
+.load-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 2px;
+}
+.load-fill {
+  width: 70%;
+  border-radius: 8px 8px 2px 2px;
+  min-height: 4px;
+  transition: height 0.4s var(--ease);
+}
+.heat {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.heat-head {
+  text-align: center;
+}
+.heat-cell {
+  min-height: 54px;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--text-muted) 6%, transparent);
+}
+.heat-cell.l1 {
+  background: color-mix(in oklab, var(--warning) 20%, transparent);
+}
+.heat-cell.l2 {
+  background: color-mix(in oklab, var(--warning) 45%, transparent);
+}
+.heat-cell.l3 {
+  background: color-mix(in oklab, var(--danger) 55%, transparent);
+}
+.heat-cell.today {
+  box-shadow: 0 0 0 2px var(--primary);
+}
+
+/* ---------- study ---------- */
+.pomo {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+.pomo-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.pomo-clock {
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.grid.two {
+  align-items: start;
+}

@@ -50,7 +50,13 @@ export function fmtDue(due: string | undefined): string {
   };
   return b ? `${f(a!)} → ${f(b)}` : f(a!);
 }
-export function fmtTime(hhmm: string, hour12 = true): string {
+let hour12Default = true;
+/** Set from the user's Settings so every time on screen follows 12h/24h. */
+export const setHour12Default = (v: boolean) => {
+  hour12Default = v;
+};
+
+export function fmtTime(hhmm: string, hour12 = hour12Default): string {
   const [h, m] = hhmm.split(':').map(Number);
   if (!hour12) return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
   return `${((h! + 11) % 12) + 1}:${String(m).padStart(2, '0')} ${h! >= 12 ? 'PM' : 'AM'}`;

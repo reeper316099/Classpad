@@ -6,6 +6,7 @@ import { applyAppearance, useUi } from '../lib/store.js';
 import { CommandPalette } from './CommandPalette.js';
 import { Dialogs } from './Dialogs.js';
 import { QuickOpen } from './NoteDialogs.js';
+import { Notifier } from './Notifier.js';
 import { Icon, type IconName } from './Icon.js';
 import { Dialog, Toasts } from './ui.js';
 
@@ -14,12 +15,10 @@ const NAV: [string, string, IconName][] = [
   ['/classes', 'Classes', 'classes'],
   ['/assignments', 'Assignments', 'assignments'],
   ['/notes', 'Notes', 'notes'],
-  ['/grades', 'Grades', 'grades'],
-  ['/gpa', 'GPA', 'gpa'],
-];
-const SOON: [string, string, IconName][] = [
   ['/planner', 'Planner', 'planner'],
   ['/study', 'Study', 'study'],
+  ['/grades', 'Grades', 'grades'],
+  ['/gpa', 'GPA', 'gpa'],
 ];
 
 const SHORTCUTS: [string, string][] = [
@@ -29,7 +28,7 @@ const SHORTCUTS: [string, string][] = [
   ['G', 'Grades'],
   ['N', 'New note'],
   ['Ctrl/⌘ P', 'Open a note by title'],
-  ['T', 'Planner (coming soon)'],
+  ['T', 'New task'],
   ['?', 'This help'],
   ['Esc', 'Close dialogs'],
 ];
@@ -72,7 +71,10 @@ export function Shell() {
       else if (k.toLowerCase() === 'n') {
         e.preventDefault();
         dialogs.openNote();
-      } else if (k.toLowerCase() === 't') nav('/planner');
+      } else if (k.toLowerCase() === 't') {
+        e.preventDefault();
+        dialogs.openTask();
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -96,13 +98,6 @@ export function Shell() {
               end={to === '/'}
               className={({ isActive }) => (isActive ? 'active' : '')}
             >
-              <Icon name={icon} />
-              {label}
-            </NavLink>
-          ))}
-          <div className="nav-section">Coming soon</div>
-          {SOON.map(([to, label, icon]) => (
-            <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
               <Icon name={icon} />
               {label}
             </NavLink>
@@ -177,6 +172,7 @@ export function Shell() {
       <CommandPalette />
       <Dialogs />
       <QuickOpen />
+      <Notifier />
       <Dialog
         open={ui.helpOpen}
         onClose={() => ui.setHelp(false)}

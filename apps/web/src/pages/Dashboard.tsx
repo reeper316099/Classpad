@@ -1,6 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from '../components/Icon.js';
+import { Sparkline } from '../components/Sparkline.js';
 import {
   ClassChip,
   Empty,
@@ -10,18 +12,22 @@ import {
   Skeleton,
   classStyle,
 } from '../components/ui.js';
-import { DueBadge } from '../components/AssignmentsView.js';
 import { get, post } from '../lib/api.js';
+import { fmtDuration } from '../lib/dates.js';
 import { useDialogs } from '../lib/dialogs.js';
-import { DAY_LABEL, fixed, fmtTime, pct, urgency } from '../lib/format.js';
+import { fixed, fmtTime, pct } from '../lib/format.js';
 import {
   refreshAll,
-  useAssignments,
   useClasses,
+  useReadings,
+  useSaveMutation,
   useSelectedSemester,
   useTasks,
 } from '../lib/hooks.js';
-import type { SemesterGrades } from '../lib/types.js';
+import { useDeadlines, useStats } from '../lib/planner.js';
+import { parseQuickDate } from '../lib/quickDate.js';
+import { useUi } from '../lib/store.js';
+import type { SemesterGrades, Task } from '../lib/types.js';
 
 export function Welcome() {
   const dialogs = useDialogs();
@@ -70,11 +76,15 @@ export function Welcome() {
 export function DashboardPage() {
   const { semester, loaded } = useSelectedSemester();
   const { data: classes = [] } = useClasses();
-  const { data: assignments = [] } = useAssignments();
   const { data: tasks = [] } = useTasks();
+  const { data: readings = [] } = useReadings();
+  const { data: deadlines = [] } = useDeadlines();
+  const { data: stats } = useStats();
   const dialogs = useDialogs();
+  const saveTask = useSaveMutation<Task>('tasks');
+  const [quick, setQuick] = useState('');
   const { data: sg, isLoading } = useQuery({
-    queryKey: ['sem-grades', semester?.id, assignments.length],
+    queryKey: ['sem-grades', semester?.id, deadlines.length],
     enabled: !!semester,
     queryFn: () => get<SemesterGrades>(`/grades/semester/${semester!.id}`),
   });
@@ -90,10 +100,8 @@ export function DashboardPage() {
   const semClasses = classes.filter((c) => c.semesterId === semester?.id);
   const ids = new Set(semClasses.map((c) => c.id));
   const byId = new Map(classes.map((c) => [c.id, c]));
-  const upcoming = assignments
-    .filter((a) => ids.has(a.classId) && a.status !== 'complete' && a.due)
-    .sort((a, b) => a.due!.localeCompare(b.due!))
-    .slice(0, 7);
+  const upcoming = deadlines.filter((d) => ids.has(d.classId)).slice(0, 7);
+  const overdue = deadlines.filter((d) => ids.has(d.classId) && d.urgency === 'overdue').length;
   const dow = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][new Date().getDay()]!;
   const today = semClasses
     .flatMap((c) => c.meetings.filter((m) => m.day === dow).map((m) => ({ c, m })))
@@ -101,8 +109,24 @@ export function DashboardPage() {
   const openTasks = tasks
     .filter((t) => !t.done)
     .sort((a, b) => (a.date ?? '9').localeCompare(b.date ?? '9'))
-    .slice(0, 5);
-  const overdue = upcoming.filter((a) => urgency(a.due).level === 'overdue').length;
+    .slice(0, 6);
+  const reading = readings.filter((r) => r.status === 'reading');
+  const week = stats?.workload[0];
+  const goals = stats
+    ? semClasses
+        .map((c) => ({ c, ...stats.study.perClass.find((p) => p.classId === c.id)! }))
+        .filter((x) => x.targetMinutes > 0)
+    : [];
+
+  const add = async () => {
+    if (!quick.trim()) return;
+    const p = parseQuickDate(quick);
+    await saveTask.mutateAsync({
+      data: { title: p.title, date: p.due ?? null, priority: 'medium' },
+    });
+    setQuick('');
+    useUi.getState().toast(`Task added${p.due ? ` · ${p.due.replace('T', ' ')}` : ''}`);
+  };
 
   return (
     <>
@@ -110,11 +134,46 @@ export function DashboardPage() {
         title={semester?.name ?? 'Dashboard'}
         sub={semester?.start && semester.end ? `${semester.start} → ${semester.end}` : undefined}
         actions={
-          <button className="btn primary" onClick={() => dialogs.openAssignment()}>
-            <Icon name="plus" size={16} /> Add assignment
-          </button>
+          <>
+            <button className="btn" onClick={() => dialogs.openTask()}>
+              Add task
+            </button>
+            <button className="btn primary" onClick={() => dialogs.openAssignment()}>
+              <Icon name="plus" size={16} /> Add assignment
+            </button>
+          </>
         }
       />
+      {week && (week.load === 'heavy' || overdue > 0) && (
+        <Link
+          to="/planner?tab=load"
+          className={`card row load-banner ${week.load}`}
+          style={{ color: 'inherit', textDecoration: 'none' }}
+          role="status"
+        >
+          <Icon name="alert" />
+          <b>{week.load === 'heavy' ? 'This week is heavy.' : 'You have overdue work.'}</b>
+          <span className="muted">
+            {week.deadlines} deadline{week.deadlines === 1 ? '' : 's'} this week
+            {overdue ? ` · ${overdue} overdue` : ''}. See the workload view.
+          </span>
+        </Link>
+      )}
+      <div className="row card" style={{ padding: '10px 14px' }}>
+        <input
+          className="input grow"
+          placeholder='Quick add a task: "Read chapter 3 fri", "Email advisor tomorrow 4pm"'
+          aria-label="Quick add task"
+          value={quick}
+          onChange={(e) => setQuick(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') void add();
+          }}
+        />
+        <button className="btn" disabled={!quick.trim()} onClick={() => void add()}>
+          Add
+        </button>
+      </div>
       <div className="grid two">
         <section className="card">
           <div className="card-title">
@@ -150,7 +209,8 @@ export function DashboardPage() {
                         {r.credits != null ? ` · ${r.credits} cr` : ''}
                       </div>
                     </div>
-                    <b className="sens">
+                    <Sparkline points={stats?.trends[r.classId] ?? []} />
+                    <b className="sens" style={{ minWidth: 64, textAlign: 'right' }}>
                       {r.grade.status === 'graded' ? pct(r.grade.percentRounded) : '—'}
                     </b>
                   </Link>
@@ -203,22 +263,30 @@ export function DashboardPage() {
             <p className="muted">Nothing due. Nice.</p>
           ) : (
             <div className="stack tight">
-              {upcoming.map((a) => (
-                <div className="row" key={a.id}>
+              {upcoming.map((d) => (
+                <div className="row" key={d.id}>
                   <ClassChip
-                    name={byId.get(a.classId)?.name ?? ''}
-                    color={byId.get(a.classId)?.color}
-                    code={byId.get(a.classId)?.code}
+                    name={byId.get(d.classId)?.name ?? ''}
+                    color={byId.get(d.classId)?.color}
+                    code={byId.get(d.classId)?.code}
                   />
                   <button
                     className="btn ghost sm grow"
                     style={{ justifyContent: 'flex-start', color: 'var(--text)' }}
-                    onClick={() => dialogs.openAssignment({ id: a.id })}
+                    onClick={() => dialogs.openAssignment({ id: d.id })}
                   >
-                    {a.title}
+                    {d.title}
                   </button>
-                  <span className="small">
-                    <DueBadge a={a} />
+                  <span
+                    className={`small ${d.urgency === 'overdue' ? 'urg-overdue' : d.urgency === 'today' ? 'urg-today' : d.urgency === 'soon' ? 'urg-soon' : 'muted'}`}
+                  >
+                    {d.urgency === 'overdue'
+                      ? `${-d.days}d overdue`
+                      : d.urgency === 'today'
+                        ? 'Today'
+                        : d.days === 1
+                          ? 'Tomorrow'
+                          : `In ${d.days}d`}
                   </span>
                 </div>
               ))}
@@ -228,7 +296,9 @@ export function DashboardPage() {
         <section className="card">
           <div className="card-title">
             <h2>Today</h2>
-            <span className="muted small">{DAY_LABEL[dow]}</span>
+            <Link to="/planner" className="small">
+              Planner
+            </Link>
           </div>
           {today.length === 0 ? (
             <p className="muted">No classes today.</p>
@@ -252,22 +322,115 @@ export function DashboardPage() {
         </section>
         <section className="card">
           <div className="card-title">
+            <h2>Study this week</h2>
+            <Link to="/study" className="small">
+              Start timer
+            </Link>
+          </div>
+          <div className="row" style={{ gap: 24, marginBottom: 8 }}>
+            <div>
+              <div className="grade-big" style={{ fontSize: '1.8rem' }}>
+                {fmtDuration(stats?.study.totalWeekMinutes ?? 0)}
+              </div>
+              <div className="muted small">this week</div>
+            </div>
+            <div>
+              <div className="grade-big" style={{ fontSize: '1.8rem' }}>
+                {stats?.study.streakDays ?? 0}
+              </div>
+              <div className="muted small">day streak</div>
+            </div>
+          </div>
+          {goals.length === 0 ? (
+            <p className="muted small">
+              Set a weekly study goal on a class to track progress here.
+            </p>
+          ) : (
+            <div className="stack tight">
+              {goals.map(({ c, minutes, targetMinutes }) => (
+                <div key={c.id} style={classStyle(c.color)}>
+                  <div className="row small">
+                    <span className="dot" />
+                    <span className="grow">{c.code ?? c.name}</span>
+                    <span className="muted">
+                      {fmtDuration(minutes)} / {fmtDuration(targetMinutes)}
+                    </span>
+                  </div>
+                  <div
+                    className="meter"
+                    role="progressbar"
+                    aria-valuenow={Math.min(100, Math.round((minutes / targetMinutes) * 100))}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`${c.name} study goal`}
+                  >
+                    <i style={{ width: `${Math.min(100, (minutes / targetMinutes) * 100)}%` }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+        <section className="card">
+          <div className="card-title">
             <h2>Open tasks</h2>
+            <Link to="/planner?tab=tasks" className="small">
+              All tasks
+            </Link>
           </div>
           {openTasks.length === 0 ? (
             <p className="muted">All caught up.</p>
           ) : (
             <div className="stack tight">
               {openTasks.map((t) => (
-                <div className="row" key={t.id}>
-                  <Icon name="check" size={14} />
+                <label className="row check" key={t.id}>
+                  <input
+                    type="checkbox"
+                    checked={t.done}
+                    onChange={() => saveTask.mutate({ id: t.id, data: { done: true } })}
+                    aria-label={`Mark “${t.title}” done`}
+                  />
                   <span className="grow">{t.title}</span>
                   {t.date && <span className="muted small">{t.date.slice(5, 10)}</span>}
-                </div>
+                </label>
               ))}
             </div>
           )}
         </section>
+        {reading.length > 0 && (
+          <section className="card stack tight">
+            <div className="card-title">
+              <h2>Currently reading</h2>
+            </div>
+            {reading.map((r) => {
+              const p = r.totalPages
+                ? Math.min(100, Math.round(((r.pagesRead ?? 0) / r.totalPages) * 100))
+                : 0;
+              return (
+                <div key={r.id}>
+                  <div className="row small">
+                    <span className="grow" style={{ fontWeight: 600 }}>
+                      {r.title}
+                    </span>
+                    <span className="muted">
+                      {r.pagesRead ?? 0}/{r.totalPages ?? '?'} pages
+                    </span>
+                  </div>
+                  <div
+                    className="meter"
+                    role="progressbar"
+                    aria-valuenow={p}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                    aria-label={`Progress in ${r.title}`}
+                  >
+                    <i style={{ width: `${p}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        )}
         {semester && semester.goals.length > 0 && (
           <section className="card">
             <div className="card-title">

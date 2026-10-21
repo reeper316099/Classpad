@@ -62,6 +62,8 @@ export const ClassSchema = z.object({
   passFail: z.boolean().default(false),
   includeInGpa: z.boolean().default(true),
   targetGrade: z.number().min(0).optional(),
+  /** Hours per week you aim to study this class. */
+  studyTargetHours: z.number().min(0).max(80).optional(),
   archived: z.boolean().default(false),
 });
 
