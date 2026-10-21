@@ -18,7 +18,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "guard": "node scripts/guard-private.mjs",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "dev:server": "tsc -b && node packages/server/dist/dev.js"
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/guard-private.mjs"

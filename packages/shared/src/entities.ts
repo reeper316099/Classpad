@@ -22,6 +22,8 @@ const base = {
 export const SemesterSchema = z.object({
   ...base,
   name: z.string().min(1),
+  /** Stable folder name, assigned on creation. */
+  slug: z.string().optional(),
   start: IsoSchema.optional(),
   end: IsoSchema.optional(),
   isCurrent: z.boolean().default(false),
@@ -41,6 +43,7 @@ export const ClassSchema = z.object({
   ...base,
   semesterId: z.string(),
   name: z.string().min(1),
+  slug: z.string().optional(),
   code: z.string().optional(),
   type: z.string().optional(),
   delivery: DeliverySchema.optional(),
@@ -165,7 +168,16 @@ export const GradingSchemeSchema = z.object({
     cutoffs: z.array(LetterCutoffSchema).min(1),
     roundingMode: z.enum(['half_up', 'truncate']).default('half_up'),
     decimals: z.number().int().min(0).max(4).default(2),
+    letterOn: z.enum(['raw', 'rounded']).default('raw'),
   }),
+  latePolicy: z.object({ perDayPercent: z.number(), maxPercent: z.number().optional() }).optional(),
+  curve: z
+    .union([
+      z.object({ kind: z.literal('flat'), add: z.number() }),
+      z.object({ kind: z.literal('scale_to_max'), max: z.number().positive() }),
+    ])
+    .optional(),
+  extraCreditCapPercent: z.number().min(0).optional(),
   normalizeOverGradedOnly: z.boolean().default(true),
   extraCreditAllowed: z.boolean().default(true),
   maxScore: z.number().optional(),

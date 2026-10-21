@@ -3,7 +3,9 @@ import { createHash, randomBytes } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type { ZodType } from 'zod';
+import type { ZodType, ZodTypeDef } from 'zod';
+
+type Schema<T> = ZodType<T, ZodTypeDef, unknown>;
 import { createBackup, listBackups, readFromLatestBackup } from './backup.js';
 import { StoreError } from './errors.js';
 import { KeyedMutex } from './mutex.js';
@@ -16,14 +18,14 @@ export type Op =
   | { type: 'move'; from: string; to: string };
 
 export interface ReadOptions<T> {
-  schema?: ZodType<T>;
+  schema?: Schema<T>;
   fallback?: () => T;
 }
 
 export interface VersionedOptions<T> {
   version: number;
   migrations?: Migrations;
-  schema?: ZodType<T>;
+  schema?: Schema<T>;
   fallback: () => T;
 }
 
@@ -41,7 +43,10 @@ export class JsonStore extends EventEmitter {
   readonly root: string;
   private mutex = new KeyedMutex();
   private selfWrites = new Map<string, string>();
-  private validators: { match: (rel: string) => boolean; validate: (text: string) => void }[] = [];
+  private validators: {
+    match: (rel: string) => boolean;
+    validate: (text: string, rel: string) => void;
+  }[] = [];
   private watcher?: FSWatcher;
   private locked = false;
 
@@ -87,7 +92,10 @@ export class JsonStore extends EventEmitter {
     return abs;
   }
 
-  registerValidator(match: (rel: string) => boolean, validate: (text: string) => void): void {
+  registerValidator(
+    match: (rel: string) => boolean,
+    validate: (text: string, rel: string) => void,
+  ): void {
     this.validators.push({ match, validate });
   }
 
@@ -184,7 +192,7 @@ export class JsonStore extends EventEmitter {
   }
 
   // ---------- JSON ----------
-  private parseAndValidate<T>(text: string, rel: string, schema?: ZodType<T>): T {
+  private parseAndValidate<T>(text: string, rel: string, schema?: Schema<T>): T {
     let raw: unknown;
     try {
       raw = JSON.parse(text);
@@ -245,7 +253,7 @@ export class JsonStore extends EventEmitter {
     });
   }
 
-  async writeJson<T>(rel: string, data: T, opts: { schema?: ZodType<T> } = {}): Promise<void> {
+  async writeJson<T>(rel: string, data: T, opts: { schema?: Schema<T> } = {}): Promise<void> {
     const checked = opts.schema ? opts.schema.parse(data) : data;
     await this.withLocks([rel], () => this.rawWrite(rel, stableStringify(checked)));
   }
@@ -356,7 +364,7 @@ export class JsonStore extends EventEmitter {
         for (const v of this.validators) {
           if (!v.match(rel)) continue;
           try {
-            v.validate(text);
+            v.validate(text, rel);
           } catch (e) {
             const err = e as StoreError;
             // keep the user's broken edit for them, but never let it replace what's in memory
