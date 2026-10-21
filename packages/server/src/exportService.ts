@@ -301,3 +301,69 @@ export function gradeReportHtml(ctx: Context, opts: { hideGrades?: boolean } = {
   .class{break-inside:avoid}.warn{color:#8a5a00}code{background:#f3f3f3;padding:0 .25rem}${opts.hideGrades ? '.grade,td,code,b{filter:blur(6px)}' : ''}@media print{details>summary{display:none}}</style></head><body>
   <h1>Grade report</h1><div class="note">Generated ${esc(new Date().toISOString().slice(0, 10))} by Classpad. Print this page to save as PDF.</div>${parts.join('')}${transcript}</body></html>`;
 }
+
+/** One row per assignment with the class and its current grade: for spreadsheets and other tools. */
+export function exportGradebook(ctx: Context): string {
+  const sems = new Map(ctx.semesters.list().map((s) => [s.id, s]));
+  const grades = new Map<string, { percent: string; letter: string }>();
+  for (const c of ctx.classes.list()) {
+    const g = ctx.grading.classGrade(c.id).grade;
+    grades.set(c.id, {
+      percent: g.percentRaw ? g.percentRaw.toFixed(2) : '',
+      letter: g.letter ?? '',
+    });
+  }
+  const classes = [...ctx.classes.list()].sort(
+    (a, b) =>
+      (sems.get(a.semesterId)?.start ?? '').localeCompare(sems.get(b.semesterId)?.start ?? '') ||
+      a.name.localeCompare(b.name),
+  );
+  const rows: Record<string, unknown>[] = [];
+  for (const c of classes) {
+    const items = ctx.assignments
+      .list()
+      .filter((a) => a.classId === c.id)
+      .sort((a, b) => (a.due ?? '').localeCompare(b.due ?? '') || a.title.localeCompare(b.title));
+    for (const a of items)
+      rows.push({
+        semester: sems.get(c.semesterId)?.name ?? '',
+        class: c.name,
+        code: c.code ?? '',
+        credits: c.credits ?? '',
+        assignment: a.title,
+        type: a.type.join('; '),
+        due: a.due?.slice(0, 10) ?? '',
+        weight: a.weight ?? '',
+        points_possible: a.pointsPossible ?? '',
+        score_percent: scorePercent(a),
+        status: a.status,
+        class_percent: grades.get(c.id)?.percent ?? '',
+        class_letter: grades.get(c.id)?.letter ?? '',
+      });
+  }
+  return toCsv(
+    [
+      'semester',
+      'class',
+      'code',
+      'credits',
+      'assignment',
+      'type',
+      'due',
+      'weight',
+      'points_possible',
+      'score_percent',
+      'status',
+      'class_percent',
+      'class_letter',
+    ],
+    rows,
+  );
+}
+
+function scorePercent(a: Assignment): string | number {
+  if (!a.score) return '';
+  if ('percent' in a.score) return a.score.percent;
+  const possible = a.score.possible ?? a.pointsPossible;
+  return possible ? ((a.score.earned / possible) * 100).toFixed(2) : '';
+}

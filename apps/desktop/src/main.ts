@@ -172,6 +172,14 @@ async function boot(): Promise<void> {
   ipcMain.handle('classpad:open-data-folder', (e) => {
     if (trusted(e)) return shell.openPath(dataDir).then(() => undefined);
   });
+  ipcMain.handle('classpad:choose-folder', async (e) => {
+    if (!trusted(e)) throw new Error('untrusted sender');
+    const r = await dialog.showOpenDialog(win ?? undefined!, {
+      title: 'Choose a folder for the export',
+      properties: ['openDirectory', 'createDirectory'],
+    });
+    return r.canceled ? null : (r.filePaths[0] ?? null);
+  });
   ipcMain.handle('classpad:open-report', (e, hide: unknown) => {
     if (!trusted(e)) throw new Error('untrusted sender');
     return openReportWindow(hide === true);

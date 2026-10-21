@@ -16,6 +16,7 @@
     "format": "prettier --write .",
     "typecheck": "tsc -b && tsc -p apps/web --noEmit && tsc -p apps/desktop --noEmit",
     "test": "vitest run",
+    "test:perf": "vitest run -c vitest.perf.config.ts",
     "test:watch": "vitest",
     "guard": "node scripts/guard-private.mjs",
     "build": "tsc -b",

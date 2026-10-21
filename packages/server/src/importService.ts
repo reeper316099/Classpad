@@ -2,6 +2,7 @@ import {
   openZip,
   parseBackup,
   previewCsv,
+  previewGradebook,
   previewIcs,
   previewMarkdownFolder,
   previewNotion,
@@ -12,6 +13,7 @@ import {
   type ImportPreview,
 } from '@classpad/importers';
 import { newId } from '@classpad/shared';
+import { findPlugin } from './plugins.js';
 import { z } from 'zod';
 import { AttachmentService } from './attachments.js';
 import type { Context } from './context.js';
@@ -90,6 +92,8 @@ export interface PreviewInput {
   data?: Buffer;
   text?: string;
   collection?: CsvCollection;
+  /** A mapping plugin (built-in or from the plugins folder) that reads a foreign CSV. */
+  pluginId?: string;
   icsAs?: 'tasks' | 'assignments';
   className?: string;
   dropTooltips?: boolean;
@@ -120,6 +124,12 @@ export class ImportService {
           input.kind === 'notion'
             ? previewNotion(archive, { dropTooltips: input.dropTooltips })
             : previewMarkdownFolder(archive);
+      } else if (input.kind === 'csv' && input.pluginId) {
+        const plugin = await findPlugin(this.ctx.store, input.pluginId);
+        if (!plugin) throw new ApiError(404, 'NOT_FOUND', `plugin "${input.pluginId}" not found`);
+        preview = previewGradebook(input.text ?? input.data?.toString('utf8') ?? '', plugin, {
+          className: input.className,
+        });
       } else if (input.kind === 'csv') {
         if (!input.collection)
           throw new ApiError(422, 'BAD_INPUT', '"collection" is required for CSV imports');

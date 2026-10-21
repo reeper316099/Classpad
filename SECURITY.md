@@ -39,6 +39,8 @@ Know the limits:
 - Turning encryption on removes older plaintext backups and takes a fresh encrypted one. Copies you
   made yourself (exports, your own backups) are not touched.
 - Locked data is protected at rest, not against malware that can read process memory while unlocked.
+- **Exports are plaintext.** Exports and the folder export contain readable copies of your data. Classpad asks you to confirm when encryption is on; protect the destination yourself.
+- **Plugins are data, not code.** They are size-limited, schema-validated and cannot run anything; row filters deliberately have no regular expressions.
 - Search and other derived indexes live in memory only and are never written to disk.
 
 ## Releases

@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('classpad', {
     return () => ipcRenderer.removeListener('classpad:menu', handler);
   },
   openDataFolder: (): Promise<void> => ipcRenderer.invoke('classpad:open-data-folder'),
+  chooseFolder: (): Promise<string | null> => ipcRenderer.invoke('classpad:choose-folder'),
   openReport: (hide = false): Promise<void> => ipcRenderer.invoke('classpad:open-report', hide),
   saveReportPdf: (): Promise<{ saved: boolean; path?: string }> =>
     ipcRenderer.invoke('classpad:save-report-pdf'),

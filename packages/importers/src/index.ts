@@ -8,3 +8,5 @@ export * from './csvImport.js';
 export * from './ics.js';
 export * from './mdFolder.js';
 export * from './backup.js';
+export * from './mapping.js';
+export * from './builtinMappings.js';

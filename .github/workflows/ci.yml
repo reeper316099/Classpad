@@ -20,6 +20,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm test
+      - run: npm run test:perf
       # only what ships: build-time tooling (electron-builder) is not part of the app
       - run: npm audit --omit=dev --audit-level=moderate
         if: matrix.os == 'ubuntu-latest'

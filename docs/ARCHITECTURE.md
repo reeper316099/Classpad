@@ -48,10 +48,11 @@ There is no cloud component.
 
 Classpad has no plugin system in v1. The supported seams for contributors are:
 
-1. **An optional module**: add a Zod schema in `packages/shared/src/modules.ts`, a repository line in
+1. **A CSV format**: write a JSON mapping plugin (no code, see [PLUGINS.md](PLUGINS.md)). This is the supported way for users to extend importing.
+2. **An optional module**: add a Zod schema in `packages/shared/src/modules.ts`, a repository line in
    `packages/server/src/context.ts` and routes in `app.ts`, then a definition in
    `apps/web/src/lib/modules.ts`. The generic table page handles the rest.
-2. **An importer**: add a pure parser in `packages/importers` that returns `ImportPreview` drafts.
-3. **A grading mode or GPA scale**: `packages/grades` (schemes and presets) with golden tests.
+3. **An importer**: add a pure parser in `packages/importers` that returns `ImportPreview` drafts.
+4. **A grading mode or GPA scale**: `packages/grades` (schemes and presets) with golden tests.
 
 Anything that needs network access, accounts or sync is out of scope for v1.

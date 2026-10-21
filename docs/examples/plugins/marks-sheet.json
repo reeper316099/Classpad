@@ -1,0 +1,17 @@
+{
+  "pluginVersion": 1,
+  "id": "marks-sheet",
+  "name": "Marks sheet (example)",
+  "description": "Reads a CSV with the columns Task, Mark and Out of.",
+  "kind": "gradebook-csv",
+  "layout": "long",
+  "columns": {
+    "title": ["Task", "Item"],
+    "class": "Subject",
+    "due": "Due",
+    "score": "Mark",
+    "pointsPossible": "Out of"
+  },
+  "className": "Placeholder Course",
+  "skipRows": [{ "column": "Task", "contains": "total" }]
+}

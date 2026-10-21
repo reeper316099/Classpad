@@ -13,6 +13,7 @@ declare global {
       dataDir: string;
       onMenu(cb: (action: string) => void): () => void;
       openDataFolder(): Promise<void>;
+      chooseFolder(): Promise<string | null>;
       openReport(hide?: boolean): Promise<void>;
       saveReportPdf(): Promise<{ saved: boolean; path?: string }>;
     };

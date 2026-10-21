@@ -1,17 +1,19 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { Icon } from '../components/Icon.js';
+import { SyncFolderCard } from '../components/SyncFolderCard.js';
 import { PageHead } from '../components/ui.js';
 import { download, get, openInTab, post, postBinary } from '../lib/api.js';
 import { refreshAll } from '../lib/hooks.js';
 import { useUi } from '../lib/store.js';
 import type { ImportSummary } from '../lib/types.js';
 
-type Kind = 'notion' | 'markdown' | 'csv' | 'ics' | 'json';
+type Kind = 'notion' | 'markdown' | 'csv' | 'gradebook' | 'ics' | 'json';
 const KINDS: [Kind, string, string][] = [
   ['notion', 'Notion export (.zip)', '.zip'],
   ['markdown', 'Markdown folder (.zip)', '.zip'],
   ['csv', 'CSV spreadsheet', '.csv'],
+  ['gradebook', 'Gradebook CSV (LMS export)', '.csv'],
   ['ics', 'Calendar (.ics)', '.ics'],
   ['json', 'Classpad backup (.json)', '.json'],
 ];
@@ -38,6 +40,18 @@ interface History {
   undoneAt?: string;
 }
 
+interface PluginInfo {
+  id: string;
+  name: string;
+  description?: string;
+}
+interface PluginList {
+  builtin: PluginInfo[];
+  user: PluginInfo[];
+  errors: { file: string; message: string }[];
+  folder: string;
+}
+
 export function ImportExportPage() {
   const qc = useQueryClient();
   const toast = useUi((s) => s.toast);
@@ -45,6 +59,8 @@ export function ImportExportPage() {
   const [kind, setKind] = useState<Kind>('notion');
   const [collection, setCollection] = useState('assignments');
   const [csvAs, setIcsAs] = useState<'tasks' | 'assignments'>('tasks');
+  const [pluginId, setPluginId] = useState('gradebook-rows');
+  const [className, setClassName] = useState('');
   const [strategy, setStrategy] = useState('update_empty');
   const [sum, setSum] = useState<ImportSummary | null>(null);
   const [done, setDone] = useState<Commit | null>(null);
@@ -52,6 +68,18 @@ export function ImportExportPage() {
   const { data: hist = [] } = useQuery({
     queryKey: ['import-history'],
     queryFn: () => get<History[]>('/import/history'),
+  });
+
+  const { data: plugins } = useQuery({
+    queryKey: ['plugins'],
+    queryFn: () => get<PluginList>('/plugins'),
+    enabled: kind === 'gradebook',
+  });
+  const { data: classNames = [] } = useQuery({
+    queryKey: ['class-names'],
+    queryFn: async () =>
+      (await get<{ items: { name: string }[] }>('/classes?limit=500')).items.map((c) => c.name),
+    enabled: kind === 'gradebook',
   });
 
   const guard = async (f: () => Promise<void>) => {
@@ -73,6 +101,9 @@ export function ImportExportPage() {
         setSum(
           await post<ImportSummary>('/import/preview', {
             kind,
+            ...(kind === 'gradebook'
+              ? { kind: 'csv', pluginId, className: className.trim() || undefined }
+              : {}),
             text: await f.text(),
             collection: kind === 'csv' ? collection : undefined,
             icsAs: kind === 'ics' ? csvAs : undefined,
@@ -150,6 +181,37 @@ export function ImportExportPage() {
               Download template
             </button>
           )}
+          {kind === 'gradebook' && (
+            <>
+              <select
+                className="select"
+                style={{ width: 'auto' }}
+                aria-label="Gradebook format"
+                value={pluginId}
+                onChange={(e) => setPluginId(e.target.value)}
+              >
+                {[...(plugins?.builtin ?? []), ...(plugins?.user ?? [])].map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              <input
+                className="input"
+                style={{ width: 220 }}
+                list="class-names"
+                aria-label="Class for these assignments"
+                placeholder="Class (if the file has none)"
+                value={className}
+                onChange={(e) => setClassName(e.target.value)}
+              />
+              <datalist id="class-names">
+                {classNames.map((n) => (
+                  <option key={n} value={n} />
+                ))}
+              </datalist>
+            </>
+          )}
           {kind === 'ics' && (
             <select
               className="select"
@@ -161,6 +223,12 @@ export function ImportExportPage() {
               <option value="tasks">Events as tasks</option>
               <option value="assignments">Events as assignments</option>
             </select>
+          )}
+          {kind === 'gradebook' && !!plugins?.errors.length && (
+            <span className="badge warning" role="status">
+              {plugins.errors.length} plugin file(s) in <span className="mono">plugins/</span> could
+              not be used: {plugins.errors[0]!.file}: {plugins.errors[0]!.message}
+            </span>
           )}
           <input
             ref={file}
@@ -375,11 +443,16 @@ export function ImportExportPage() {
           >
             Full backup (.json)
           </button>
+          <button className="btn sm" onClick={() => download('/export/gradebook', 'gradebook.csv')}>
+            Gradebook (.csv)
+          </button>
           <button className="btn sm primary" onClick={() => openInTab('/export/report')}>
             Printable grade report
           </button>
         </div>
       </section>
+
+      <SyncFolderCard />
 
       {hist.length > 0 && (
         <section className="card stack tight">

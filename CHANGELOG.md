@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Import and export helpers
+
+- Gradebook CSV import for LMS-style exports (a row per assignment, or a column per assignment), with a preview, warnings for anything skipped, and undo.
+- Declarative plugins: drop a JSON file in `plugins/` to teach Classpad a new CSV layout. Plugins contain no code. See [docs/PLUGINS.md](docs/PLUGINS.md).
+- Gradebook CSV export (one row per assignment, with class percent and letter).
+- One-way "Export to a folder" for other apps: backup, spreadsheet, calendar files and Markdown notes. Asks before writing unencrypted copies of encrypted data.
+
 ## 0.1.0 (first public release)
 
 Local-first student workspace. No network, no telemetry, no accounts.

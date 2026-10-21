@@ -6,3 +6,4 @@ export * from './frontmatter.js';
 export * from './wikilinks.js';
 export * from './modules.js';
 export * from './srs.js';
+export * from './plugins.js';

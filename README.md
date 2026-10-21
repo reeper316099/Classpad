@@ -18,6 +18,7 @@ _Screenshots use the built-in demo data. Regenerate with `node scripts/screensho
 - **Planner**: timetable, calendar, tasks, workload heatmap, study timer and stats.
 - **Import** from a Notion export, CSV, ICS, Markdown or a JSON backup, with preview and undo. See [docs/NOTION_IMPORT.md](docs/NOTION_IMPORT.md).
 - **Optional modules** (off by default except Reading): journal, contacts, activities, jobs & internships, admissions, budget, flashcards with spaced repetition.
+- **Bring your data in and out**: gradebook CSV import, declarative [plugins](docs/PLUGINS.md) for other layouts, and a one-way export folder for your other apps.
 - **Privacy**: no network, no telemetry, no accounts. Optional app lock and encryption at rest ([SECURITY.md](SECURITY.md)).
 
 More: [architecture](docs/ARCHITECTURE.md) · [data format](docs/DATA_FORMAT.md) · [good first issues](docs/GOOD_FIRST_ISSUES.md) · [changelog](CHANGELOG.md)

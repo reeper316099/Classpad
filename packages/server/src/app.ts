@@ -29,12 +29,16 @@ import { CSV_COLLECTIONS, csvTemplate, type CsvCollection } from '@classpad/impo
 import { AttachmentService, isInlineSafe } from './attachments.js';
 import {
   exportCsv,
+  exportGradebook,
   exportIcs,
   exportJson,
   exportMarkdownVault,
   gradeReportHtml,
 } from './exportService.js';
+import path from 'node:path';
 import { clearDemo, hasDemo, loadDemo } from './demo.js';
+import { listPlugins } from './plugins.js';
+import { syncToFolder } from './syncService.js';
 import { LockService, readPrivacySync } from './lock.js';
 import { agenda, deadlines, stats, timetable } from './planner.js';
 import { APP_CSP, readStatic } from './static.js';
@@ -848,6 +852,10 @@ export async function createApp(opts: AppOptions): Promise<App> {
     icsAs: z.enum(['tasks', 'assignments']).optional(),
     className: z.string().max(200).optional(),
     dropTooltips: z.boolean().optional(),
+    pluginId: z
+      .string()
+      .regex(/^[a-z0-9][a-z0-9-]{1,38}$/)
+      .optional(),
   });
   routes.push({
     method: 'POST',
@@ -863,6 +871,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
           collection: PreviewBody.shape.collection,
           icsAs: PreviewBody.shape.icsAs,
           className: PreviewBody.shape.className,
+          pluginId: PreviewBody.shape.pluginId,
         })
         .parse(req.query);
       return imports.preview({ ...q, data: req.body });
@@ -910,6 +919,33 @@ export async function createApp(opts: AppOptions): Promise<App> {
       exportCsv(ctx, collection),
     );
   });
+  app.get(`${api}/export/gradebook`, async (_req, reply) =>
+    download(reply, 'text/csv; charset=utf-8', 'gradebook.csv', exportGradebook(ctx)),
+  );
+  route('GET', '/plugins', 'Built-in and user mapping plugins', async () => ({
+    ...(await listPlugins(store)),
+    folder: path.join(opts.dataDir, 'plugins'),
+  }));
+  const Sync = z.object({
+    dir: z.string().min(1).max(1024),
+    acknowledgePlaintext: z.boolean().optional(),
+  });
+  route(
+    'POST',
+    '/sync/export',
+    'One-way export to a folder other apps can read',
+    async (r) => {
+      const b = Sync.parse(r.body);
+      if (lock.status().encryptedCollections.length && !b.acknowledgePlaintext)
+        throw new ApiError(
+          409,
+          'NEEDS_ACK',
+          'Some of your data is encrypted at rest. Exported files are NOT encrypted. Confirm to export anyway.',
+        );
+      return syncToFolder(ctx, opts.dataDir, b.dir);
+    },
+    Sync,
+  );
   app.get(`${api}/export/ics`, async (req, reply) => {
     const { kind } = z
       .object({ kind: z.enum(['deadlines', 'timetable', 'all']).default('all') })
