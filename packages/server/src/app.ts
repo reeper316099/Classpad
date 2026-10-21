@@ -26,6 +26,7 @@ import {
 } from './exportService.js';
 import { clearDemo, hasDemo, loadDemo } from './demo.js';
 import { agenda, deadlines, stats, timetable } from './planner.js';
+import { APP_CSP, readStatic } from './static.js';
 import { backlinksFor, resolveLink } from './noteTools.js';
 import { TemplateService } from './templates.js';
 import { ImportService, STRATEGIES } from './importService.js';
@@ -41,6 +42,10 @@ export interface AppOptions {
   dev?: boolean;
   logger?: boolean;
   watch?: boolean;
+  /** Directory with the built web UI; when set, the server also serves it (same origin as the API). */
+  staticDir?: string;
+  /** Accepted Host header values (DNS-rebinding guard). Defaults to loopback names on the listening port. */
+  allowedHosts?: string[];
 }
 
 export interface App {
@@ -119,6 +124,8 @@ export async function createApp(opts: AppOptions): Promise<App> {
       : false,
     genReqId: (req) => String(req.headers['x-request-id'] ?? randomBytes(8).toString('hex')),
     bodyLimit: 10 * 1024 * 1024,
+    // long-lived live-update (SSE) connections must not keep the server (and the app) from shutting down
+    forceCloseConnections: true,
   });
   const routes: { method: string; path: string; summary: string; body?: ZodType }[] = [];
   const api = '/api/v1';
@@ -126,6 +133,26 @@ export async function createApp(opts: AppOptions): Promise<App> {
   app.addHook('onRequest', async (req, reply) => {
     reply.header('x-request-id', req.id);
     const url = req.url.split('?')[0]!;
+    // DNS-rebinding guard: a web page on another origin must not be able to reach this server by name.
+    const addr = app.server.address();
+    const host = String(req.headers.host ?? '');
+    // Loopback names only. In production the port must also be ours; in dev any loopback port is fine so a
+    // dev-server proxy on another port keeps working.
+    const hostName = host.replace(/:\d+$/, '');
+    const loopback = ['127.0.0.1', 'localhost', '[::1]'].includes(hostName);
+    const portOk = opts.dev || !addr || typeof addr !== 'object' || host.endsWith(`:${addr.port}`);
+    const allowed =
+      opts.allowedHosts ??
+      (loopback && portOk ? [host] : addr && typeof addr === 'object' ? [] : null);
+    if (allowed && !allowed.includes(host))
+      throw new ApiError(403, 'BAD_HOST', 'unexpected Host header');
+    // the UI bundle itself is public (it holds no data); everything under /api needs the token
+    if (
+      opts.staticDir &&
+      !url.startsWith(`${api}/`) &&
+      (req.method === 'GET' || req.method === 'HEAD')
+    )
+      return;
     let given = (req.headers.authorization ?? '').replace(/^Bearer\s+/i, '');
     if (!given && url === `${api}/events`)
       given = String((req.query as Record<string, string>)?.access_token ?? '');
@@ -159,11 +186,29 @@ export async function createApp(opts: AppOptions): Promise<App> {
     req.log.error({ msg: e.message }, 'unhandled error');
     return send(500, 'INTERNAL', 'internal error');
   });
-  app.setNotFoundHandler((req, reply) =>
-    reply
+  app.setNotFoundHandler(async (req, reply) => {
+    const url = req.url.split('?')[0]!;
+    if (
+      opts.staticDir &&
+      (req.method === 'GET' || req.method === 'HEAD') &&
+      !url.startsWith(`${api}/`)
+    ) {
+      const f = await readStatic(opts.staticDir, url);
+      if (f) {
+        return reply
+          .header('content-type', f.type)
+          .header('cache-control', f.immutable ? 'public, max-age=31536000, immutable' : 'no-cache')
+          .header('content-security-policy', APP_CSP)
+          .header('x-content-type-options', 'nosniff')
+          .header('referrer-policy', 'no-referrer')
+          .header('x-frame-options', 'DENY')
+          .send(req.method === 'HEAD' ? '' : f.body);
+      }
+    }
+    return reply
       .status(404)
-      .send({ error: { code: 'NOT_FOUND', message: 'route not found', requestId: req.id } }),
-  );
+      .send({ error: { code: 'NOT_FOUND', message: 'route not found', requestId: req.id } });
+  });
 
   const route = (
     method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',

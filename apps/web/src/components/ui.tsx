@@ -1,4 +1,14 @@
-import { useEffect, useRef, type CSSProperties, type ReactNode } from 'react';
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useEffect,
+  useId,
+  useRef,
+  type CSSProperties,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 import { classTokens } from '../lib/color.js';
 import { pct } from '../lib/format.js';
 import type { GradeResult, Step } from '../lib/types.js';
@@ -92,11 +102,29 @@ export function Field({
   children: ReactNode;
   htmlFor?: string;
 }) {
+  // Tie the label to its control automatically (accessible name, click-to-focus, and testable by label).
+  const auto = useId();
+  const only =
+    Children.count(children) === 1 && isValidElement(children)
+      ? (children as ReactElement<{ id?: string }>)
+      : null;
+  const id = htmlFor ?? only?.props.id ?? auto;
+  const hintId = hint ? `${id}-hint` : undefined;
+  const control = only
+    ? cloneElement(only as ReactElement<Record<string, unknown>>, {
+        id,
+        ...(hintId ? { 'aria-describedby': hintId } : {}),
+      })
+    : children;
   return (
     <div className="field">
-      <label htmlFor={htmlFor}>{label}</label>
-      {children}
-      {hint && <span className="hint">{hint}</span>}
+      <label htmlFor={id}>{label}</label>
+      {control}
+      {hint && (
+        <span className="hint" id={hintId}>
+          {hint}
+        </span>
+      )}
     </div>
   );
 }

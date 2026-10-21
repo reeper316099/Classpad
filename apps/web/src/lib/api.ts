@@ -5,7 +5,17 @@ export interface ApiConfig {
 
 declare global {
   interface Window {
-    classpad?: { api: ApiConfig };
+    /** Present only inside the desktop app (injected by the preload script). */
+    classpad?: {
+      api: ApiConfig;
+      platform: string;
+      version: string;
+      dataDir: string;
+      onMenu(cb: (action: string) => void): () => void;
+      openDataFolder(): Promise<void>;
+      openReport(hide?: boolean): Promise<void>;
+      saveReportPdf(): Promise<{ saved: boolean; path?: string }>;
+    };
   }
 }
 
@@ -42,7 +52,11 @@ async function request(
       headers: { authorization: `Bearer ${token}`, ...headers },
     });
   } catch {
-    throw new ApiError(0, 'NETWORK', 'Cannot reach the local Classpad server');
+    throw new ApiError(
+      0,
+      'NETWORK',
+      'Cannot reach the local Classpad server. In development run `npm run dev` (it starts the server and the app together); in the desktop app, quit and reopen Classpad.',
+    );
   }
   if (!res.ok) {
     let code = 'ERROR',
@@ -94,6 +108,9 @@ export async function download(path: string, filename: string): Promise<void> {
 }
 
 export async function openInTab(path: string): Promise<void> {
+  // desktop app: the main process shows the report in its own window
+  if (window.classpad && path.startsWith('/export/report'))
+    return window.classpad.openReport(path.includes('hide=1'));
   const res = await request('GET', path);
   window.open(URL.createObjectURL(await res.blob()), '_blank', 'noopener');
 }

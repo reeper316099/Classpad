@@ -1,0 +1,62 @@
+name: Release
+# Push a tag like v0.1.0 to build installers for Windows, macOS and Linux and publish a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run guard -- --all
+      - run: npm test
+      - name: Linux packaging tools (rpm)
+        if: matrix.os == 'ubuntu-latest'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+      - name: Build installers (unsigned)
+        run: npm run desktop:dist
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installers-${{ matrix.os }}
+          if-no-files-found: error
+          path: |
+            release/*.dmg
+            release/*.exe
+            release/*.AppImage
+            release/*.deb
+            release/*.rpm
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true
+          draft: true
+          body: |
+            ## Installing
+            These builds are **unsigned**, so your OS will warn you the first time:
+            - **macOS:** right-click the app → Open (or System Settings → Privacy & Security → Open Anyway).
+            - **Windows:** SmartScreen → More info → Run anyway.
+            - **Linux:** `chmod +x` the AppImage, or install the `.deb` / `.rpm`.
+
+            Everything stays on your computer. There is no telemetry and no network access.

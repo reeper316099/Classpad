@@ -8,3 +8,6 @@ private-fixtures/
 out/
 release/
 .dev-data
+release/
+test-results/
+playwright-report/

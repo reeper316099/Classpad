@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc -b && tsc -p apps/web --noEmit",
+    "typecheck": "tsc -b && tsc -p apps/web --noEmit && tsc -p apps/desktop --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "guard": "node scripts/guard-private.mjs",
@@ -23,7 +23,12 @@
     "fixtures:generate": "node scripts/generate-fixtures.mjs",
     "fixtures:check-leak": "node scripts/check-fixture-leak.mjs",
     "dev": "node scripts/dev.mjs",
-    "build:web": "npm run build -w @classpad/web"
+    "build:web": "npm run build -w @classpad/web",
+    "desktop": "npm run start -w @classpad/desktop",
+    "desktop:pack": "npm run pack -w @classpad/desktop",
+    "desktop:dist": "npm run dist -w @classpad/desktop",
+    "e2e": "npm run bundle -w @classpad/desktop && playwright test -c e2e/playwright.config.ts",
+    "dev:stop": "node scripts/dev.mjs --stop"
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/guard-private.mjs"

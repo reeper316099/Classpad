@@ -1,0 +1,43 @@
+appId: dev.classpad.app
+productName: Classpad
+copyright: Copyright © 2026 Classpad contributors
+electronVersion: 44.9.2
+directories:
+  output: ../../release
+  buildResources: build
+# everything is bundled by esbuild, so only the bundle is packaged (no node_modules)
+files:
+  - dist/**/*
+  - package.json
+  - '!**/*.map'
+asar: true
+compression: normal
+extraMetadata:
+  main: dist/main.cjs
+mac:
+  category: public.app-category.education
+  icon: build/icon.png
+  identity: null # unsigned for now; see docs/PACKAGING.md to add signing/notarization
+  target:
+    - target: dmg
+      arch: universal
+dmg:
+  title: Classpad
+win:
+  icon: build/icon.png
+  target:
+    - nsis
+    - portable
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+linux:
+  icon: build/icon.png
+  category: Education
+  maintainer: Classpad contributors
+  target:
+    - AppImage
+    - deb
+    - rpm
+artifactName: ${productName}-${version}-${os}-${arch}.${ext}

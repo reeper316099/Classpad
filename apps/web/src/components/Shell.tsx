@@ -80,6 +80,33 @@ export function Shell() {
     return () => window.removeEventListener('keydown', onKey);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // native menu (desktop app) -> the same actions as the keyboard shortcuts
+  useEffect(() => {
+    const go: Record<string, string> = {
+      'go-dashboard': '/',
+      'go-classes': '/classes',
+      'go-assignments': '/assignments',
+      'go-notes': '/notes',
+      'go-planner': '/planner',
+      'go-study': '/study',
+      'go-grades': '/grades',
+      'go-gpa': '/gpa',
+      settings: '/settings',
+      import: '/import',
+    };
+    return window.classpad?.onMenu((a) => {
+      if (go[a]) nav(go[a]!);
+      else if (a === 'new-assignment') dialogs.openAssignment();
+      else if (a === 'new-note') dialogs.openNote();
+      else if (a === 'new-task') dialogs.openTask();
+      else if (a === 'new-class') dialogs.openClass();
+      else if (a === 'new-semester') dialogs.openSemester();
+      else if (a === 'quick-open') dialogs.setQuickOpen(true);
+      else if (a === 'palette') useUi.getState().setPalette(true);
+      else if (a === 'help') useUi.getState().setHelp(true);
+    });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const nextTheme = ui.theme === 'system' ? 'light' : ui.theme === 'light' ? 'dark' : 'system';
   return (
     <div className="app">

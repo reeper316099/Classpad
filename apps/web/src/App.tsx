@@ -1,9 +1,15 @@
-import { QueryClient, QueryClientProvider, useQueryClient } from '@tanstack/react-query';
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+  useQueryClient,
+} from '@tanstack/react-query';
 import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Shell } from './components/Shell.js';
 import { eventsUrl } from './lib/api.js';
 import { refreshAll } from './lib/hooks.js';
+import { useUi } from './lib/store.js';
 import { AssignmentsPage } from './pages/Assignments.js';
 import { ClassPage, ClassesPage } from './pages/Classes.js';
 import { DashboardPage } from './pages/Dashboard.js';
@@ -17,7 +23,17 @@ import { SettingsPage } from './pages/Settings.js';
 const StudyPage = lazy(() => import('./pages/Study.js').then((m) => ({ default: m.StudyPage })));
 const GpaPage = lazy(() => import('./pages/Gpa.js').then((m) => ({ default: m.GpaPage })));
 
+let lastError = { msg: '', at: 0 };
+/** A failed request must never just look like "no data": tell the user once, with the reason. */
 const client = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (e) => {
+      const msg = (e as Error).message || 'Request failed';
+      if (msg === lastError.msg && Date.now() - lastError.at < 15_000) return;
+      lastError = { msg, at: Date.now() };
+      useUi.getState().toast(`Something went wrong: ${msg}`, { ms: 8000 });
+    },
+  }),
   defaultOptions: { queries: { staleTime: 15_000, refetchOnWindowFocus: false, retry: 1 } },
 });
 

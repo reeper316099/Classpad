@@ -8,8 +8,9 @@ export default defineConfig({
   server: {
     port: 5173,
     strictPort: false,
-    proxy: { '/api': { target: API, changeOrigin: false } },
+    proxy: { '/api': { target: API, changeOrigin: true } },
   },
-  build: { target: 'es2022', sourcemap: true },
+  // never inline assets as data: URLs: the app's CSP (font-src 'self') would block inlined fonts such as KaTeX's
+  build: { target: 'es2022', sourcemap: true, assetsInlineLimit: 0 },
   test: { environment: 'jsdom', include: ['src/**/*.test.{ts,tsx}'] },
 });

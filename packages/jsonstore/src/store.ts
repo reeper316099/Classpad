@@ -357,7 +357,7 @@ export class JsonStore extends EventEmitter {
   async watch(): Promise<void> {
     if (this.watcher) return;
     const ignored = (p: string) =>
-      /(^|[\\/])(backups|quarantine|logs|attachments|exports|imports)([\\/]|$)|\.tmp$|\.lock$/.test(
+      /(^|[\\/])(backups|quarantine|logs|attachments|exports|imports|electron)([\\/]|$)|(^|[\\/])Singleton(Lock|Socket|Cookie)$|\.tmp$|\.lock$/.test(
         path.relative(this.root, p),
       );
     this.watcher = chokidarWatch(this.root, {
@@ -396,6 +396,8 @@ export class JsonStore extends EventEmitter {
       }
       this.emit('external-change', { rel });
     };
+    // a file we cannot watch (sockets, permissions) must never take the app down
+    this.watcher.on('error', (err) => this.emit('watch-error', err));
     this.watcher
       .on('add', onFile)
       .on('change', onFile)
@@ -404,7 +406,10 @@ export class JsonStore extends EventEmitter {
           rel: path.relative(this.root, abs).split(path.sep).join('/'),
         }),
       );
-    await new Promise<void>((res) => this.watcher!.once('ready', () => res()));
+    await new Promise<void>((res) => {
+      this.watcher!.once('ready', () => res());
+      this.watcher!.once('error', () => res());
+    });
   }
 
   async close(): Promise<void> {

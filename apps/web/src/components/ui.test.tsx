@@ -2,7 +2,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { Breakdown, GradePill, Toasts } from './ui.js';
+import { Breakdown, Field, GradePill, Toasts } from './ui.js';
 import type { GradeResult } from '../lib/types.js';
 
 afterEach(cleanup);
@@ -71,5 +71,37 @@ describe('Toasts', () => {
     expect(onAction).toHaveBeenCalledOnce();
     expect(dismiss).toHaveBeenCalledWith(1);
     expect(screen.getByRole('status').getAttribute('aria-live')).toBe('polite');
+  });
+});
+
+describe('Field', () => {
+  it('ties the label to its control so it can be found, focused and announced', () => {
+    render(
+      <Field label="Weight %" hint="Share of the class grade">
+        <input className="input" />
+      </Field>,
+    );
+    const input = screen.getByLabelText('Weight %');
+    expect(input.tagName).toBe('INPUT');
+    expect(input.getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.getElementById(input.getAttribute('aria-describedby')!)!.textContent).toBe(
+      'Share of the class grade',
+    );
+  });
+  it('keeps an explicit id, and works for selects', () => {
+    render(
+      <>
+        <Field label="Title" htmlFor="my-title">
+          <input id="my-title" />
+        </Field>
+        <Field label="Class">
+          <select>
+            <option>A</option>
+          </select>
+        </Field>
+      </>,
+    );
+    expect(screen.getByLabelText('Title').id).toBe('my-title');
+    expect(screen.getByLabelText('Class').tagName).toBe('SELECT');
   });
 });

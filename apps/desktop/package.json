@@ -1,0 +1,22 @@
+{
+  "name": "@classpad/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Classpad desktop app",
+  "author": "Classpad contributors",
+  "main": "dist/main.cjs",
+  "type": "module",
+  "scripts": {
+    "bundle": "node scripts/bundle.mjs",
+    "start": "npm run bundle && electron .",
+    "pack": "npm run bundle && electron-builder --dir",
+    "dist": "npm run bundle && electron-builder"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.1",
+    "electron": "44.9.2",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  }
+}

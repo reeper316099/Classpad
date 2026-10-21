@@ -1,4 +1,4 @@
-import { get, post } from './api.js';
+import { apiConfig, get, post } from './api.js';
 import type { Attachment, Page } from './types.js';
 
 const blobCache = new Map<string, Promise<string>>();
@@ -24,7 +24,6 @@ export function attachmentBlobUrl(hash: string): Promise<string> {
     p = (async () => {
       const a = await findAttachment(hash);
       if (!a) throw new Error('Attachment not found');
-      const { apiConfig } = await import('./api.js');
       const { baseUrl, token } = apiConfig();
       const res = await fetch(`${baseUrl}/api/v1/attachments/${a.id}/file`, {
         headers: { authorization: `Bearer ${token}` },
@@ -42,7 +41,6 @@ export function attachmentBlobUrl(hash: string): Promise<string> {
 export async function attachmentBytes(hash: string): Promise<Uint8Array> {
   const a = await findAttachment(hash);
   if (!a) throw new Error('Attachment not found');
-  const { apiConfig } = await import('./api.js');
   const { baseUrl, token } = apiConfig();
   const res = await fetch(`${baseUrl}/api/v1/attachments/${a.id}/file`, {
     headers: { authorization: `Bearer ${token}` },

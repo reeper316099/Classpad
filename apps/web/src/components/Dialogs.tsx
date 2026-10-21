@@ -150,10 +150,37 @@ function AssignmentDialog() {
         </>
       }
     >
-      <div className="dlg-body">
+      <div
+        className="dlg-body"
+        onKeyDown={(e) => {
+          if (
+            e.key === 'Enter' &&
+            !(e.target instanceof HTMLTextAreaElement) &&
+            !(e.target instanceof HTMLButtonElement) &&
+            !(e.target instanceof HTMLSelectElement)
+          ) {
+            e.preventDefault();
+            void submit();
+          }
+        }}
+      >
         {err && (
           <div className="badge danger" role="alert">
             {err}
+          </div>
+        )}
+        {classes.length === 0 && (
+          <div className="badge warning row tight" role="status">
+            Assignments belong to a class, and you have none yet.
+            <button
+              className="btn sm"
+              onClick={() => {
+                close();
+                useDialogs.getState().openClass();
+              }}
+            >
+              Create a class
+            </button>
           </div>
         )}
         <div className="form-grid">
@@ -441,7 +468,20 @@ function ClassDialog() {
         </>
       }
     >
-      <div className="dlg-body">
+      <div
+        className="dlg-body"
+        onKeyDown={(e) => {
+          if (
+            e.key === 'Enter' &&
+            !(e.target instanceof HTMLTextAreaElement) &&
+            !(e.target instanceof HTMLButtonElement) &&
+            !(e.target instanceof HTMLSelectElement)
+          ) {
+            e.preventDefault();
+            void submit();
+          }
+        }}
+      >
         {err && (
           <div className="badge danger" role="alert">
             {err}
@@ -673,7 +713,20 @@ function SemesterDialog() {
         </>
       }
     >
-      <div className="dlg-body">
+      <div
+        className="dlg-body"
+        onKeyDown={(e) => {
+          if (
+            e.key === 'Enter' &&
+            !(e.target instanceof HTMLTextAreaElement) &&
+            !(e.target instanceof HTMLButtonElement) &&
+            !(e.target instanceof HTMLSelectElement)
+          ) {
+            e.preventDefault();
+            void submit();
+          }
+        }}
+      >
         {err && (
           <div className="badge danger" role="alert">
             {err}

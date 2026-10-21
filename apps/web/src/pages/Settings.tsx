@@ -236,6 +236,16 @@ export function SettingsPage() {
           {about &&
             `${about.counts.classes} classes · ${about.counts.assignments} assignments · ${about.counts.notes} notes.`}
         </p>
+        {window.classpad && (
+          <div className="row">
+            <span className="muted small mono" title="Data folder">
+              {window.classpad.dataDir}
+            </span>
+            <button className="btn sm" onClick={() => void window.classpad!.openDataFolder()}>
+              Show in folder
+            </button>
+          </div>
+        )}
         {about?.demoLoaded && (
           <div className="row">
             <span>Demo data is loaded.</span>
