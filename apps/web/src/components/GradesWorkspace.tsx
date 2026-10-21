@@ -4,6 +4,7 @@ import { get, patch, post } from '../lib/api.js';
 import { fixed, num, pct, scoreText } from '../lib/format.js';
 import { letterFor, parseOverride } from '../lib/grade.js';
 import { refreshAll, useAssignments, useClasses } from '../lib/hooks.js';
+import { useDialogs } from '../lib/dialogs.js';
 import { useUi } from '../lib/store.js';
 import type {
   Assignment,
@@ -46,6 +47,7 @@ export function GradesWorkspace({ classId }: { classId: string }) {
     placeholderData: keepPreviousData,
   });
   const [tab, setTab] = useState<Tab>('current');
+  const dialogs = useDialogs();
   useEffect(() => setTab('current'), [classId]);
   if (!cls) return null;
   const g = cg?.grade;
@@ -76,7 +78,10 @@ export function GradesWorkspace({ classId }: { classId: string }) {
               'Calculating…'
             )}
             {' · '}
-            {scheme?.name ?? 'Assignment weights'}
+            {scheme?.name ?? 'Assignment weights'}{' '}
+            <button className="btn ghost sm" onClick={() => dialogs.openGrading(classId)}>
+              Set up grading
+            </button>
             {cls.credits != null ? ` · ${cls.credits} credits` : ''}
           </div>
         </div>
@@ -89,11 +94,35 @@ export function GradesWorkspace({ classId }: { classId: string }) {
           ))}
         </div>
       </div>
-      {g?.warnings.map((w, i) => (
-        <div key={i} className="badge warning" style={{ alignSelf: 'flex-start' }}>
-          {w}
+      {scheme?.mode === 'category_weights' && (scheme.categories ?? []).length === 0 && (
+        <div className="badge warning row tight" style={{ alignSelf: 'flex-start' }}>
+          This class uses category weights but has no categories yet.
+          <button className="btn sm" onClick={() => dialogs.openGrading(classId)}>
+            Add categories
+          </button>
         </div>
-      ))}
+      )}
+      {scheme?.mode === 'category_weights' &&
+        (scheme.categories ?? []).length > 0 &&
+        items.some((a) => !(scheme.categories ?? []).some((c) => c.id === a.categoryId)) && (
+          <div className="badge warning row tight" style={{ alignSelf: 'flex-start' }}>
+            {
+              items.filter((a) => !(scheme.categories ?? []).some((c) => c.id === a.categoryId))
+                .length
+            }{' '}
+            assignment(s) are not in a category, so they do not count yet.
+            <button className="btn sm" onClick={() => dialogs.openGrading(classId)}>
+              Choose categories
+            </button>
+          </div>
+        )}
+      {g?.warnings
+        .filter((w) => !/has no valid category/.test(w))
+        .map((w, i) => (
+          <div key={i} className="badge warning" style={{ alignSelf: 'flex-start' }}>
+            {w}
+          </div>
+        ))}
 
       {tab === 'current' && (
         <div className="card stack">
@@ -126,7 +155,12 @@ export function GradesWorkspace({ classId }: { classId: string }) {
             (() => {
               const max = Math.max(...cg.sensitivity.map((s) => Number(s.swing)), 1);
               return (
-                <div className="table-wrap">
+                <div
+                  className="table-wrap"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Table, scrollable"
+                >
                   <table className="t">
                     <thead>
                       <tr>
@@ -323,7 +357,7 @@ function WhatIf({
           Type a hypothetical score on any item (90, or 45/50). Nothing is saved unless you press
           Apply. Clear a graded item to see the grade without it.
         </p>
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
           <table className="t">
             <thead>
               <tr>
@@ -568,7 +602,12 @@ function Needed({
                   If the other remaining items score your current average, this is what each one
                   needs on its own.
                 </p>
-                <div className="table-wrap">
+                <div
+                  className="table-wrap"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Table, scrollable"
+                >
                   <table className="t">
                     <thead>
                       <tr>

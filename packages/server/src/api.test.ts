@@ -303,3 +303,63 @@ describe('performance smoke', () => {
     expect(performance.now() - t1).toBeLessThan(200); // generous in CI; target is 20 ms on dev hardware
   });
 });
+
+describe('per-class grading schemes', () => {
+  it('saves one scheme without touching the others, and a class can use it', async () => {
+    const before = (await call('GET', '/grading-schemes')).body as { id: string }[];
+    const sem = (await call('POST', '/semesters', { name: 'Scheme Term' })).body as { id: string };
+    const cls = (await call('POST', '/classes', { name: 'Cat Class', semesterId: sem.id }))
+      .body as { id: string };
+    const scale = (before[0] as never as { scale: unknown }).scale;
+    const scheme = {
+      id: `class-${cls.id}`,
+      name: 'Cat Class categories',
+      mode: 'category_weights',
+      categories: [
+        { id: 'hw', name: 'Homework', weight: 30, dropLowest: 1 },
+        { id: 'ex', name: 'Exams', weight: 70 },
+      ],
+      scale,
+      normalizeOverGradedOnly: true,
+      extraCreditAllowed: true,
+    };
+    const put = await call('PUT', `/grading-schemes/${scheme.id}`, scheme);
+    expect(put.status).toBe(200);
+    const after = (await call('GET', '/grading-schemes')).body as { id: string }[];
+    expect(after).toHaveLength(before.length + 1);
+    expect(after.map((s) => s.id)).toEqual(expect.arrayContaining(before.map((s) => s.id)));
+    await call('PATCH', `/classes/${cls.id}`, { gradingSchemeId: scheme.id });
+    for (const [title, cat, score] of [
+      ['HW1', 'hw', 100],
+      ['HW2', 'hw', 80],
+      ['Final', 'ex', 90],
+    ] as const)
+      await call('POST', '/assignments', {
+        title,
+        classId: cls.id,
+        categoryId: cat,
+        score: { percent: score },
+      });
+    const g = (await call('GET', `/grades/class/${cls.id}`)).body as {
+      grade: { percentRaw: string };
+    };
+    // homework: drop the lowest (80) -> 100; exams 90: 100*30 + 90*70 = 93
+    expect(Number(g.grade.percentRaw)).toBeCloseTo(93);
+    // updating it replaces in place
+    const again = await call('PUT', `/grading-schemes/${scheme.id}`, {
+      ...scheme,
+      name: 'Renamed',
+    });
+    expect(again.status).toBe(200);
+    expect(
+      ((await call('GET', '/grading-schemes')).body as { id: string; name: string }[]).filter(
+        (s) => s.id === scheme.id,
+      ),
+    ).toHaveLength(1);
+  });
+  it('rejects a mismatched id', async () => {
+    const [first] = (await call('GET', '/grading-schemes')).body as { id: string }[];
+    const r = await call('PUT', '/grading-schemes/other', first);
+    expect(r.status).toBe(422);
+  });
+});

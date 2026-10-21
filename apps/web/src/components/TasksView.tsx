@@ -215,7 +215,7 @@ export function TasksView() {
           long things really take you.
         </Empty>
       ) : (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
           <table className="t">
             <thead>
               <tr>

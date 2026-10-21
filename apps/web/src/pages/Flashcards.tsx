@@ -135,7 +135,7 @@ export function FlashcardsPage() {
           button), then press “Sync from notes”. Or add cards by hand.
         </Empty>
       ) : (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
           <table className="t">
             <thead>
               <tr>

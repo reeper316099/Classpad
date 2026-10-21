@@ -10,6 +10,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
+function cleanup(dir: string) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+  } catch {
+    /* best effort */
+  }
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-m9-'));
@@ -34,8 +43,8 @@ const api = (p: string, method = 'GET', body?: unknown) =>
 
 test.afterAll(async () => {
   await app?.close();
-  rmSync(dataDir, { recursive: true, force: true });
-  rmSync(outDir, { recursive: true, force: true });
+  cleanup(dataDir);
+  cleanup(outDir);
 });
 
 test('import a gradebook with a user plugin, then export to a folder', async () => {
@@ -55,6 +64,7 @@ test('import a gradebook with a user plugin, then export to a folder', async () 
     env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
   });
   page = await app.firstWindow();
+  await page.setViewportSize({ width: 1280, height: 860 });
   await page.waitForLoadState('domcontentloaded');
   const sem = await api('/semesters', 'POST', { name: 'M9 Term' });
   await api('/classes', 'POST', { name: 'Lorem 101', semesterId: sem.id });

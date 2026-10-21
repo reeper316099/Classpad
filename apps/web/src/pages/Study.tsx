@@ -271,7 +271,13 @@ export function StudyPage() {
           {sessions.length === 0 ? (
             <p className="muted">Nothing logged in the last two weeks.</p>
           ) : (
-            <div className="table-wrap" style={{ maxHeight: 280, overflow: 'auto' }}>
+            <div
+              className="table-wrap"
+              tabIndex={0}
+              role="region"
+              aria-label="Table, scrollable"
+              style={{ maxHeight: 280, overflow: 'auto' }}
+            >
               <table className="t">
                 <tbody>
                   {sessions.slice(0, 30).map((s) => {

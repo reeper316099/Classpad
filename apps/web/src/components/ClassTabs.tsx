@@ -128,7 +128,7 @@ export function ClassReadingsTab({ c }: { c: ClassEntity }) {
           Add a book or article to track your progress.
         </Empty>
       ) : (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
           <table className="t">
             <thead>
               <tr>
@@ -284,7 +284,7 @@ export function ClassFilesTab({ c }: { c: ClassEntity }) {
           Add the syllabus here, or attach files to this class's assignments and notes.
         </Empty>
       ) : (
-        <div className="table-wrap">
+        <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
           <table className="t">
             <thead>
               <tr>

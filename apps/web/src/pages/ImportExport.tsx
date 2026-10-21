@@ -279,7 +279,12 @@ export function ImportExportPage() {
                   All {sum.validation.length} classes match (or have no graded work yet)
                 </div>
               ) : (
-                <div className="table-wrap">
+                <div
+                  className="table-wrap"
+                  tabIndex={0}
+                  role="region"
+                  aria-label="Table, scrollable"
+                >
                   <table className="t">
                     <thead>
                       <tr>

@@ -6,7 +6,9 @@ interface DialogState {
   semester: { open: boolean; id?: string };
   note: { open: boolean; classId?: string };
   task: { open: boolean; id?: string; classId?: string };
+  grading: { open: boolean; classId?: string };
   quickOpen: boolean;
+  openGrading: (classId: string) => void;
   openAssignment: (o?: { id?: string; classId?: string }) => void;
   openClass: (id?: string) => void;
   openSemester: (id?: string) => void;
@@ -22,7 +24,9 @@ export const useDialogs = create<DialogState>((set) => ({
   semester: { open: false },
   note: { open: false },
   task: { open: false },
+  grading: { open: false },
   quickOpen: false,
+  openGrading: (classId) => set({ grading: { open: true, classId } }),
   openAssignment: (o = {}) => set({ assignment: { open: true, ...o } }),
   openClass: (id) => set({ klass: { open: true, id } }),
   openSemester: (id) => set({ semester: { open: true, id } }),
@@ -36,5 +40,6 @@ export const useDialogs = create<DialogState>((set) => ({
       semester: { open: false },
       note: { open: false },
       task: { open: false },
+      grading: { open: false },
     }),
 }));

@@ -165,7 +165,7 @@ export function GpaPage() {
           </div>
           <div className="card stack">
             <h2>Transcript</h2>
-            <div className="table-wrap">
+            <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
               <table className="t">
                 <thead>
                   <tr>

@@ -10,6 +10,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
+function cleanup(dir: string) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+  } catch {
+    /* best effort */
+  }
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-editor-'));
@@ -66,7 +75,7 @@ test.beforeAll(async () => {
 });
 test.afterAll(async () => {
   await app?.close();
-  rmSync(dataDir, { recursive: true, force: true });
+  cleanup(dataDir);
 });
 test.describe.configure({ mode: 'serial' });
 
@@ -331,7 +340,11 @@ for (const scheme of ['light', 'dark'] as const) {
       failures.push(...res.map((x: string) => `${label} → ${x}`));
     };
     await scan('editor');
-    await content().getByText('A paragraph').dblclick();
+    await content()
+      .getByText('A paragraph')
+      .click({ position: { x: 4, y: 4 } });
+    await page.keyboard.press('Home');
+    await page.keyboard.press('Shift+End');
     await expect(page.getByRole('toolbar', { name: 'Format selected text' })).toBeVisible();
     await scan('selection toolbar');
     await content().getByText('end').click({ button: 'right' });

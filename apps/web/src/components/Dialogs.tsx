@@ -19,6 +19,7 @@ import { get } from '../lib/api.js';
 import { NewNoteDialog } from './NoteDialogs.js';
 import { TaskDialog } from './TaskDialog.js';
 import { Dialog, Field } from './ui.js';
+import { GradingSetup } from './GradingSetup.js';
 
 const CLASS_TYPES = [
   'core',
@@ -55,6 +56,7 @@ export function Dialogs() {
       <SemesterDialog />
       <NewNoteDialog />
       <TaskDialog />
+      <GradingSetup />
     </>
   );
 }
@@ -268,7 +270,14 @@ function AssignmentDialog() {
         </datalist>
         <div className="form-grid">
           {scheme?.mode === 'category_weights' ? (
-            <Field label="Category" hint="Which part of the grade this counts toward">
+            <Field
+              label="Category"
+              hint={
+                (scheme.categories ?? []).length
+                  ? 'Which part of the grade this counts toward'
+                  : 'No categories yet: use “Set up grading” on the class’s Grades tab'
+              }
+            >
               <select className="select" value={String(f.categoryId)} onChange={set('categoryId')}>
                 <option value="">— none —</option>
                 {(scheme.categories ?? []).map((c) => (
@@ -618,7 +627,10 @@ function ClassDialog() {
           ))}
         </div>
         <div className="form-grid">
-          <Field label="Grading scheme" hint="How the grade is calculated">
+          <Field
+            label="Grading scheme"
+            hint="For your own category weights, use “Set up grading” on the class’s Grades tab"
+          >
             <select
               className="select"
               value={String(f.gradingSchemeId)}

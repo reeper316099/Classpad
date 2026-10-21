@@ -623,6 +623,23 @@ export async function createApp(opts: AppOptions): Promise<App> {
     (r) => config.putSchemes(z.array(GradingSchemeSchema).parse(r.body)),
     z.array(GradingSchemeSchema),
   );
+  route(
+    'PUT',
+    '/grading-schemes/:id',
+    'Create or replace one grading scheme (for example a class’s own category weights)',
+    async (r) => {
+      const id = z.object({ id: z.string().min(1).max(80) }).parse(r.params).id;
+      const body = GradingSchemeSchema.parse(r.body);
+      if (body.id !== id)
+        throw new ApiError(422, 'BAD_REFERENCE', 'The scheme id must match the URL');
+      const next = config.schemes.some((s) => s.id === id)
+        ? config.schemes.map((s) => (s.id === id ? body : s))
+        : [...config.schemes, body];
+      await config.putSchemes(next);
+      return body;
+    },
+    GradingSchemeSchema,
+  );
   route('GET', '/gpa-scales', 'List GPA scales', () => config.scales);
   route(
     'PUT',

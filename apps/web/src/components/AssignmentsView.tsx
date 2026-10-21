@@ -87,7 +87,7 @@ export function AssignmentsTable({
   const remove = useDeleteWithUndo<Assignment>('assignments', (a) => `“${a.title}”`);
   const byId = new Map(classes.map((c) => [c.id, c]));
   return (
-    <div className="table-wrap">
+    <div className="table-wrap" tabIndex={0} role="region" aria-label="Table, scrollable">
       <table className="t">
         <thead>
           <tr>

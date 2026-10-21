@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Grading
+
+- Set a class's own category weights: **Grades → Set up grading** lets you add categories (Homework, Exams…), give each a weight, drop the lowest scores, choose how a category is combined, and sort assignments into categories (with a "match by type or title" shortcut). Before, the category mode had no way to create categories, so every assignment needed its own weight. See [docs/GRADING.md](docs/GRADING.md).
+
 ### Note editor: one view, like Notion
 
 - Edit and preview are now a single live view. The page looks finished as you type; Markdown syntax shows only where your caret is. The file on disk is never reshaped (opening a note leaves it byte-for-byte unchanged).

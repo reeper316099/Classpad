@@ -27,6 +27,21 @@ Common rules:
 - **Curves** (flat add, or scale the top score to the maximum) are explicit steps, never hidden.
 - **Pass/fail** classes are excluded from GPA and shown as pass or fail against a threshold.
 
+## Setting up your own categories (in the app)
+
+Open a class → **Grades** → **Set up grading**.
+
+1. Pick **Categories**, then add your own (Homework, Quizzes, Midterm, Final, Participation…) or start from a
+   common layout. Give each a weight; the dialog shows whether they add up to 100%.
+2. Optionally **drop the lowest N** scores in a category, and choose how it is combined: **total points** (points
+   earned over points possible) or **average of percents** (every assignment gets an equal say).
+3. Say which category each assignment counts in. **Match by type or title** does the obvious ones for you (an
+   assignment typed "exam" goes to a category called "Exams").
+
+The categories belong to that class alone, so every class can follow its own syllabus. A category with no graded
+work yet is left out of the average until it has some, and assignments that are not in a category do not count
+(the Grades tab tells you how many). New assignments pick their category in the assignment form.
+
 ## Rounding and letters
 
 Rounding is half-up by default (or truncate), to a configurable number of decimals. The letter can be

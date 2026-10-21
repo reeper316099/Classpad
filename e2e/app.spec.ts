@@ -11,13 +11,22 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
+function cleanup(dir: string) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+  } catch {
+    /* best effort */
+  }
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');
 const main = path.join(root, 'apps/desktop/dist/main.cjs');
 const fixtures = path.join(root, 'fixtures/synthetic/notion-export');
 
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-'));
-test.afterAll(() => rmSync(dataDir, { recursive: true, force: true }));
+test.afterAll(() => cleanup(dataDir));
 
 async function launch(): Promise<{ app: ElectronApplication; page: Page }> {
   // E2E_EXECUTABLE=/path/to/Classpad(.exe/.app binary) runs the same tests against a packaged build
@@ -28,6 +37,7 @@ async function launch(): Promise<{ app: ElectronApplication; page: Page }> {
     env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
   });
   const page = await app.firstWindow();
+  await page.setViewportSize({ width: 1280, height: 860 });
   await page.waitForLoadState('domcontentloaded');
   return { app, page };
 }

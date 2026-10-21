@@ -10,6 +10,15 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
+function cleanup(dir: string) {
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
+  } catch {
+    /* best effort */
+  }
+}
+
 const here = path.dirname(fileURLToPath(import.meta.url));
 const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-notes-'));
@@ -18,7 +27,7 @@ let page: Page;
 
 test.afterAll(async () => {
   await app?.close();
-  rmSync(dataDir, { recursive: true, force: true });
+  cleanup(dataDir);
 });
 
 test('class page tabs are real, and notes get code blocks and toggles', async () => {
@@ -27,6 +36,7 @@ test('class page tabs are real, and notes get code blocks and toggles', async ()
     env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
   });
   page = await app.firstWindow();
+  await page.setViewportSize({ width: 1280, height: 860 });
   await page.waitForLoadState('domcontentloaded');
   await page.getByRole('heading', { name: 'Open demo data' }).click();
   await expect(page.getByRole('heading', { name: 'Demo Term' })).toBeVisible();
