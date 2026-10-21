@@ -67,14 +67,17 @@ beforeAll(async () => {
   );
   const nDir = path.join(dir, 'data/notes/perf-class');
   await mkdir(nDir, { recursive: true });
-  await Promise.all(
-    Array.from({ length: NOTES }, (_, i) =>
-      writeFile(
-        path.join(nDir, `note-${i}.md`),
-        `---\nid: N${String(i).padStart(10, '0')}\ntitle: Note ${i}\nclassId: ${classId}\ntags: []\n---\nlorem ipsum dolor ${i} sit amet entropy${i % 97}\n`,
-      ),
-    ),
-  );
+  // in batches: opening 10k files at once exceeds the open-file limit on Windows (EMFILE)
+  for (let start = 0; start < NOTES; start += 200)
+    await Promise.all(
+      Array.from({ length: Math.min(200, NOTES - start) }, (_, k) => {
+        const i = start + k;
+        return writeFile(
+          path.join(nDir, `note-${i}.md`),
+          `---\nid: N${String(i).padStart(10, '0')}\ntitle: Note ${i}\nclassId: ${classId}\ntags: []\n---\nlorem ipsum dolor ${i} sit amet entropy${i % 97}\n`,
+        );
+      }),
+    );
   const t0 = performance.now();
   app = await createApp({ dataDir: dir, token: 't' });
   startupMs = performance.now() - t0;
