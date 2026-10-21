@@ -20,6 +20,16 @@ import { NewNoteDialog } from './NoteDialogs.js';
 import { TaskDialog } from './TaskDialog.js';
 import { Dialog, Field } from './ui.js';
 
+const CLASS_TYPES = [
+  'core',
+  'gen_ed',
+  'elective',
+  'major',
+  'minor',
+  'prerequisite',
+  'lab',
+  'honors',
+];
 const TYPES = [
   'essay',
   'presentation',
@@ -366,7 +376,7 @@ function ClassDialog() {
       code: c?.code ?? '',
       semesterId: c?.semesterId ?? semester?.id ?? semesters[0]?.id ?? '',
       credits: c?.credits != null ? String(c.credits) : '',
-      type: c?.type ?? '',
+      type: c?.type ? typeLabel(c.type) : '',
       delivery: c?.delivery ?? '',
       instructor: c?.instructor ?? '',
       location: c?.location ?? '',
@@ -415,7 +425,12 @@ function ClassDialog() {
           credits,
           studyTargetHours:
             String(f.studyTarget ?? '').trim() === '' ? null : Number(f.studyTarget),
-          type: f.type || null,
+          type:
+            String(f.type ?? '')
+              .trim()
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '_')
+              .replace(/^_|_$/g, '') || null,
           delivery: f.delivery || null,
           instructor: String(f.instructor).trim() || null,
           location: String(f.location).trim() || null,
@@ -532,12 +547,18 @@ function ClassDialog() {
         </div>
         <div className="form-grid">
           <Field label="Type">
-            <select className="select" value={String(f.type ?? '')} onChange={set('type')}>
-              <option value="">—</option>
-              <option value="core">Core</option>
-              <option value="gen_ed">Gen Ed</option>
-              <option value="elective">Elective</option>
-            </select>
+            <input
+              className="input"
+              list="class-types"
+              value={String(f.type ?? '')}
+              onChange={set('type')}
+              placeholder="Core, Elective, Major…"
+            />
+            <datalist id="class-types">
+              {CLASS_TYPES.map((t) => (
+                <option key={t} value={typeLabel(t)} />
+              ))}
+            </datalist>
           </Field>
           <Field label="Format">
             <select className="select" value={String(f.delivery ?? '')} onChange={set('delivery')}>

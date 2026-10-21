@@ -4,7 +4,9 @@ import { parseCsv, type Table } from './csv.js';
 import { convertNotionMarkdown } from './notionBody.js';
 import {
   formatInterval,
+  normalizeAssignmentStatus,
   normalizePriority,
+  normalizeReadingStatus,
   normalizeTaskPriority,
   normTitle,
   parseBool,
@@ -373,6 +375,10 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
   const clsCsv = chosen.get('classes');
   const classRows = clsCsv?.table.rows ?? [];
   const classExported = new Map<string, string>();
+  /** The Classes table also lists each class's notes: a second way to tell which class a note belongs to. */
+  const classOfNote = new Map<string, string>();
+  const classOfAssignment = new Map<string, string>();
+  const classOfReading = new Map<string, string>();
   classRows.forEach((r, idx) => {
     const name = cleanLabel(r['Class'] ?? '');
     if (!name) return;
@@ -418,6 +424,18 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
         where,
       );
     out.classes.push(c);
+    for (const [col, map] of [
+      ['Assignments', classOfAssignment],
+      ['Readings', classOfReading],
+    ] as const)
+      for (const x of parseRelation(r[col])) {
+        if (x.id) map.set(`id:${x.id}`, c.ref);
+        map.set(`t:${normTitle(x.title)}`, c.ref);
+      }
+    for (const nr of parseRelation(r['Notes'])) {
+      if (nr.id) classOfNote.set(`id:${nr.id}`, c.ref);
+      classOfNote.set(`t:${normTitle(nr.title)}`, c.ref);
+    }
     if ((r['% Grade'] ?? '').trim() || true) classExported.set(c.ref, r['% Grade'] ?? '');
     const b = body(page);
     if (b.markdown.trim())
@@ -447,15 +465,10 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
     const classRel = parseRelation(r['Class'])[0];
     const where = `Assignments: ${title}`;
     const page = pageFor(asgCsv!.dir, title);
-    const st = slugOption(r['Status'] ?? '');
-    const status =
-      st === 'complete' || st === 'done'
-        ? 'complete'
-        : st === 'in_progress'
-          ? 'in_progress'
-          : 'not_started';
-    if (st && !['complete', 'done', 'in_progress', 'not_started'].includes(st))
-      warn('OPTION', `Unknown status "${r['Status']}"`, where);
+    const stat = normalizeAssignmentStatus(r['Status']);
+    const status = stat.value;
+    if (!stat.known)
+      warn('OPTION', `Unknown status "${cleanLabel(r['Status']!)}"; set to Not started`, where);
     const pri = normalizePriority(r['Priority']);
     if ((r['Priority'] ?? '').trim() && !pri)
       warn('OPTION', `Unknown priority "${cleanLabel(r['Priority']!)}"`, where);
@@ -468,7 +481,10 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
     const a: DraftAssignment = {
       ref: mkRef('assignment', title, page?.id, classRel?.title),
       title,
-      classRef: classTitleToRef(classRel),
+      classRef:
+        classTitleToRef(classRel) ??
+        (page?.id ? classOfAssignment.get(`id:${page.id}`) : undefined) ??
+        classOfAssignment.get(`t:${normTitle(title)}`),
       type: splitMulti(r['Type']).map(slugOption).filter(Boolean),
       status,
       priority: pri?.value,
@@ -512,14 +528,23 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
     const title = cleanLabel(r['Title'] ?? '');
     if (!title) continue;
     const classRel = parseRelation(r['Class'])[0];
-    const s = slugOption(r['Status'] ?? '');
+    const rs = normalizeReadingStatus(r['Status']);
+    if (!rs.known)
+      warn(
+        'OPTION',
+        `Unknown reading status "${cleanLabel(r['Status']!)}"; set to To read`,
+        `Readings: ${title}`,
+      );
     const d = date(r['Date Read'] ?? '', `Readings: ${title}`);
     const page = pageFor(rdCsv!.dir, title);
     out.readings.push({
       ref: mkRef('reading', title, page?.id),
       title,
-      classRef: classTitleToRef(classRel),
-      status: s === 'complete' ? 'complete' : s === 'reading' ? 'reading' : 'to_read',
+      classRef:
+        classTitleToRef(classRel) ??
+        (page?.id ? classOfReading.get(`id:${page.id}`) : undefined) ??
+        classOfReading.get(`t:${normTitle(title)}`),
+      status: rs.value,
       format: slugOption(r['Format'] ?? '') || undefined,
       totalPages: parseNumber(r['Total Pages']) ?? undefined,
       pagesRead: parseNumber(r['Pages Read']) ?? undefined,
@@ -577,19 +602,49 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
       continue;
     }
     const d = date(r['Date'] ?? '', `Notebook: ${title}`);
+    const assignmentRefs = parseRelation(r['Related Assignments'])
+      .map((x) => resolve('assignment', x))
+      .filter((x): x is string => !!x);
+    const readingRefs = parseRelation(r['Readings'])
+      .map((x) => resolve('reading', x))
+      .filter((x): x is string => !!x);
+    // which class? the note's own Class relation first, then the class's list of notes, then the work it relates to
+    let classRef = classTitleToRef(classRel);
+    let how = '';
+    if (!classRef) {
+      classRef =
+        (page?.id && classOfNote.get(`id:${page.id}`)) ||
+        classOfNote.get(`t:${normTitle(title)}`) ||
+        undefined;
+      if (classRef) how = 'from the class page';
+    }
+    if (!classRef) {
+      classRef =
+        assignmentRefs
+          .map((a) => out.assignments.find((x) => x.ref === a)?.classRef)
+          .find(Boolean) ??
+        readingRefs.map((x) => out.readings.find((y) => y.ref === x)?.classRef).find(Boolean);
+      if (classRef) how = 'from its related assignment or reading';
+    }
+    if (classRef && how)
+      warn('NOTE_CLASS', `Class for "${title}" was worked out ${how}`, 'Notebook');
+    if (!classRef)
+      warn(
+        'NOTE_CLASS',
+        classRel
+          ? `Class "${classRel.title}" for note "${title}" is not in the export; the note was imported without a class`
+          : `Note "${title}" has no class; it was imported without one`,
+        'Notebook',
+      );
     out.notes.push({
       ref: mkRef('note', title, page?.id, classRel?.title),
       title,
-      classRef: classTitleToRef(classRel),
+      classRef,
       date: d?.start.slice(0, 10),
       markdown: b.markdown,
       tags: ['imported'],
-      assignmentRefs: parseRelation(r['Related Assignments'])
-        .map((x) => resolve('assignment', x))
-        .filter((x): x is string => !!x),
-      readingRefs: parseRelation(r['Readings'])
-        .map((x) => resolve('reading', x))
-        .filter((x): x is string => !!x),
+      assignmentRefs,
+      readingRefs,
     } satisfies DraftNote);
   }
 

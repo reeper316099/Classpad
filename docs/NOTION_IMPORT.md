@@ -27,8 +27,15 @@ Strategies: `skip`, `update_empty` (default: fill only empty fields, never overw
   `important | mid | low`; the cleaned display label is kept as `priorityLabel`.
 - Relation cells (`Title (path.md)` or URL-only references to pages outside the export).
   Assignments whose class cannot be resolved go to an **Unassigned** class instead of being lost.
-- Page bodies are converted to standard Markdown: callouts become blockquotes, toggles become bold
-  blockquotes, escaped checkboxes are unescaped, `$` + backtick equations become `$…$`, page links
+- Which class a note belongs to: its own `Class` relation first; if that is empty or points outside
+  the export, the class page's own list of notes; then the class of the assignment or reading it
+  relates to. Assignments and readings use the same fallbacks. Anything still unresolved is listed as a
+  warning (`NOTE_CLASS` / `RELATION`) instead of being left silently without a class.
+- Dropdown (select) options: common wordings of Status are understood (`Done`, `Submitted`,
+  `Doing`, `To-do`, `Late`, …), as are reading statuses (`Finished`, `Currently reading`, …). Class types
+  and assignment types accept any value. An option that is not recognised is reported as a warning.
+- Page bodies are converted to standard Markdown: callouts become blockquotes, **toggles (toggle lists and
+  toggle headings 1–3) stay collapsible** as `<details>` blocks, nesting included, escaped checkboxes are unescaped, `$` + backtick equations become `$…$`, page links
   become `[[wiki-links]]`, files and images are copied into content-addressed `attachments/`.
   Links to embedded database views are dropped.
 - Template pages (rows-less pages in a database folder, or titles like "New …", "… Template",
@@ -37,8 +44,11 @@ Strategies: `skip`, `update_empty` (default: fill only empty fields, never overw
 - Computed columns (`% Grade`, `Weighted Grade`, `Days Left`, …) are **not imported**. Instead the
   report recomputes each class grade with the default scheme and compares it to the exported
   `% Grade` (tolerance 0.01); mismatches are listed.
-- Optional modules that do not exist yet (journal, contacts, jobs, budget) are counted under
-  "skipped"; re-importing later picks them up. Instructor names are kept on the class.
+- Journal, contacts, jobs and budget rows are imported into the optional modules (turn them on in
+  Settings → Modules to see them). Instructor names are kept on the class.
+- Notion's Markdown export writes toggles as `<details>` only in some exports; where a page's toggles were
+  exported as plain nested bullets, they arrive as nested bullets, because the file no longer says they
+  were toggles.
 
 ## Other formats
 

@@ -8,6 +8,7 @@ import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import { get } from '../lib/api.js';
 import { attachmentBlobUrl, parseAttachmentLink } from '../lib/attachments.js';
+import { remarkToggles } from '../lib/remarkToggles.js';
 import { parseWikiHref, remarkWikiLinks } from '../lib/remarkWikiLinks.js';
 
 export const slugHeading = (s: string) =>
@@ -90,6 +91,34 @@ function WikiLink({
   );
 }
 
+/** A fenced code block with its language and a copy button. */
+function CodeBlock({ children }: { children?: ReactNode }) {
+  const [copied, setCopied] = useState(false);
+  const code = (Array.isArray(children) ? children[0] : children) as
+    { props?: { className?: string; children?: ReactNode } } | undefined;
+  const lang = /language-([\w+#-]+)/.exec(code?.props?.className ?? '')?.[1];
+  const copy = () => {
+    void navigator.clipboard
+      ?.writeText(textOf(code?.props?.children).replace(/\n$/, ''))
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => null);
+  };
+  return (
+    <div className="code-block">
+      <div className="code-head">
+        <span className="muted small">{lang && lang !== 'math' ? lang : 'code'}</span>
+        <button type="button" className="btn ghost sm" onClick={copy} aria-label="Copy code">
+          {copied ? 'Copied' : 'Copy'}
+        </button>
+      </div>
+      <pre>{children}</pre>
+    </div>
+  );
+}
+
 export function Markdown({
   source,
   onWikiLink,
@@ -125,6 +154,9 @@ export function Markdown({
         );
       return <span>{children}</span>; // relative or unknown targets are not navigable
     },
+    pre({ children }) {
+      return <CodeBlock>{children}</CodeBlock>;
+    },
     img({ src = '', alt }) {
       if (parseAttachmentLink(src)) return <AttachmentImage href={src} alt={alt} />;
       return (
@@ -146,7 +178,7 @@ export function Markdown({
   return (
     <div className="md">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkMath, remarkWikiLinks]}
+        remarkPlugins={[remarkGfm, remarkMath, remarkWikiLinks, remarkToggles]}
         rehypePlugins={[
           [rehypeKatex, { throwOnError: false, strict: 'ignore', trust: false, maxExpand: 200 }],
           [rehypeHighlight, { detect: false, ignoreMissing: true }],

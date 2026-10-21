@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   buildIcs,
+  convertNotionMarkdown,
   csvTemplate,
   fold,
   openMemory,
@@ -8,6 +9,7 @@ import {
   previewCsv,
   previewIcs,
   previewMarkdownFolder,
+  previewNotion,
   toCsv,
   parseCsv,
 } from './index.js';
@@ -151,5 +153,118 @@ describe('JSON backup parsing', () => {
     expect(() => parseBackup('{"format":"x"}')).toThrow(/Classpad backup/);
     expect(() => parseBackup('{"format":"classpad-backup","schemaVersion":9}')).toThrow(/version/);
     expect(parseBackup('{"format":"classpad-backup","schemaVersion":1}').notes).toEqual([]);
+  });
+});
+
+describe('Notion toggles', () => {
+  const ctx = {
+    pagePath: 'p.md',
+    propertyNames: new Set<string>(),
+    hasFile: () => false,
+    dropTooltips: false,
+  };
+  const conv = (s: string) => convertNotionMarkdown(s, ctx).markdown;
+
+  it('keeps a toggle list collapsible', () => {
+    const md = conv('<details>\n<summary>Lorem</summary>\n\nipsum **dolor**\n\n</details>');
+    expect(md).toBe('<details>\n<summary>Lorem</summary>\n\nipsum **dolor**\n\n</details>\n');
+  });
+  it('keeps toggle headings 1, 2 and 3', () => {
+    for (const n of [1, 2, 3])
+      expect(
+        conv(`<details>\n<summary><h${n}>Sit amet</h${n}></summary>\n\nbody\n\n</details>`),
+      ).toContain(`<summary><h${n}>Sit amet</h${n}></summary>`);
+  });
+  it('keeps nested toggles in order', () => {
+    const md = conv(
+      '<details>\n<summary>Outer</summary>\n\nbefore\n\n<details>\n<summary>Inner</summary>\n\ndeep\n\n</details>\n\nafter\n\n</details>',
+    );
+    expect(md.indexOf('Outer')).toBeLessThan(md.indexOf('Inner'));
+    expect(md.match(/<details>/g)).toHaveLength(2);
+    expect(md.match(/<\/details>/g)).toHaveLength(2);
+    expect(md.indexOf('deep')).toBeLessThan(md.lastIndexOf('after'));
+  });
+  it('does not loop forever on a malformed toggle', () => {
+    expect(conv('<details><summary>x</summary>never closed')).toContain('never closed');
+  });
+});
+
+describe('Notion: which class does a note belong to?', () => {
+  const id = (n: number) => n.toString(16).padStart(32, '0');
+  const H = 'Sample Hub';
+  const cls = (name: string, extra: Record<string, string> = {}) => ({
+    Class: name,
+    Semester: '',
+    Days: 'Monday',
+    Category: '',
+    Location: '',
+    Dates: '',
+    Times: '9a-10a',
+    Type: 'core',
+    Credits: '3',
+    'Quick Notes': '',
+    Notes: '',
+    Assignments: '',
+    Contacts: '',
+    ...extra,
+  });
+  const rel = (title: string, dir: string, n: number) =>
+    `${title} (${encodeURI(`${H}/${dir}/${title} ${id(n)}.md`)})`;
+  const make = () => {
+    const classes = toCsv(Object.keys(cls('x')), [
+      cls('Alpha 101', { Notes: rel('Lecture Two', 'Notebook/Notebook', 12) }),
+      cls('Beta 202'),
+    ]);
+    const notebook = toCsv(
+      ['Title', 'Date', 'Class', 'Related Assignments', 'Semester', 'Readings'],
+      [
+        {
+          Title: 'Lecture One',
+          Date: 'September 1, 2031',
+          Class: rel('Beta 202', 'Classes/Classes', 2),
+          'Related Assignments': '',
+          Semester: '',
+          Readings: '',
+        },
+        // no Class cell, but the class page lists this note
+        {
+          Title: 'Lecture Two',
+          Date: 'September 2, 2031',
+          Class: '',
+          'Related Assignments': '',
+          Semester: '',
+          Readings: '',
+        },
+        // no Class cell and nobody lists it
+        {
+          Title: 'Lecture Three',
+          Date: 'September 3, 2031',
+          Class: '',
+          'Related Assignments': '',
+          Semester: '',
+          Readings: '',
+        },
+      ],
+    );
+    return openMemory({
+      [`${H}/Classes/Classes ${id(100)}_all.csv`]: classes,
+      [`${H}/Classes/Classes/Alpha 101 ${id(1)}.md`]: '# Alpha 101\n',
+      [`${H}/Classes/Classes/Beta 202 ${id(2)}.md`]: '# Beta 202\n',
+      [`${H}/Notebook/Notebook ${id(200)}_all.csv`]: notebook,
+      [`${H}/Notebook/Notebook/Lecture One ${id(11)}.md`]: '# Lecture One\n\nbody one\n',
+      [`${H}/Notebook/Notebook/Lecture Two ${id(12)}.md`]: '# Lecture Two\n\nbody two\n',
+      [`${H}/Notebook/Notebook/Lecture Three ${id(13)}.md`]: '# Lecture Three\n\nbody three\n',
+    });
+  };
+  it('uses the note’s Class, then the class’s own list of notes, and says so when it cannot tell', () => {
+    const p = previewNotion(make());
+    const by = Object.fromEntries(p.notes.map((n) => [n.title, n]));
+    const cn = (n: string) => p.classes.find((c) => c.ref === by[n]!.classRef)?.name;
+    expect(cn('Lecture One')).toBe('Beta 202');
+    expect(cn('Lecture Two')).toBe('Alpha 101');
+    expect(by['Lecture Three']!.classRef).toBeUndefined();
+    const w = p.warnings.filter((x) => x.code === 'NOTE_CLASS').map((x) => x.message);
+    expect(w.some((m) => m.includes('Lecture Two') && /class page/.test(m))).toBe(true);
+    expect(w.some((m) => m.includes('Lecture Three') && /no class/i.test(m))).toBe(true);
   });
 });

@@ -85,13 +85,13 @@ describe('synthetic Notion export', () => {
     expect(md).toContain('$E = mc^2$');
     expect(md).toContain('\\int_0^1');
     expect(md).toContain('> 📌 Remember');
-    expect(md).toContain('> **Toggle');
+    expect(md).toMatch(/<details>\n<summary>Toggle [^<]+<\/summary>/); // toggles stay collapsible
     expect(md).toMatch(/- \[ \] /);
     expect(md).toMatch(/- \[x\] /);
     expect(md).not.toContain('\\[');
     expect(md).toContain('[[Lecture 2 - Ipsum Deep Dive]]');
     expect(md).toMatch(/!\[Figure 1\]\(attachment-ref:/);
-    expect(md).not.toMatch(/<aside|<details|Class:|Date:/);
+    expect(md).not.toMatch(/<aside|Class:|Date:/);
     expect(p.attachments.map((a) => a.filename)).toEqual(['Figure 1.png']); // logo decoy is not imported
     for (const t of p.templates) expect(t.markdown).not.toMatch(/Tooltip|template author/i);
   });

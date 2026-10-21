@@ -250,6 +250,45 @@ export function normalizePriority(
   return null;
 }
 
+const wordOf = (cell: string | undefined) =>
+  cleanLabel(cell ?? '')
+    .replace(/[\p{Extended_Pictographic}️⃣]/gu, '')
+    .replace(/[^\p{L}]/gu, '')
+    .toLowerCase();
+
+export type AssignmentStatus = 'not_started' | 'in_progress' | 'complete';
+/** Notion "Status" options come in many wordings; map the common ones. `known` is false for anything else. */
+export function normalizeAssignmentStatus(cell: string | undefined): {
+  value: AssignmentStatus;
+  known: boolean;
+} {
+  const w = wordOf(cell);
+  if (!w) return { value: 'not_started', known: true };
+  if (/^(complete|completed|done|finished|submitted|graded|turnedin|handedin|sent)/.test(w))
+    return { value: 'complete', known: true };
+  if (/^(inprogress|doing|started|working|wip|ongoing|drafting|inreview|review|active)/.test(w))
+    return { value: 'in_progress', known: true };
+  if (/^(notstarted|todo|backlog|planned|pending|upcoming|new|late|overdue|missing|open)/.test(w))
+    return { value: 'not_started', known: true };
+  return { value: 'not_started', known: false };
+}
+
+export type ReadingStatus = 'to_read' | 'reading' | 'complete';
+export function normalizeReadingStatus(cell: string | undefined): {
+  value: ReadingStatus;
+  known: boolean;
+} {
+  const w = wordOf(cell);
+  if (!w) return { value: 'to_read', known: true };
+  if (/^(complete|completed|done|finished|read)$/.test(w))
+    return { value: 'complete', known: true };
+  if (/^(reading|inprogress|started|current|currentlyreading|ongoing)/.test(w))
+    return { value: 'reading', known: true };
+  if (/^(toread|notstarted|todo|wantto|wishlist|queued|backlog|planned|unread)/.test(w))
+    return { value: 'to_read', known: true };
+  return { value: 'to_read', known: false };
+}
+
 export type TaskPriority = 'low' | 'medium' | 'high';
 export function normalizeTaskPriority(cell: string | undefined): TaskPriority | null {
   const p = normalizePriority(cell);

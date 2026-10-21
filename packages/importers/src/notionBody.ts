@@ -64,19 +64,16 @@ export function convertNotionMarkdown(input: string, ctx: BodyContext): BodyResu
       .join('\n');
   });
 
-  // toggles
-  t = t.replace(
-    /<details>\s*<summary>([\s\S]*?)<\/summary>([\s\S]*?)<\/details>/g,
-    (_m, s: string, body: string) =>
-      [
-        `> **${cleanLabel(s)}**`,
-        '>',
-        ...body
-          .trim()
-          .split('\n')
-          .map((l) => `> ${l}`.trimEnd()),
-      ].join('\n'),
-  );
+  // toggles (toggle list and toggle heading 1/2/3) stay collapsible: normalised to <details>, innermost first
+  const TOGGLE =
+    /<details[^>]*>\s*<summary>((?:(?!<\/summary>|<details)[\s\S])*?)<\/summary>((?:(?!<details)[\s\S])*?)<\/details>/;
+  for (let guard = 0; guard < 500 && TOGGLE.test(t); guard++)
+    t = t.replace(TOGGLE, (_m, s: string, body: string) => {
+      const h = /^\s*<h([1-3])[^>]*>([\s\S]*?)<\/h\1>\s*$/i.exec(s);
+      const title = cleanLabel((h ? h[2]! : s).replace(/<[^>]+>/g, '')) || 'Toggle';
+      const summary = h ? `<h${h[1]}>${title}</h${h[1]}>` : title;
+      return `\n\n<details>\n<summary>${summary}</summary>\n\n${body.trim()}\n\n</details>\n\n`;
+    });
 
   // escaped checkboxes, equations, breaks, comments
   t = t.replace(/\\\[( |x|X)\\\]/g, '[$1]');

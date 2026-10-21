@@ -2,7 +2,9 @@ import { parseCsv, toCsv } from './csv.js';
 import {
   cleanLabel,
   formatInterval,
+  normalizeAssignmentStatus,
   normalizePriority,
+  normalizeReadingStatus,
   normalizeTaskPriority,
   normTitle,
   parseBool,
@@ -219,7 +221,9 @@ export function previewCsv(text: string, collection: CsvCollection): ImportPrevi
     } else if (collection === 'assignments') {
       const d = date(col(r, 'due'));
       const pri = normalizePriority(col(r, 'priority'));
-      const st = slugOption(col(r, 'status'));
+      const stat = normalizeAssignmentStatus(col(r, 'status'));
+      if (!stat.known)
+        warn('OPTION', `Unknown status "${col(r, 'status')}"; set to Not started`, where);
       const score = parsePercent(col(r, 'score'));
       const pp = parseNumber(col(r, 'points_possible'));
       out.assignments.push({
@@ -227,12 +231,7 @@ export function previewCsv(text: string, collection: CsvCollection): ImportPrevi
         title: key,
         classRef: cls ? nameRef('class', cls) : undefined,
         type: splitMulti(col(r, 'type')).map(slugOption).filter(Boolean),
-        status:
-          st === 'complete' || st === 'done'
-            ? 'complete'
-            : st === 'in_progress'
-              ? 'in_progress'
-              : 'not_started',
+        status: stat.value,
         priority: pri?.value,
         priorityLabel: pri?.label,
         due: d ? formatInterval(d) : undefined,
@@ -263,13 +262,13 @@ export function previewCsv(text: string, collection: CsvCollection): ImportPrevi
         actualHours: parseNumber(col(r, 'actual_hours')) ?? undefined,
       });
     } else {
-      const s = slugOption(col(r, 'status'));
+      const rs = normalizeReadingStatus(col(r, 'status'));
       const d = date(col(r, 'date_read'));
       out.readings.push({
         ref: mk('reading'),
         title: key,
         classRef: cls ? nameRef('class', cls) : undefined,
-        status: s === 'complete' ? 'complete' : s === 'reading' ? 'reading' : 'to_read',
+        status: rs.value,
         format: slugOption(col(r, 'format')) || undefined,
         totalPages: parseNumber(col(r, 'total_pages')) ?? undefined,
         pagesRead: parseNumber(col(r, 'pages_read')) ?? undefined,

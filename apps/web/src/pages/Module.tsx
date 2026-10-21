@@ -313,16 +313,19 @@ export function ModulePage({ def }: { def: ModuleDef }) {
   );
 }
 
-function ModuleDialog({
+export function ModuleDialog({
   def,
   classes,
   item,
+  initial,
   open,
   onClose,
 }: {
   def: ModuleDef;
   classes: ClassEntity[];
   item?: Item;
+  /** Values to start a new item with (for example the class it is being added from). */
+  initial?: Record<string, unknown>;
   open: boolean;
   onClose: () => void;
 }) {
@@ -331,7 +334,9 @@ function ModuleDialog({
   const [err, setErr] = useState('');
   useEffect(() => {
     if (open) {
-      setForm(item ? toForm(def.fields, item) : blankForm(def.fields));
+      setForm(
+        item ? toForm(def.fields, item) : { ...blankForm(def.fields), ...(initial as object) },
+      );
       setErr('');
     }
   }, [open, item?.id]); // eslint-disable-line react-hooks/exhaustive-deps

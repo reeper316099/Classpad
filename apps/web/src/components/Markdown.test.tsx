@@ -136,3 +136,38 @@ describe('wiki links and attachments', () => {
     expect(onOpenAttachment).toHaveBeenCalledWith(hash, 'pdf', 'Lecture slides');
   });
 });
+
+describe('Markdown toggles', () => {
+  it('renders a toggle list and toggle headings as collapsible details', () => {
+    const { container } = show(
+      '<details>\n<summary>Why?</summary>\n\nBecause **reasons**.\n\n</details>\n\n<details>\n<summary><h2>Big idea</h2></summary>\n\nbody\n\n</details>',
+    );
+    const d = container.querySelectorAll('details');
+    expect(d).toHaveLength(2);
+    expect(d[0]!.querySelector('summary')!.textContent).toBe('Why?');
+    expect(d[0]!.querySelector('strong')!.textContent).toBe('reasons');
+    expect(d[1]!.querySelector('summary')!.className).toContain('toggle-h2');
+    expect(d[0]!.open).toBe(false);
+  });
+  it('still drops scripts and handlers placed inside or next to a toggle', () => {
+    const { container } = show(
+      '<details>\n<summary onclick="window.pwned=2">T</summary>\n\n<script>window.pwned=2</script>\n\ntext\n\n</details>',
+    );
+    expect(container.querySelector('script, [onclick]')).toBeNull();
+    expect((window as unknown as { pwned?: number }).pwned).toBeUndefined();
+    expect(container.querySelector('details')).not.toBeNull();
+  });
+});
+
+describe('Markdown code blocks', () => {
+  it('shows the language and a copy button', () => {
+    const { container } = show('```python\nprint(1)\n```');
+    expect(container.querySelector('.code-head')!.textContent).toContain('python');
+    expect(container.querySelector('pre code')!.textContent).toContain('print(1)');
+    expect(screen.getByRole('button', { name: 'Copy code' })).toBeTruthy();
+  });
+  it('renders a block with no language as plain code', () => {
+    const { container } = show('```\nplain\n```');
+    expect(container.querySelector('.code-head')!.textContent).toContain('code');
+  });
+});

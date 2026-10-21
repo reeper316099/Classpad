@@ -20,6 +20,7 @@ import {
 import { tags as t } from '@lezer/highlight';
 import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
 import { uploadForMarkdown } from '../lib/attachments.js';
+import { codeBlock, toggleBlock, type Insert, type ToggleLevel } from '../lib/noteBlocks.js';
 import { useUi } from '../lib/store.js';
 
 export interface EditorHandle {
@@ -29,6 +30,10 @@ export interface EditorHandle {
   /** Prefix each selected line, e.g. '- [ ] '. */
   prefixLines(prefix: string): void;
   cloze(): void;
+  /** Insert a fenced code block (wrapping the selection). */
+  codeBlock(lang: string): void;
+  /** Insert a collapsible toggle: 0 = toggle list, 1-3 = toggle heading. */
+  toggle(level: ToggleLevel): void;
   getSelection(): string;
   goToLine(line: number): void;
   focus(): void;
@@ -84,6 +89,22 @@ const theme = EditorView.theme({
     color: 'var(--text)',
   },
 });
+
+/** Replace the selection with a block, starting on its own line, and select what the block says to. */
+const insertBlock = (view: EditorView, make: (selection: string) => Insert) => {
+  const { from, to } = view.state.selection.main;
+  const ins = make(view.state.sliceDoc(from, to));
+  const lead = from > 0 && view.state.sliceDoc(from - 1, from) !== '\n' ? '\n' : '';
+  view.dispatch({
+    changes: { from, to, insert: lead + ins.text },
+    selection: EditorSelection.range(
+      from + lead.length + ins.select[0],
+      from + lead.length + ins.select[1],
+    ),
+    scrollIntoView: true,
+  });
+  view.focus();
+};
 
 const wrapSel = (view: EditorView, before: string, after = before) => {
   view.dispatch(
@@ -154,6 +175,8 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       const { from, to } = v.state.selection.main;
       return v.state.sliceDoc(from, to);
     },
+    codeBlock: (lang) => view.current && insertBlock(view.current, (s) => codeBlock(s, lang)),
+    toggle: (level) => view.current && insertBlock(view.current, (s) => toggleBlock(s, level)),
     goToLine: (line) => {
       const v = view.current;
       if (!v) return;

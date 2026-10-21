@@ -26,6 +26,7 @@ import {
   useSelectedSemester,
 } from '../lib/hooks.js';
 import { outline, wordStats } from '../lib/notes.js';
+import { CODE_LANGUAGES } from '../lib/noteBlocks.js';
 import { useUi } from '../lib/store.js';
 import type { ClassEntity, Note, SearchHit } from '../lib/types.js';
 
@@ -315,6 +316,7 @@ function NoteEditor({
   const editor = useRef<EditorHandle>(null);
   const previewBox = useRef<HTMLDivElement>(null);
   const modules = useUi((s) => s.modules);
+  const [codeLang, setCodeLang] = useState('');
   const [draft, setDraft] = useState<Draft>(() => toDraft(note));
   const [status, setStatus] = useState<'saved' | 'saving' | 'dirty' | 'error'>('saved');
   const [conflict, setConflict] = useState(false);
@@ -643,6 +645,37 @@ function NoteEditor({
             {tb('B', 'Bold (Ctrl/⌘ B)', () => editor.current?.wrap('**'))}
             {tb('I', 'Italic (Ctrl/⌘ I)', () => editor.current?.wrap('*'))}
             {tb('<>', 'Inline code', () => editor.current?.wrap('`'))}
+            {tb('{ }', 'Code block (uses the language chosen next to it)', () =>
+              editor.current?.codeBlock(codeLang),
+            )}
+            <select
+              className="select sm tb-select"
+              aria-label="Code block language"
+              title="Code block language"
+              value={codeLang}
+              onChange={(e) => setCodeLang(e.target.value)}
+            >
+              {CODE_LANGUAGES.map(([k, label]) => (
+                <option key={k} value={k}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <select
+              className="select sm tb-select"
+              aria-label="Insert a toggle"
+              title="Insert a collapsible toggle"
+              value=""
+              onChange={(e) => {
+                if (e.target.value) editor.current?.toggle(Number(e.target.value) as 0 | 1 | 2 | 3);
+              }}
+            >
+              <option value="">Toggle ▾</option>
+              <option value="0">Toggle list</option>
+              <option value="1">Toggle heading 1</option>
+              <option value="2">Toggle heading 2</option>
+              <option value="3">Toggle heading 3</option>
+            </select>
             {tb('Σ', 'Inline math', () => editor.current?.wrap('$'))}
             {tb('☑', 'Task list', () => editor.current?.prefixLines('- [ ] '))}
             {tb('❝', 'Quote', () => editor.current?.prefixLines('> '))}

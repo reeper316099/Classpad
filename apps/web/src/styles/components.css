@@ -1427,3 +1427,8 @@ html.focus-mode .content {
   letter-spacing: 0.06em;
   color: var(--text-3, var(--muted));
 }
+
+.tb-select {
+  width: auto;
+  max-width: 130px;
+}

@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Notes
+
+- Collapsible toggles like Notion's: toggle list and toggle headings 1, 2 and 3 (stored as portable `<details>`, nestable). Insert them from the new **Toggle** menu in the note toolbar.
+- Code blocks: a toolbar button with a language picker, and rendered blocks show their language with a Copy button.
+
+### Class page
+
+- The Notes, Readings and Files tabs are real: a class's notes, its reading list with progress (add readings right there), and its syllabus plus attached files.
+
+### Notion import
+
+- A note's class now falls back to the class page's list of notes, then to its related assignment or reading, and anything unresolved is reported as a warning. Assignments and readings get the same fallbacks.
+- Toggles stay collapsible. More Status and reading-status wordings are understood.
+- Class Type accepts any value (it was limited to Core, Gen Ed and Elective, which hid other imported types).
+
 ### Import and export helpers
 
 - Gradebook CSV import for LMS-style exports (a row per assignment, or a column per assignment), with a preview, warnings for anything skipped, and undo.

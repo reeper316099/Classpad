@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  normalizeAssignmentStatus,
   normalizePriority,
+  normalizeReadingStatus,
   normalizeTaskPriority,
   parseDays,
   parseNotionDate,
@@ -149,5 +151,26 @@ describe('relations and names', () => {
     const id = 'b'.repeat(32);
     expect(splitName(`Things ${id}_all.csv`)).toEqual({ base: 'Things', id, suffix: '_all.csv' });
     expect(splitName('plain.md')).toEqual({ base: 'plain.md', suffix: '' });
+  });
+});
+
+describe('status wordings', () => {
+  it('maps common Notion status options', () => {
+    const a = (s: string) => normalizeAssignmentStatus(s);
+    expect(a('Done')).toEqual({ value: 'complete', known: true });
+    expect(a('Submitted').value).toBe('complete');
+    expect(a('In progress').value).toBe('in_progress');
+    expect(a('🔥 Doing').value).toBe('in_progress');
+    expect(a('Not started').value).toBe('not_started');
+    expect(a('To-do').value).toBe('not_started');
+    expect(a('Late').value).toBe('not_started');
+    expect(a('')).toEqual({ value: 'not_started', known: true });
+    expect(a('Waiting on professor')).toEqual({ value: 'not_started', known: false });
+  });
+  it('maps reading statuses', () => {
+    expect(normalizeReadingStatus('Finished').value).toBe('complete');
+    expect(normalizeReadingStatus('Currently reading').value).toBe('reading');
+    expect(normalizeReadingStatus('Want to read').value).toBe('to_read');
+    expect(normalizeReadingStatus('Lost it').known).toBe(false);
   });
 });

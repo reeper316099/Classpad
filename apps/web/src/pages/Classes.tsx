@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AssignmentsTable } from '../components/AssignmentsView.js';
+import { ClassFilesTab, ClassNotesTab, ClassReadingsTab } from '../components/ClassTabs.js';
 import { GradesWorkspace } from '../components/GradesWorkspace.js';
 import { Icon } from '../components/Icon.js';
 import { Empty, GradePill, PageHead, Sens, classStyle } from '../components/ui.js';
@@ -299,15 +300,9 @@ export function ClassPage() {
           )}
         </div>
       )}
-      {(tab === 'notes' || tab === 'readings' || tab === 'files') && (
-        <Empty icon="notes" title="Arriving in a later milestone">
-          {tab === 'notes'
-            ? 'Class notes with Markdown, math and backlinks are coming next.'
-            : tab === 'readings'
-              ? 'The reading tracker comes with the optional modules.'
-              : 'Syllabus and file attachments land with the notes editor.'}
-        </Empty>
-      )}
+      {tab === 'notes' && <ClassNotesTab c={c} />}
+      {tab === 'readings' && <ClassReadingsTab c={c} />}
+      {tab === 'files' && <ClassFilesTab c={c} />}
     </>
   );
 }
