@@ -1,2 +1,10 @@
-/** Pure grade/GPA engine. Implemented in M1. */
+export * from './decimal.js';
+export * from './types.js';
+export * from './letters.js';
+export * from './rounding.js';
+export * from './grade.js';
+export * from './whatif.js';
+export * from './solver.js';
+export * from './gpa.js';
+export * from './presets.js';
 export const GRADES_ENGINE_VERSION = 1;
