@@ -1,9 +1,16 @@
 name: Release
 # Push a tag like v0.1.0 to build installers for Windows, macOS and Linux and publish a GitHub release.
+# Or run it by hand (Actions → Release → Run workflow), choosing a branch and typing the tag to publish
+# under (e.g. v1.3.2); leave the tag empty to only build and keep the installers as run artifacts.
 on:
   push:
     tags: ['v*']
   workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish the installers under, e.g. v1.3.2 (created at the chosen commit if missing)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -45,7 +52,7 @@ jobs:
 
   publish:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -55,6 +62,8 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           files: dist/*
+          tag_name: ${{ inputs.tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: true
           draft: true
           body: |

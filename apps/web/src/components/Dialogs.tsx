@@ -312,7 +312,10 @@ function AssignmentDialog() {
               onChange={set('pointsPossible')}
             />
           </Field>
-          <Field label="Score" hint="Points earned (18), a percent (90%), or 45/50. Leave empty if ungraded.">
+          <Field
+            label="Score"
+            hint="Points earned (18), a percent (90%), or 45/50. Leave empty if ungraded."
+          >
             <input className="input num" value={String(f.score ?? '')} onChange={set('score')} />
           </Field>
           <Field label="Late penalty (points off)">
