@@ -9,7 +9,17 @@ import {
   GradingSchemeSchema,
   NoteSchema,
   ReadingSchema,
+  ActivitySchema,
+  AdmissionSchema,
+  BudgetItemSchema,
+  CardSchema,
+  ContactSchema,
+  JobSchema,
+  JournalEntrySchema,
   SemesterSchema,
+  extractClozeCards,
+  isDue,
+  schedule,
   StudySessionSchema,
   TaskSchema,
 } from '@classpad/shared';
@@ -25,6 +35,7 @@ import {
   gradeReportHtml,
 } from './exportService.js';
 import { clearDemo, hasDemo, loadDemo } from './demo.js';
+import { LockService, readPrivacySync } from './lock.js';
 import { agenda, deadlines, stats, timetable } from './planner.js';
 import { APP_CSP, readStatic } from './static.js';
 import { backlinksFor, resolveLink } from './noteTools.js';
@@ -57,6 +68,8 @@ export interface App {
 /** PATCH treats null as "clear this field". */
 const nullsToUndefined = (b: Record<string, unknown>) =>
   Object.fromEntries(Object.entries(b).map(([k, v]) => [k, v === null ? undefined : v]));
+
+const OPEN_WHEN_LOCKED = new Set(['/api/v1/health', '/api/v1/lock/status', '/api/v1/lock/unlock']);
 
 const Id = z.object({ id: z.string().min(1).max(64) });
 const Paging = z.object({
@@ -110,7 +123,13 @@ function applyList<T extends Base>(items: T[], query: Record<string, unknown>) {
 
 export async function createApp(opts: AppOptions): Promise<App> {
   const token = opts.token ?? randomBytes(24).toString('hex');
-  const ctx = await createContext(opts.dataDir, { watch: opts.watch });
+  // With encrypted collections, nothing is read from disk until the passphrase is entered.
+  const privacy = readPrivacySync(opts.dataDir);
+  const ctx = await createContext(opts.dataDir, {
+    watch: opts.watch,
+    lazy: !!privacy?.enc?.collections.length,
+  });
+  const lock = new LockService(ctx, privacy);
   const app = fastify({
     logger: opts.logger
       ? {
@@ -158,6 +177,9 @@ export async function createApp(opts: AppOptions): Promise<App> {
       given = String((req.query as Record<string, string>)?.access_token ?? '');
     if (!given || !timingSafeEqual(digest(given), digest(token)))
       throw new ApiError(401, 'UNAUTHORIZED', 'missing or invalid bearer token');
+    // while locked, only the lock endpoints and the health check answer
+    if (lock.locked && !OPEN_WHEN_LOCKED.has(url))
+      throw new ApiError(423, 'LOCKED', 'Classpad is locked');
   });
 
   app.setErrorHandler((err: unknown, req, reply) => {
@@ -296,6 +318,13 @@ export async function createApp(opts: AppOptions): Promise<App> {
     store,
     bus,
     study,
+    journal,
+    contacts,
+    activities,
+    jobs,
+    admissions,
+    budget,
+    cards,
   } = ctx;
 
   // cascades: removing a parent never leaves dangling children
@@ -373,7 +402,117 @@ export async function createApp(opts: AppOptions): Promise<App> {
   );
   crud('/tasks', tasks, TaskSchema.omit({ id: true, createdAt: true, updatedAt: true }));
   crud('/readings', readings, ReadingSchema.omit({ id: true, createdAt: true, updatedAt: true }));
-  crud('/notes', notes, NoteSchema.omit({ id: true, createdAt: true, updatedAt: true }));
+  crud('/notes', notes, NoteSchema.omit({ id: true, createdAt: true, updatedAt: true }), {
+    // a deleted note takes its generated flashcards with it
+    remove: async (id) => {
+      await notes.delete(id);
+      await cards.deleteMany(
+        cards
+          .list()
+          .filter((c) => c.noteId === id)
+          .map((c) => c.id),
+      );
+    },
+  });
+
+  // ---- optional modules ----
+  const body = <S extends z.ZodObject<z.ZodRawShape>>(S: S) =>
+    S.omit({ id: true, createdAt: true, updatedAt: true });
+  crud('/journal', journal, body(JournalEntrySchema));
+  crud('/contacts', contacts, body(ContactSchema));
+  crud('/activities', activities, body(ActivitySchema));
+  crud('/jobs', jobs, body(JobSchema));
+  crud('/admissions', admissions, body(AdmissionSchema));
+  crud('/budget', budget, body(BudgetItemSchema));
+  crud('/flashcards', cards, body(CardSchema));
+
+  // flashcards generated from {{c1::cloze}} text in a note: create new, drop stale, keep the rest (and your progress)
+  route(
+    'POST',
+    '/flashcards/sync-note/:id',
+    'Create/update cloze flashcards from a note',
+    async (r) => {
+      const { id } = Id.parse(r.params);
+      const n = notes.get(id);
+      if (!n) throw notFound('notes', id);
+      const want = extractClozeCards(n.markdown);
+      const have = cards.list().filter((c) => c.noteId === id && c.cloze !== undefined);
+      const fresh = want.filter((w) => !have.some((h) => h.sourceKey === w.sourceKey));
+      const stale = have.filter((h) => !want.some((w) => w.sourceKey === h.sourceKey));
+      for (const w of fresh)
+        await cards.create({
+          noteId: id,
+          classId: n.classId,
+          front: w.front,
+          back: w.back,
+          cloze: w.cloze,
+          sourceKey: w.sourceKey,
+        });
+      await cards.deleteMany(stale.map((c) => c.id));
+      return { created: fresh.length, removed: stale.length, kept: have.length - stale.length };
+    },
+  );
+
+  const isNew = (c: { srs: { reps: number; lapses: number } }) =>
+    c.srs.reps === 0 && c.srs.lapses === 0;
+  route('GET', '/study/queue', 'Flashcards to review now', (r) => {
+    const q = z
+      .object({
+        limit: z.coerce.number().int().min(1).max(200).default(30),
+        newLimit: z.coerce.number().int().min(0).max(100).default(10),
+        classId: z.string().max(64).optional(),
+        noteId: z.string().max(64).optional(),
+      })
+      .parse(r.query);
+    const now = new Date();
+    const pool = cards
+      .list()
+      .filter(
+        (c) => (!q.classId || c.classId === q.classId) && (!q.noteId || c.noteId === q.noteId),
+      );
+    const review = pool
+      .filter((c) => !isNew(c) && isDue(c.srs, now))
+      .sort((a, b) => a.srs.dueAt.localeCompare(b.srs.dueAt) || a.id.localeCompare(b.id));
+    const fresh = pool
+      .filter(isNew)
+      .sort((a, b) => a.createdAt.localeCompare(b.createdAt) || a.id.localeCompare(b.id));
+    return {
+      cards: [...review.slice(0, q.limit), ...fresh.slice(0, q.newLimit)].slice(0, q.limit),
+      counts: { due: review.length, new: fresh.length, total: pool.length },
+    };
+  });
+  route('GET', '/study/decks', 'Flashcard counts per class', () => {
+    const now = new Date();
+    const by = new Map<
+      string,
+      { classId: string | null; total: number; due: number; new: number }
+    >();
+    for (const c of cards.list()) {
+      const k = c.classId ?? '';
+      const d = by.get(k) ?? { classId: c.classId ?? null, total: 0, due: 0, new: 0 };
+      d.total++;
+      if (isNew(c)) d.new++;
+      else if (isDue(c.srs, now)) d.due++;
+      by.set(k, d);
+    }
+    return [...by.values()];
+  });
+  const Answer = z.object({
+    cardId: z.string().min(1).max(64),
+    rating: z.enum(['again', 'hard', 'good', 'easy']),
+  });
+  route(
+    'POST',
+    '/study/answer',
+    'Rate a flashcard and schedule its next review',
+    async (r) => {
+      const a = Answer.parse(r.body);
+      const c = cards.get(a.cardId);
+      if (!c) throw notFound('flashcards', a.cardId);
+      return cards.update(a.cardId, { srs: schedule(c.srs, a.rating) });
+    },
+    Answer,
+  );
 
   crud(
     '/study-sessions',
@@ -571,6 +710,50 @@ export async function createApp(opts: AppOptions): Promise<App> {
   route('DELETE', '/templates/notes/:id', 'Delete a note template', async (r) => {
     await templates.remove(Id.parse(r.params).id);
   });
+
+  // ---- app lock and encryption at rest ----
+  const Pass = z.string().min(1).max(500);
+  route('GET', '/lock/status', 'Lock state', () => lock.status());
+  route('POST', '/lock/unlock', 'Unlock with the passphrase', (r) =>
+    lock.unlock(z.object({ passphrase: Pass }).parse(r.body).passphrase),
+  );
+  route('POST', '/lock/lock', 'Lock now', () => lock.lock());
+  route(
+    'POST',
+    '/lock/setup',
+    'Set or change the passphrase (optionally choose encrypted collections)',
+    (r) =>
+      lock.setup(
+        z
+          .object({
+            passphrase: Pass,
+            current: Pass.optional(),
+            collections: z.array(z.string().max(40)).max(20).optional(),
+            autoLockMinutes: z.number().int().min(0).max(1440).optional(),
+            lockOnHide: z.boolean().optional(),
+          })
+          .parse(r.body),
+      ),
+  );
+  route('POST', '/lock/collections', 'Choose which collections are encrypted at rest', (r) => {
+    const b = z
+      .object({ collections: z.array(z.string().max(40)).max(20), passphrase: Pass.optional() })
+      .parse(r.body);
+    return lock.setCollections(b.collections, b.passphrase);
+  });
+  route('PATCH', '/lock/settings', 'Auto-lock settings', (r) =>
+    lock.updateSettings(
+      z
+        .object({
+          autoLockMinutes: z.number().int().min(0).max(1440).optional(),
+          lockOnHide: z.boolean().optional(),
+        })
+        .parse(r.body),
+    ),
+  );
+  route('POST', '/lock/disable', 'Remove the lock and decrypt everything', (r) =>
+    lock.disable(z.object({ passphrase: Pass }).parse(r.body).passphrase),
+  );
 
   // ---- settings, demo data, about ----
   route('GET', '/settings', 'UI and app settings', async () =>

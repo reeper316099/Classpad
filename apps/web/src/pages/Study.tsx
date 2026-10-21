@@ -134,6 +134,7 @@ export function StudyPage() {
               <div className="pomo-clock">{fmtClock(p.remaining)}</div>
               <div
                 className="row tight"
+                role="img"
                 aria-label={`${p.timer?.completed ?? 0} focus sessions done`}
               >
                 {Array.from({ length: p.cfg.longEvery }, (_, i) => (

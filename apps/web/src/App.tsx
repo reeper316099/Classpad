@@ -6,13 +6,17 @@ import {
 } from '@tanstack/react-query';
 import { Suspense, lazy, useEffect } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
+import { LockGate, lockKey } from './components/LockGate.js';
 import { Shell } from './components/Shell.js';
-import { eventsUrl } from './lib/api.js';
+import { ApiError, eventsUrl } from './lib/api.js';
 import { refreshAll } from './lib/hooks.js';
 import { useUi } from './lib/store.js';
 import { AssignmentsPage } from './pages/Assignments.js';
 import { ClassPage, ClassesPage } from './pages/Classes.js';
 import { DashboardPage } from './pages/Dashboard.js';
+import { FlashcardsPage } from './pages/Flashcards.js';
+import { JournalPage } from './pages/Journal.js';
+import { ModuleRoute } from './pages/Module.js';
 import { GradesPage } from './pages/Grades.js';
 import { ImportExportPage } from './pages/ImportExport.js';
 import { NotesPage } from './pages/Notes.js';
@@ -28,6 +32,10 @@ let lastError = { msg: '', at: 0 };
 const client = new QueryClient({
   queryCache: new QueryCache({
     onError: (e) => {
+      if (e instanceof ApiError && e.status === 423) {
+        void client.invalidateQueries({ queryKey: lockKey });
+        return;
+      }
       const msg = (e as Error).message || 'Request failed';
       if (msg === lastError.msg && Date.now() - lastError.at < 15_000) return;
       lastError = { msg, at: Date.now() };
@@ -59,39 +67,44 @@ function LiveUpdates() {
 export function App() {
   return (
     <QueryClientProvider client={client}>
-      <LiveUpdates />
-      <HashRouter>
-        <Routes>
-          <Route element={<Shell />}>
-            <Route index element={<DashboardPage />} />
-            <Route path="classes" element={<ClassesPage />} />
-            <Route path="classes/:id/:tab?" element={<ClassPage />} />
-            <Route path="assignments" element={<AssignmentsPage />} />
-            <Route path="grades/:classId?" element={<GradesPage />} />
-            <Route
-              path="gpa"
-              element={
-                <Suspense fallback={null}>
-                  <GpaPage />
-                </Suspense>
-              }
-            />
-            <Route path="import" element={<ImportExportPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-            <Route path="notes/:id?" element={<NotesPage />} />
-            <Route path="planner" element={<PlannerPage />} />
-            <Route
-              path="study"
-              element={
-                <Suspense fallback={null}>
-                  <StudyPage />
-                </Suspense>
-              }
-            />
-            <Route path="*" element={<DashboardPage />} />
-          </Route>
-        </Routes>
-      </HashRouter>
+      <LockGate>
+        <LiveUpdates />
+        <HashRouter>
+          <Routes>
+            <Route element={<Shell />}>
+              <Route index element={<DashboardPage />} />
+              <Route path="classes" element={<ClassesPage />} />
+              <Route path="classes/:id/:tab?" element={<ClassPage />} />
+              <Route path="assignments" element={<AssignmentsPage />} />
+              <Route path="grades/:classId?" element={<GradesPage />} />
+              <Route
+                path="gpa"
+                element={
+                  <Suspense fallback={null}>
+                    <GpaPage />
+                  </Suspense>
+                }
+              />
+              <Route path="import" element={<ImportExportPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+              <Route path="notes/:id?" element={<NotesPage />} />
+              <Route path="planner" element={<PlannerPage />} />
+              <Route
+                path="study"
+                element={
+                  <Suspense fallback={null}>
+                    <StudyPage />
+                  </Suspense>
+                }
+              />
+              <Route path="modules/:id" element={<ModuleRoute />} />
+              <Route path="journal" element={<JournalPage />} />
+              <Route path="flashcards" element={<FlashcardsPage />} />
+              <Route path="*" element={<DashboardPage />} />
+            </Route>
+          </Routes>
+        </HashRouter>
+      </LockGate>
     </QueryClientProvider>
   );
 }

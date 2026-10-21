@@ -119,15 +119,11 @@ export function WeekView() {
       {isLoading ? (
         <Skeleton h={300} />
       ) : (
-        <div className="week card" role="grid" aria-label="Week timetable">
+        <div className="week card" role="group" aria-label="Week timetable">
           <div className="week-head">
             <div />
             {days.map((d) => (
-              <div
-                key={d.date}
-                role="columnheader"
-                className={`week-dayhead ${d.date === today ? 'today' : ''}`}
-              >
+              <div key={d.date} className={`week-dayhead ${d.date === today ? 'today' : ''}`}>
                 <span className="muted small">{WEEKDAY_SHORT[dowKey(d.date)]}</span>
                 <b>{fromIso(d.date).getDate()}</b>
               </div>

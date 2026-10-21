@@ -387,3 +387,40 @@ describe('attachments', () => {
     expect((await call('DELETE', `/attachments/${a.body.id}`)).status).toBe(204);
   });
 });
+
+describe('module data from a Notion export', () => {
+  it('imports journal/contacts/jobs/budget, is idempotent, links contacts to classes, and undoes cleanly', async () => {
+    const { call } = await make();
+    const imp = await importNotion(call);
+    expect(imp.commit.created).toMatchObject({ journal: 2, contacts: 2, jobs: 1, budget: 2 });
+    const j = (await call('GET', '/journal')).body;
+    expect(j.total).toBe(2);
+    expect(j.items.find((e: any) => e.title === 'Lorem day').mood).toEqual(['happy', 'focused']);
+    const lorem = (await call('GET', '/classes?name=LOREM%20101')).body.items[0];
+    const pat = (await call('GET', '/contacts')).body.items.find(
+      (c: any) => c.name === 'Pat Placeholder',
+    );
+    expect(pat.classIds).toEqual([lorem.id]);
+    expect((await call('GET', '/budget')).body.items.map((b: any) => b.cost).sort()).toEqual([
+      2, 4.5,
+    ]);
+    const again = await importNotion(call);
+    expect(again.commit.created).toMatchObject({ journal: 0, contacts: 0, jobs: 0, budget: 0 });
+    expect((await call('GET', '/journal')).body.total).toBe(2);
+    await call('POST', `/import/undo/${imp.commit.importId}`);
+    for (const c of ['journal', 'contacts', 'jobs', 'budget'])
+      expect((await call('GET', `/${c}`)).body.total).toBe(0);
+  });
+  it('a JSON backup round-trips module data and flashcards', async () => {
+    const a = await make();
+    await a.call('POST', '/journal', { date: '2031-03-05', markdown: 'entry' });
+    await a.call('POST', '/jobs', { position: 'Intern' });
+    await a.call('POST', '/flashcards', { front: 'Q', back: 'A' });
+    const backup = (await a.call('GET', '/export/json')).text;
+    const b = await make();
+    const p = await b.call('POST', '/import/preview', { kind: 'json', text: backup });
+    const c = await b.call('POST', '/import/commit', { previewId: p.body.previewId });
+    expect(c.body.created).toMatchObject({ journal: 1, jobs: 1, cards: 1 });
+    expect((await b.call('GET', '/flashcards')).body.items[0].front).toBe('Q');
+  });
+});

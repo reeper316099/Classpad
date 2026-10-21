@@ -76,12 +76,17 @@ export class NoteRepo implements Collection<Note> {
     this.items.clear();
     this.files.clear();
     this.loadErrors.length = 0;
-    for (const rel of await this.store.list(NOTES_DIR, { ext: '.md', recursive: true }))
-      await this.loadFile(rel);
+    const rels = await this.store.list(NOTES_DIR, { ext: '.md', recursive: true });
+    // read in parallel batches (startup with thousands of notes), but apply in order so results are deterministic
+    for (let i = 0; i < rels.length; i += 64) {
+      const batch = rels.slice(i, i + 64);
+      const texts = await Promise.all(batch.map((rel) => this.store.readText(rel)));
+      for (const [j, rel] of batch.entries()) await this.loadFile(rel, texts[j]);
+    }
   }
 
-  private async loadFile(rel: string): Promise<void> {
-    const text = await this.store.readText(rel);
+  private async loadFile(rel: string, preloaded?: string | null): Promise<void> {
+    const text = preloaded === undefined ? await this.store.readText(rel) : preloaded;
     if (text === null) return;
     try {
       const hadId = /^id:/m.test(text.split(/^---\s*$/m)[1] ?? '');

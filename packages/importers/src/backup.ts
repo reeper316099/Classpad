@@ -8,6 +8,13 @@ export interface BackupV1 {
   tasks: unknown[];
   readings: unknown[];
   notes: unknown[];
+  journal?: unknown[];
+  contacts?: unknown[];
+  activities?: unknown[];
+  jobs?: unknown[];
+  admissions?: unknown[];
+  budget?: unknown[];
+  flashcards?: unknown[];
   attachments: unknown[];
   gradingSchemes: unknown[];
   gpaScales: unknown[];
@@ -35,6 +42,13 @@ export function parseBackup(text: string): BackupV1 {
     tasks: arr('tasks'),
     readings: arr('readings'),
     notes: arr('notes'),
+    journal: arr('journal'),
+    contacts: arr('contacts'),
+    activities: arr('activities'),
+    jobs: arr('jobs'),
+    admissions: arr('admissions'),
+    budget: arr('budget'),
+    flashcards: arr('flashcards'),
     attachments: arr('attachments'),
     gradingSchemes: arr('gradingSchemes'),
     gpaScales: arr('gpaScales'),

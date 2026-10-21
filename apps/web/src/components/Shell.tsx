@@ -2,7 +2,11 @@ import { useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useDialogs } from '../lib/dialogs.js';
 import { useSelectedSemester } from '../lib/hooks.js';
+import { MODULES, isOn } from '../lib/modules.js';
 import { applyAppearance, useUi } from '../lib/store.js';
+import { useLockStatus } from './LockGate.js';
+import { post } from '../lib/api.js';
+import { useQueryClient } from '@tanstack/react-query';
 import { CommandPalette } from './CommandPalette.js';
 import { Dialogs } from './Dialogs.js';
 import { QuickOpen } from './NoteDialogs.js';
@@ -38,10 +42,16 @@ export function Shell() {
   const nav = useNavigate();
   const dialogs = useDialogs();
   const { semester, semesters } = useSelectedSemester();
+  const qc = useQueryClient();
+  const { data: lockStatus } = useLockStatus();
+  const modNav = MODULES.filter((m) => isOn(ui.modules, m.id)).map(
+    (m) =>
+      [m.custom ? `/${m.id}` : `/modules/${m.id}`, m.label, m.icon] as [string, string, IconName],
+  );
 
   useEffect(() => {
     applyAppearance(ui);
-  }, [ui.theme, ui.accent, ui.density, ui.hideGrades]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ui.theme, ui.accent, ui.density, ui.hideGrades, ui.hideJournal]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -129,6 +139,17 @@ export function Shell() {
               {label}
             </NavLink>
           ))}
+          {modNav.length > 0 && (
+            <div className="nav-group" aria-hidden="true">
+              Modules
+            </div>
+          )}
+          {modNav.map(([to, label, icon]) => (
+            <NavLink key={to} to={to} className={({ isActive }) => (isActive ? 'active' : '')}>
+              <Icon name={icon} />
+              {label}
+            </NavLink>
+          ))}
         </nav>
         <div className="sidebar-foot nav">
           <NavLink to="/import" className={({ isActive }) => (isActive ? 'active' : '')}>
@@ -155,6 +176,17 @@ export function Shell() {
             <kbd>⌘K</kbd>
           </button>
           <span className="grow" />
+          {lockStatus?.enabled && (
+            <button
+              className="btn sm"
+              onClick={() =>
+                void post('/lock/lock').then(() => qc.invalidateQueries({ queryKey: ['lock'] }))
+              }
+              aria-label="Lock Classpad now"
+            >
+              <Icon name="lock" size={14} /> Lock
+            </button>
+          )}
           {semesters.length > 0 && (
             <select
               className="select sm"

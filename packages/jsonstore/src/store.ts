@@ -6,6 +6,7 @@ import path from 'node:path';
 import type { ZodType, ZodTypeDef } from 'zod';
 
 type Schema<T> = ZodType<T, ZodTypeDef, unknown>;
+import { decryptText, encryptText, isEnvelope, type Crypto } from './crypto.js';
 import { createBackup, listBackups, readFromLatestBackup } from './backup.js';
 import { StoreError } from './errors.js';
 import { KeyedMutex } from './mutex.js';
@@ -49,6 +50,7 @@ export class JsonStore extends EventEmitter {
   }[] = [];
   private watcher?: FSWatcher;
   private locked = false;
+  private crypto: Crypto | null = null;
 
   private constructor(root: string) {
     super();
@@ -101,16 +103,61 @@ export class JsonStore extends EventEmitter {
 
   // ---------- raw IO (no locking) ----------
   private async rawRead(rel: string): Promise<string | null> {
+    let text: string;
     try {
-      return await fs.readFile(this.resolve(rel), 'utf8');
+      text = await fs.readFile(this.resolve(rel), 'utf8');
     } catch (e) {
       if (isNotFound(e)) return null;
       throw new StoreError(`cannot read ${rel}: ${(e as Error).message}`, 'IO', rel);
     }
+    return this.plain(rel, text);
   }
 
-  private async rawWrite(rel: string, text: string | Buffer): Promise<void> {
+  /** Decrypt a file's text if it is an encrypted envelope (needs the key to be set). */
+  private plain(rel: string, text: string): string {
+    if (!isEnvelope(text)) return text;
+    if (!this.crypto)
+      throw new StoreError(`${rel} is encrypted and the app is locked`, 'ENCRYPTED', rel);
+    return decryptText(this.crypto.key, rel, text);
+  }
+
+  /** Delete every backup (used after encrypting: older backups still hold the data in plain text). */
+  async purgeBackups(): Promise<number> {
+    const files = await this.list('backups', { ext: '.zip' });
+    for (const f of files) await fs.rm(this.resolve(f), { force: true });
+    return files.length;
+  }
+
+  /** Turn encryption on (or off with null). Takes effect for subsequent reads and writes. */
+  setCrypto(c: Crypto | null): void {
+    this.crypto = c;
+  }
+
+  /**
+   * Rewrite every data file under the new policy (encrypt chosen paths, decrypt the rest, or use a new key).
+   * A backup is taken first. Each file is self-describing, so a crash mid-way leaves a readable mix.
+   */
+  async reencryptAll(next: Crypto | null, opts: { backup?: boolean } = {}): Promise<number> {
+    if (opts.backup !== false) await this.backup('pre-encryption');
+    const rels = (await this.list('data', { recursive: true })).filter((r) =>
+      /\.(json|jsonl|md)$/.test(r),
+    );
+    const plain = new Map<string, string>();
+    for (const r of rels) {
+      const t = await this.readText(r);
+      if (t !== null) plain.set(r, t);
+    }
+    this.crypto = next;
+    for (const [r, t] of plain) await this.writeText(r, t);
+    return plain.size;
+  }
+
+  private async rawWrite(rel: string, data: string | Buffer): Promise<void> {
     const abs = this.resolve(rel);
+    const text =
+      typeof data === 'string' && this.crypto?.shouldEncrypt(rel)
+        ? encryptText(this.crypto.key, rel, data)
+        : data;
     await fs.mkdir(path.dirname(abs), { recursive: true });
     const tmp = `${abs}.${process.pid}.${randomBytes(4).toString('hex')}.tmp`;
     const fh = await fs.open(tmp, 'w');
@@ -250,7 +297,14 @@ export class JsonStore extends EventEmitter {
         return this.parseAndValidate(text, rel, opts.schema);
       } catch (e) {
         if (!(e instanceof StoreError) || e.code !== 'CORRUPT') throw e;
-        const good = await this.quarantine(rel);
+        let good = await this.quarantine(rel);
+        if (good !== null && isEnvelope(good)) {
+          try {
+            good = this.plain(rel, good);
+          } catch {
+            good = null;
+          }
+        }
         if (good !== null) {
           try {
             const v = this.parseAndValidate(good, rel, opts.schema);
@@ -374,6 +428,15 @@ export class JsonStore extends EventEmitter {
         text = null;
       }
       if (text !== null && this.selfWrites.get(abs) === sha(text)) return;
+      if (text !== null && isEnvelope(text)) {
+        if (!this.crypto) return; // locked: cannot read it, nothing to refresh
+        try {
+          text = decryptText(this.crypto.key, rel, text);
+        } catch {
+          this.emit('invalid-edit', { rel, message: 'encrypted file could not be decrypted' });
+          return;
+        }
+      }
       if (text !== null) {
         for (const v of this.validators) {
           if (!v.match(rel)) continue;

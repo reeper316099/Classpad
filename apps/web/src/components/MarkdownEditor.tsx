@@ -29,6 +29,7 @@ export interface EditorHandle {
   /** Prefix each selected line, e.g. '- [ ] '. */
   prefixLines(prefix: string): void;
   cloze(): void;
+  getSelection(): string;
   goToLine(line: number): void;
   focus(): void;
 }
@@ -146,6 +147,12 @@ export const MarkdownEditor = forwardRef<EditorHandle, Props>(function MarkdownE
       const used = [...v.state.doc.toString().matchAll(/\{\{c(\d+)::/g)].map((m) => Number(m[1]));
       const n = (used.length ? Math.max(...used) : 0) + 1;
       wrapSel(v, `{{c${n}::`, '}}');
+    },
+    getSelection: () => {
+      const v = view.current;
+      if (!v) return '';
+      const { from, to } = v.state.selection.main;
+      return v.state.sliceDoc(from, to);
     },
     goToLine: (line) => {
       const v = view.current;

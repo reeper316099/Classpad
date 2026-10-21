@@ -4,3 +4,5 @@ export * from './enums.js';
 export * from './entities.js';
 export * from './frontmatter.js';
 export * from './wikilinks.js';
+export * from './modules.js';
+export * from './srs.js';

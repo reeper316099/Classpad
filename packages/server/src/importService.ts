@@ -32,7 +32,37 @@ interface Session {
   at: number;
 }
 
-type Kind = 'semesters' | 'classes' | 'assignments' | 'tasks' | 'readings' | 'notes';
+type Kind =
+  | 'semesters'
+  | 'classes'
+  | 'assignments'
+  | 'tasks'
+  | 'readings'
+  | 'notes'
+  | 'journal'
+  | 'contacts'
+  | 'activities'
+  | 'jobs'
+  | 'admissions'
+  | 'budget'
+  | 'cards';
+const ALL_KINDS: Kind[] = [
+  'semesters',
+  'classes',
+  'assignments',
+  'tasks',
+  'readings',
+  'notes',
+  'journal',
+  'contacts',
+  'activities',
+  'jobs',
+  'admissions',
+  'budget',
+  'cards',
+];
+/** Backups call the flashcards collection `flashcards`. */
+const backupKey = (k: Kind) => (k === 'cards' ? 'flashcards' : k);
 type Entity = { id: string; importRef?: string } & Record<string, unknown>;
 
 export interface Manifest {
@@ -48,14 +78,8 @@ export interface Manifest {
   config?: { schemes: unknown; scales: unknown };
   warnings: string[];
 }
-const emptyKinds = <T>(f: () => T): Record<Kind, T> => ({
-  semesters: f(),
-  classes: f(),
-  assignments: f(),
-  tasks: f(),
-  readings: f(),
-  notes: f(),
-});
+const emptyKinds = <T>(f: () => T): Record<Kind, T> =>
+  Object.fromEntries(ALL_KINDS.map((k) => [k, f()])) as Record<Kind, T>;
 
 const isEmpty = (v: unknown) =>
   v === undefined || v === null || v === '' || (Array.isArray(v) && v.length === 0);
@@ -129,6 +153,10 @@ export class ImportService {
       tasks: [],
       readings: [],
       notes: [],
+      journal: [],
+      contacts: [],
+      jobs: [],
+      budget: [],
       templates: [],
       attachments: [],
       skipped: [],
@@ -155,6 +183,10 @@ export class ImportService {
         tasks: p.tasks.length,
         readings: p.readings.length,
         notes: p.notes.length,
+        journal: p.journal.length,
+        contacts: p.contacts.length,
+        jobs: p.jobs.length,
+        budget: p.budget.length,
         templates: p.templates.length,
         attachments: p.attachments.length,
       },
@@ -165,6 +197,10 @@ export class ImportService {
         tasks: titles(p.tasks),
         readings: titles(p.readings),
         notes: titles(p.notes),
+        journal: titles(p.journal),
+        contacts: titles(p.contacts),
+        jobs: p.jobs.map((j) => `${j.position}${j.company ? ' @ ' + j.company : ''}`),
+        budget: p.budget.map((b) => b.purchase),
         templates: p.templates.map((t) => `${t.kind}: ${t.name}`),
       },
       skipped: p.skipped,
@@ -218,7 +254,7 @@ export class ImportService {
     const { ctx } = this;
     const p = s.preview;
     const existing = new Map<string, Entity>();
-    for (const k of ['semesters', 'classes', 'assignments', 'tasks', 'readings', 'notes'] as Kind[])
+    for (const k of ALL_KINDS)
       for (const e of this.repo(k).list() as Entity[])
         if (e.importRef) existing.set(e.importRef, e);
     const refToId = new Map<string, string>();
@@ -383,6 +419,27 @@ export class ImportService {
         await this.touch('assignments', aid, { noteIds: [...a.noteIds, nid] }, m);
     }
 
+    // optional modules
+    for (const d of p.journal) {
+      const { ref, ...rest } = d;
+      await apply('journal', ref, rest);
+    }
+    for (const d of p.contacts) {
+      const { ref, classRefs, ...rest } = d;
+      await apply('contacts', ref, {
+        ...rest,
+        classIds: classRefs.map((r) => refToId.get(r)).filter((x): x is string => !!x),
+      });
+    }
+    for (const d of p.jobs) {
+      const { ref, ...rest } = d;
+      await apply('jobs', ref, rest);
+    }
+    for (const d of p.budget) {
+      const { ref, ...rest } = d;
+      await apply('budget', ref, rest);
+    }
+
     // templates
     for (const t of p.templates) {
       const rel = `config/templates/${t.kind}/${slugify(t.name)}.md`;
@@ -414,17 +471,17 @@ export class ImportService {
       tasks: ctx.tasks.schemaForRestore(),
       readings: ctx.readings.schemaForRestore(),
       notes: ctx.notes.schemaForRestore(),
+      journal: ctx.journal.schemaForRestore(),
+      contacts: ctx.contacts.schemaForRestore(),
+      activities: ctx.activities.schemaForRestore(),
+      jobs: ctx.jobs.schemaForRestore(),
+      admissions: ctx.admissions.schemaForRestore(),
+      budget: ctx.budget.schemaForRestore(),
+      cards: ctx.cards.schemaForRestore(),
     };
-    for (const kind of [
-      'semesters',
-      'classes',
-      'assignments',
-      'tasks',
-      'readings',
-      'notes',
-    ] as Kind[]) {
+    for (const kind of ALL_KINDS) {
       const repo = this.repo(kind);
-      for (const raw of b[kind] as unknown[]) {
+      for (const raw of (b as unknown as Record<string, unknown[]>)[backupKey(kind)] ?? []) {
         const parsed = schemaOf[kind].safeParse(raw);
         if (!parsed.success) {
           m.warnings.push(`Skipped invalid ${kind} entry: ${parsed.error.issues[0]?.message}`);
@@ -506,26 +563,26 @@ export class ImportService {
     const warnings: string[] = [];
     await ctx.store.backup('pre-undo');
     // restore edited entities first (they may be parents of created ones), then delete created, children first
-    for (const kind of [
-      'semesters',
-      'classes',
-      'assignments',
-      'tasks',
-      'readings',
-      'notes',
-    ] as Kind[])
-      for (const prev of Object.values(m.updated[kind]))
+    for (const kind of ALL_KINDS)
+      for (const prev of Object.values(m.updated[kind] ?? {}))
         await (this.repo(kind) as Repo<never>).put(prev as never);
-    const mine = (k: Kind) => new Set(m.created[k]);
+    const mine = (k: Kind) => new Set(m.created[k] ?? []);
     for (const kind of [
+      'cards',
       'notes',
+      'journal',
+      'contacts',
+      'activities',
+      'jobs',
+      'admissions',
+      'budget',
       'tasks',
       'readings',
       'assignments',
       'classes',
       'semesters',
     ] as Kind[]) {
-      for (const id of [...m.created[kind]].reverse()) {
+      for (const id of [...(m.created[kind] ?? [])].reverse()) {
         if (!this.repo(kind).get(id)) continue;
         if (
           kind === 'classes' &&

@@ -314,6 +314,7 @@ function NoteEditor({
   const remove = useDeleteWithUndo<Note>('notes', (n) => `“${n.title}”`);
   const editor = useRef<EditorHandle>(null);
   const previewBox = useRef<HTMLDivElement>(null);
+  const modules = useUi((s) => s.modules);
   const [draft, setDraft] = useState<Draft>(() => toDraft(note));
   const [status, setStatus] = useState<'saved' | 'saving' | 'dirty' | 'error'>('saved');
   const [conflict, setConflict] = useState(false);
@@ -355,6 +356,10 @@ function NoteEditor({
       setStatus(dirty.current ? 'dirty' : 'saved');
       void qc.invalidateQueries({ queryKey: ['list', 'notes'] });
       void qc.invalidateQueries({ queryKey: ['backlinks'] });
+      if (useUi.getState().modules.flashcards && d.markdown.includes('{{c'))
+        void post(`/flashcards/sync-note/${note.id}`)
+          .then(() => qc.invalidateQueries({ queryKey: ['decks'] }))
+          .catch(() => null);
     } catch (e) {
       dirty.current = true;
       setStatus('error');
@@ -643,6 +648,19 @@ function NoteEditor({
             {tb('❝', 'Quote', () => editor.current?.prefixLines('> '))}
             {tb('[[ ]]', 'Link to a note', () => editor.current?.wrap('[[', ']]'))}
             {tb('{{c}}', 'Cloze deletion for flashcards', () => editor.current?.cloze())}
+            {modules.flashcards &&
+              tb('Card', 'Make a flashcard from the selected text (front = selection)', () => {
+                const t = editor.current?.getSelection().trim();
+                if (!t) return useUi.getState().toast('Select some text first');
+                void post('/flashcards', {
+                  front: t,
+                  back: '',
+                  noteId: note.id,
+                  classId: draft.classId || null,
+                }).then(() =>
+                  useUi.getState().toast('Flashcard added. Add the back in Flashcards.'),
+                );
+              })}
           </div>
         )}
         <span className="grow" />

@@ -1,14 +1,29 @@
 import { JsonStore } from '@classpad/jsonstore';
 import {
+  ActivitySchema,
+  AdmissionSchema,
   AssignmentSchema,
   AttachmentSchema,
+  BudgetItemSchema,
+  CardSchema,
   ClassSchema,
+  ContactSchema,
+  JobSchema,
+  JournalEntrySchema,
   ReadingSchema,
   SemesterSchema,
   TaskSchema,
+  newSrs,
+  type Activity,
+  type Admission,
   type Assignment,
   type Attachment,
+  type BudgetItem,
+  type Card,
   type ClassEntity,
+  type Contact,
+  type Job,
+  type JournalEntry,
   type Reading,
   type Semester,
   type Task,
@@ -35,6 +50,16 @@ export interface Context {
   notes: NoteRepo;
   attachments: Repo<Attachment>;
   study: StudyRepo;
+  journal: Repo<JournalEntry>;
+  contacts: Repo<Contact>;
+  activities: Repo<Activity>;
+  jobs: Repo<Job>;
+  admissions: Repo<Admission>;
+  budget: Repo<BudgetItem>;
+  cards: Repo<Card>;
+  /** False while encrypted data is still locked (nothing is readable until `loadAll`). */
+  loaded: boolean;
+  loadAll(): Promise<void>;
   grading: GradingService;
   search: SearchIndex;
   searchDocs(): SearchDoc[];
@@ -47,7 +72,7 @@ const ref = (cond: boolean, msg: string) => {
 
 export async function createContext(
   dataDir: string,
-  opts: { watch?: boolean } = {},
+  opts: { watch?: boolean; lazy?: boolean } = {},
 ): Promise<Context> {
   const store = await JsonStore.open(dataDir);
   await store.backupIfStale().catch(() => null);
@@ -121,9 +146,59 @@ export async function createContext(
   const study = new StudyRepo(store, bus);
   const notes = new NoteRepo(store, bus, (id) => (id ? classes.get(id)?.slug : undefined));
 
-  for (const r of [semesters, classes, assignments, tasks, readings, attachments]) await r.load();
-  await notes.load();
-  await study.load();
+  // optional modules: small JSON collections under data/
+  const mod = <T extends { id: string; createdAt: string; updatedAt: string }>(
+    name: string,
+    schema: unknown,
+    location: string,
+    fileFor: (e: T) => string = () => location,
+    beforeCreate?: (d: Record<string, unknown>) => Record<string, unknown>,
+  ) => new Repo<T>(store, bus, { name, schema: schema as never, location, fileFor, beforeCreate });
+  const journal = mod<JournalEntry>(
+    'journal',
+    JournalEntrySchema,
+    'data/journal',
+    (e) => `data/journal/${e.date.slice(0, 7)}.json`,
+  );
+  const contacts = mod<Contact>('contacts', ContactSchema, 'data/contacts/contacts.json');
+  const activities = mod<Activity>(
+    'activities',
+    ActivitySchema,
+    'data/modules/activities/activities.json',
+  );
+  const jobs = mod<Job>('jobs', JobSchema, 'data/modules/jobs/jobs.json');
+  const admissions = mod<Admission>(
+    'admissions',
+    AdmissionSchema,
+    'data/modules/admissions/admissions.json',
+  );
+  const budget = mod<BudgetItem>('budget', BudgetItemSchema, 'data/modules/budget/budget.json');
+  const cards = mod<Card>(
+    'flashcards',
+    CardSchema,
+    'data/flashcards/cards.json',
+    undefined,
+    (d) => ({
+      ...d,
+      srs: d.srs ?? newSrs(),
+    }),
+  );
+
+  const allRepos = [
+    semesters,
+    classes,
+    assignments,
+    tasks,
+    readings,
+    attachments,
+    journal,
+    contacts,
+    activities,
+    jobs,
+    admissions,
+    budget,
+    cards,
+  ] as unknown as Repo<{ id: string; createdAt: string; updatedAt: string }>[];
 
   const grading = new GradingService({
     config,
@@ -175,7 +250,15 @@ export async function createContext(
       due: undefined,
     })),
   ];
-  search.rebuild(searchDocs());
+  let loaded = false;
+  const loadAll = async () => {
+    for (const r of allRepos) await r.load();
+    await notes.load();
+    await study.load();
+    search.rebuild(searchDocs());
+    loaded = true;
+  };
+  if (!opts.lazy) await loadAll();
 
   bus.on('event', (ev: { kind: string; collection: string; entityId?: string }) => {
     const id = ev.entityId;
@@ -248,11 +331,9 @@ export async function createContext(
 
   // hand-edit validation + live reload
   store.registerValidator(
-    (rel) => [semesters, classes, assignments, tasks, readings].some((r) => r.owns(rel)),
+    (rel) => allRepos.some((r) => r.owns(rel)),
     (text, rel) => {
-      [semesters, classes, assignments, tasks, readings]
-        .find((r) => r.owns(rel))!
-        .validateText(text);
+      allRepos.find((r) => r.owns(rel))!.validateText(text);
     },
   );
   store.registerValidator(
@@ -269,8 +350,8 @@ export async function createContext(
   store.on('external-change', async ({ rel }: { rel: string }) => {
     try {
       let handled = false;
-      for (const r of [semesters, classes, assignments, tasks, readings])
-        handled = (await r.reloadFile(rel)) || handled;
+      if (!loaded) return; // locked: nothing is in memory to refresh
+      for (const r of allRepos) handled = (await r.reloadFile(rel)) || handled;
       handled = (await notes.reloadFile(rel)) || handled;
       handled = (await study.reloadFile(rel)) || handled;
       if (rel.startsWith('config/')) {
@@ -303,6 +384,17 @@ export async function createContext(
     notes,
     attachments,
     study,
+    journal,
+    contacts,
+    activities,
+    jobs,
+    admissions,
+    budget,
+    cards,
+    get loaded() {
+      return loaded;
+    },
+    loadAll,
     grading,
     search,
     searchDocs,

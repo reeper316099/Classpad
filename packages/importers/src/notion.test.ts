@@ -118,10 +118,34 @@ describe('synthetic Notion export', () => {
     const essay = p.templates.find((t) => t.name === 'Essay Template')!;
     expect(essay.markdown).toContain('- [ ]');
   });
-  it('skips optional-module data with a reason and does not import it', () => {
-    expect(p.skipped.map((s) => s.kind)).toEqual(
-      expect.arrayContaining(['journal', 'contacts', 'budget', 'jobs']),
-    );
+  it('imports journal, contacts, jobs and budget (previously skipped)', () => {
+    expect(p.journal.map((j) => [j.title, j.date, j.mood])).toEqual([
+      ['Lorem day', '2031-09-05', ['happy', 'focused']],
+      ['Ipsum evening', '2031-09-06', ['tired']],
+    ]);
+    expect(p.journal[0]!.markdown.length).toBeGreaterThan(20); // page body merged in, property header lines removed
+    expect(p.journal[0]!.markdown).not.toMatch(/Mood:|Date:/);
+    expect(p.contacts).toHaveLength(2);
+    expect(p.contacts[0]).toMatchObject({
+      name: 'Pat Placeholder',
+      role: 'Instructor',
+      email: 'pat@example.invalid',
+      phone: '555-0100',
+    });
+    expect(p.contacts[0]!.classRefs).toEqual([p.classes.find((c) => c.name === 'LOREM 101')!.ref]);
+    expect(p.jobs).toEqual([
+      expect.objectContaining({
+        position: 'Lorem Intern',
+        company: 'Example Co',
+        status: 'applied',
+        type: 'internship',
+      }),
+    ]);
+    expect(p.budget.map((b) => [b.purchase, b.cost, b.type, b.date])).toEqual([
+      ['Notebook', 4.5, 'expense', '2031-09-02'],
+      ['Snack', 2, 'expense', '2031-09-03'],
+    ]);
+    expect(p.skipped.map((s) => s.kind)).toEqual(['pages']); // only hub/module pages outside the databases remain
   });
   it('validation report: parity ok, deliberate mismatch listed, blanks handled', () => {
     const by = Object.fromEntries(p.validation.map((v) => [v.className, v.status]));

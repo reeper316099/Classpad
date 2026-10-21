@@ -1402,3 +1402,28 @@ html.focus-mode .content {
 .grid.two {
   align-items: start;
 }
+
+/* private journal text: blurred until revealed */
+.hide-journal .sens-j {
+  filter: blur(7px);
+  user-select: none;
+  transition: filter 0.2s var(--ease);
+}
+
+.lock-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--bg);
+}
+.lock-card {
+  width: min(380px, 100%);
+}
+.nav-group {
+  padding: 12px 10px 4px;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-3, var(--muted));
+}

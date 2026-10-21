@@ -19,6 +19,9 @@ interface UiState {
   density: Density;
   hideGrades: boolean;
   semesterId: string | null;
+  /** Which optional modules are switched on (the reading tracker is on by default). */
+  modules: Record<string, boolean>;
+  hideJournal: boolean;
   weekStart: 'mon' | 'sun';
   hour12: boolean;
   /** Minutes before a deadline at which to notify (empty = never). */
@@ -40,6 +43,8 @@ interface UiState {
         | 'hour12'
         | 'notifyLeads'
         | 'pomodoro'
+        | 'modules'
+        | 'hideJournal'
       >
     >,
   ) => void;
@@ -61,6 +66,8 @@ export const useUi = create<UiState>()(
       density: 'comfortable',
       hideGrades: false,
       semesterId: null,
+      modules: { reading: true },
+      hideJournal: true,
       weekStart: 'mon',
       hour12: true,
       notifyLeads: [],
@@ -91,6 +98,8 @@ export const useUi = create<UiState>()(
         density: s.density,
         hideGrades: s.hideGrades,
         semesterId: s.semesterId,
+        modules: s.modules,
+        hideJournal: s.hideJournal,
         weekStart: s.weekStart,
         hour12: s.hour12,
         notifyLeads: s.notifyLeads,
@@ -102,13 +111,14 @@ export const useUi = create<UiState>()(
 
 /** Apply appearance settings to <html>. */
 export function applyAppearance(
-  s: Pick<UiState, 'theme' | 'accent' | 'density' | 'hideGrades'>,
+  s: Pick<UiState, 'theme' | 'accent' | 'density' | 'hideGrades' | 'hideJournal'>,
   root: HTMLElement = document.documentElement,
 ) {
   root.dataset.theme = s.theme;
   root.dataset.density = s.density;
   root.style.setProperty('--accent', s.accent);
   root.classList.toggle('hide-grades', s.hideGrades);
+  root.classList.toggle('hide-journal', s.hideJournal);
 }
 
 setHour12Default(useUi.getState().hour12);

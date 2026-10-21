@@ -4,7 +4,23 @@ A calm, fast, open-source student workspace that runs entirely on your machine: 
 assignments, a serious grade calculator, Markdown notes, and a planner. Local-first, no accounts,
 no telemetry, no network calls.
 
-> Status: early development. Built so far: grade engine, storage + API, importers/exporters, UI, notes, planner & study, desktop app.
+> Status: first public release candidate. Everything below is built and tested; builds are unsigned for now.
+
+![Dashboard with demo data](docs/screenshots/dashboard-light.png)
+![Step-by-step grade breakdown (dark theme)](docs/screenshots/grades-dark.png)
+
+_Screenshots use the built-in demo data. Regenerate with `node scripts/screenshots.mjs`._
+
+## What's in it
+
+- **Grades you can trust**: exact-decimal engine, three grading modes, step-by-step "how was this calculated", what-if, "what do I need?", GPA planner. See [docs/GRADING.md](docs/GRADING.md).
+- **Notes** as real Markdown files with math, wiki links, backlinks, templates and a PDF viewer.
+- **Planner**: timetable, calendar, tasks, workload heatmap, study timer and stats.
+- **Import** from a Notion export, CSV, ICS, Markdown or a JSON backup, with preview and undo. See [docs/NOTION_IMPORT.md](docs/NOTION_IMPORT.md).
+- **Optional modules** (off by default except Reading): journal, contacts, activities, jobs & internships, admissions, budget, flashcards with spaced repetition.
+- **Privacy**: no network, no telemetry, no accounts. Optional app lock and encryption at rest ([SECURITY.md](SECURITY.md)).
+
+More: [architecture](docs/ARCHITECTURE.md) · [data format](docs/DATA_FORMAT.md) · [good first issues](docs/GOOD_FIRST_ISSUES.md) · [changelog](CHANGELOG.md)
 
 ## Develop
 

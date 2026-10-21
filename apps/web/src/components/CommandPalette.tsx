@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { get } from '../lib/api.js';
 import { useDialogs } from '../lib/dialogs.js';
 import { useClasses } from '../lib/hooks.js';
+import { MODULES, isOn } from '../lib/modules.js';
 import { useUi } from '../lib/store.js';
 import type { SearchHit } from '../lib/types.js';
 import { Icon, type IconName } from './Icon.js';
@@ -21,6 +22,7 @@ export function CommandPalette() {
   const open = useUi((s) => s.paletteOpen);
   const setOpen = useUi((s) => s.setPalette);
   const ui = useUi();
+  const modules = ui.modules;
   const nav = useNavigate();
   const dialogs = useDialogs();
   const { data: classes = [] } = useClasses();
@@ -63,6 +65,13 @@ export function CommandPalette() {
         run: go('/grades'),
       },
       { id: 'p-gpa', group: 'Go to', label: 'GPA', icon: 'gpa', run: go('/gpa') },
+      ...MODULES.filter((m) => isOn(modules, m.id)).map((m): Cmd => ({
+        id: `p-mod-${m.id}`,
+        group: 'Go to',
+        label: m.label,
+        icon: m.icon,
+        run: go(m.custom ? `/${m.id}` : `/modules/${m.id}`),
+      })),
       {
         id: 'p-import',
         group: 'Go to',
@@ -160,7 +169,7 @@ export function CommandPalette() {
       })),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [classes, ui.theme, ui.hideGrades],
+    [classes, ui.theme, ui.hideGrades, modules],
   );
 
   const term = q.trim().toLowerCase();

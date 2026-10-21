@@ -31,6 +31,7 @@ const P: Record<string, string> = {
   info: 'M12 21a9 9 0 100-18 9 9 0 000 18zM12 11v5M12 8v.5',
   list: 'M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01',
   board: 'M4 4h5v16H4zM10 4h5v10h-5zM16 4h4v13h-4z',
+  lock: 'M6 11h12v9H6zM8 11V8a4 4 0 018 0v3',
   flask: 'M9 3h6M10 3v6l-5 9a2 2 0 002 3h10a2 2 0 002-3l-5-9V3',
 };
 

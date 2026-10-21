@@ -5,3 +5,12 @@ export { stableStringify, jsonErrorLine } from './stable.js';
 export { migrate, type Migrations, type Versioned } from './migrate.js';
 export { createBackup, listBackups } from './backup.js';
 export const JSONSTORE_API_VERSION = 1;
+export {
+  deriveKey,
+  newSalt,
+  verifyHash,
+  encryptText,
+  decryptText,
+  isEnvelope,
+  type Crypto,
+} from './crypto.js';

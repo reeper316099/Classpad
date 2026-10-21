@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Icon } from '../components/Icon.js';
+import { ModulesSettings, PrivacySettings } from '../components/PrivacySettings.js';
 import { PageHead } from '../components/ui.js';
 import { del, get } from '../lib/api.js';
 import { ACCENTS } from '../lib/color.js';
@@ -84,6 +85,8 @@ export function SettingsPage() {
           Hide grades (blur numbers for screen sharing)
         </label>
       </section>
+      <ModulesSettings />
+      <PrivacySettings />
       <section className="card stack">
         <h2>Calendar & time</h2>
         <div className="row">

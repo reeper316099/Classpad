@@ -30,6 +30,7 @@ import {
   type Warning,
 } from './types.js';
 
+type DraftJobStatus = 'wishlist' | 'applied' | 'interview' | 'offer' | 'accepted' | 'rejected';
 type Kind =
   | 'semesters'
   | 'classes'
@@ -140,10 +141,19 @@ const COLUMNS: Record<Kind, { used: string[]; computed: string[] }> = {
     ],
     computed: ['outcome'],
   },
-  journal: { used: [], computed: [] },
-  contacts: { used: [], computed: [] },
-  jobs: { used: [], computed: [] },
-  budget: { used: [], computed: [] },
+  journal: { used: ['name', 'date', 'mood'], computed: [] },
+  contacts: {
+    used: ['name', 'category', 'phone', 'email', 'class'],
+    computed: ['activities', 'notes'],
+  },
+  jobs: {
+    used: ['position', 'company', 'compensation', 'priority', 'status', 'type', 'url'],
+    computed: [],
+  },
+  budget: {
+    used: ['purchase', 'category', 'cost', 'date', 'vendor', 'sentiment'],
+    computed: ['receipt'],
+  },
 };
 const COLORS = [
   '#6366f1',
@@ -156,12 +166,6 @@ const COLORS = [
   '#84cc16',
 ];
 const TEMPLATE_NAME = /template|^(new class|default|new note|new entry|new page)$/i;
-const MODULE_NOTES: Partial<Record<Kind, string>> = {
-  journal: 'Journal module is not available yet; re-importing later will pick these up',
-  contacts: 'Contacts module is not available yet',
-  jobs: 'Internships & jobs module is not available yet',
-  budget: 'Budget module is not available yet',
-};
 
 interface Csv {
   path: string;
@@ -598,7 +602,8 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
     titleCol: string;
   }[] = [];
   for (const [kind, c] of chosen) {
-    if (!['classes', 'assignments', 'notebook', 'readings', 'tasks'].includes(kind)) continue;
+    if (!['classes', 'assignments', 'notebook', 'readings', 'tasks', 'journal'].includes(kind))
+      continue;
     const base = splitName(
       c.path
         .split('/')
@@ -612,7 +617,9 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
           ? 'Assignment'
           : kind === 'tasks'
             ? 'Task'
-            : 'Title';
+            : kind === 'journal'
+              ? 'Name'
+              : 'Title';
     tplOwners.push({
       kind,
       pageDir: `${c.dir}/${base}`,
@@ -642,11 +649,102 @@ export function previewNotion(archive: Archive, opts: NotionOptions = {}): Impor
     }
   }
 
-  // ---- optional modules + unmapped pages ----
-  for (const [kind, c] of chosen) {
-    const reason = MODULE_NOTES[kind];
-    if (reason) out.skipped.push({ kind, count: c.table.rows.length, reason });
+  // ---- optional modules: journal, contacts, jobs, budget ----
+  const money = (cell: string | undefined): number | null => {
+    const raw = (cell ?? '').trim();
+    if (!raw) return null;
+    const neg = /^\(.*\)$/.test(raw) || /^-/.test(raw.replace(/^[^\d(-]+/, ''));
+    const n = Number(raw.replace(/[^0-9.]/g, ''));
+    return Number.isFinite(n) && /\d/.test(raw) ? (neg ? -n : n) : null;
+  };
+  const jr = chosen.get('journal');
+  for (const r of jr?.table.rows ?? []) {
+    const name = cleanLabel(r['Name'] ?? '');
+    if (!name || TEMPLATE_NAME.test(name)) continue;
+    const d = date(r['Date'] ?? '', `Journal: ${name}`);
+    if (!d) {
+      warn('DATE', `Journal entry "${name}" has no readable date; skipped`, 'Journal');
+      continue;
+    }
+    const page = pageFor(jr!.dir, name);
+    out.journal.push({
+      ref: mkRef('journal', name, page?.id, r['Date']),
+      date: d.start.slice(0, 10),
+      title: name,
+      mood: splitMulti(r['Mood']).map(slugOption).filter(Boolean),
+      markdown: body(page).markdown,
+    });
   }
+  const ct = chosen.get('contacts');
+  for (const r of ct?.table.rows ?? []) {
+    const name = cleanLabel(r['Name'] ?? '');
+    if (!name) continue;
+    out.contacts.push({
+      ref: mkRef('contact', name, undefined),
+      name,
+      role: cleanLabel(r['Category'] ?? '') || undefined,
+      email: (r['Email'] ?? '').trim() || undefined,
+      phone: (r['Phone'] ?? '').trim() || undefined,
+      classRefs: parseRelation(r['Class'])
+        .map((x) => resolve('class', x))
+        .filter((x): x is string => !!x),
+    });
+  }
+  const JOB: [RegExp, DraftJobStatus][] = [
+    [/interview/, 'interview'],
+    [/offer/, 'offer'],
+    [/accept|hired/, 'accepted'],
+    [/reject|declin|denied/, 'rejected'],
+    [/appl|submit/, 'applied'],
+    [/wish|save|to apply|interest|research|idea/, 'wishlist'],
+  ];
+  const jb = chosen.get('jobs');
+  for (const r of jb?.table.rows ?? []) {
+    const position = cleanLabel(r['Position'] ?? '');
+    if (!position) continue;
+    const st = (r['Status'] ?? '').trim().toLowerCase();
+    const status = JOB.find(([re]) => re.test(st))?.[1] ?? 'wishlist';
+    if (st && !JOB.some(([re]) => re.test(st)))
+      warn('OPTION', `Unknown job status "${r['Status']}"`, `Jobs: ${position}`);
+    const company = cleanLabel(r['Company'] ?? '');
+    out.jobs.push({
+      ref: mkRef('job', position, undefined, company),
+      position,
+      company,
+      type: slugOption(r['Type'] ?? '') || undefined,
+      status,
+      priority: normalizePriority(r['Priority'])?.value,
+      compensation: (r['Compensation'] ?? '').trim() || undefined,
+      url: (r['URL'] ?? '').trim() || undefined,
+    });
+  }
+  const bd = chosen.get('budget');
+  for (const r of bd?.table.rows ?? []) {
+    const purchase = cleanLabel(r['Purchase'] ?? '');
+    if (!purchase) continue;
+    const cost = money(r['Cost']);
+    const d = date(r['Date'] ?? '', `Budget: ${purchase}`);
+    if (cost === null || !d) {
+      warn(
+        'BUDGET',
+        `Skipped "${purchase}": ${cost === null ? 'unreadable cost' : 'no readable date'}`,
+        'Budget',
+      );
+      continue;
+    }
+    out.budget.push({
+      ref: mkRef('budget', purchase, undefined, `${r['Date']}|${r['Cost']}`),
+      purchase,
+      type: cost < 0 ? 'income' : 'expense',
+      cost: Math.abs(cost),
+      category: cleanLabel(r['Category'] ?? '') || undefined,
+      date: d.start.slice(0, 10),
+      vendor: cleanLabel(r['Vendor'] ?? '') || undefined,
+      sentiment: cleanLabel(r['Sentiment'] ?? '') || undefined,
+    });
+  }
+
+  // ---- unmapped pages ----
   const unmapped = pages.filter(
     (p) =>
       !usedPages.has(p.path) &&

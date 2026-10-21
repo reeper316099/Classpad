@@ -78,6 +78,42 @@ export interface DraftNote {
   assignmentRefs: string[];
   readingRefs: string[];
 }
+export interface DraftJournal {
+  ref: string;
+  date: string;
+  title: string;
+  mood: string[];
+  markdown: string;
+}
+export interface DraftContact {
+  ref: string;
+  name: string;
+  role?: string;
+  email?: string;
+  phone?: string;
+  classRefs: string[];
+}
+export interface DraftJob {
+  ref: string;
+  position: string;
+  company: string;
+  type?: string;
+  status: 'wishlist' | 'applied' | 'interview' | 'offer' | 'accepted' | 'rejected';
+  priority?: 'important' | 'mid' | 'low';
+  compensation?: string;
+  url?: string;
+}
+export interface DraftBudget {
+  ref: string;
+  purchase: string;
+  type: 'expense' | 'income';
+  cost: number;
+  category?: string;
+  date: string;
+  vendor?: string;
+  sentiment?: string;
+}
+
 export interface DraftTemplate {
   kind: 'notes' | 'assignments' | 'classes';
   name: string;
@@ -119,6 +155,10 @@ export interface ImportPreview {
   tasks: DraftTask[];
   readings: DraftReading[];
   notes: DraftNote[];
+  journal: DraftJournal[];
+  contacts: DraftContact[];
+  jobs: DraftJob[];
+  budget: DraftBudget[];
   templates: DraftTemplate[];
   attachments: AttachmentRef[];
   skipped: SkippedGroup[];
@@ -135,6 +175,10 @@ export const emptyPreview = (source: ImportPreview['source']): ImportPreview => 
   tasks: [],
   readings: [],
   notes: [],
+  journal: [],
+  contacts: [],
+  jobs: [],
+  budget: [],
   templates: [],
   attachments: [],
   skipped: [],

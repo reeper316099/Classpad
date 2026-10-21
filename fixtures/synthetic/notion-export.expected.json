@@ -8,7 +8,11 @@
     "templates": 4,
     "readings": 2,
     "tasks": 3,
-    "attachments": 1
+    "attachments": 1,
+    "journal": 2,
+    "contacts": 2,
+    "jobs": 1,
+    "budget": 2
   },
   "parity": {
     "mismatchClasses": [
