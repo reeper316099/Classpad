@@ -161,7 +161,21 @@ export class GradingService {
   gpa(opts: { scaleId?: string; semesterId?: string } = {}) {
     const scale = this.d.config.scale(opts.scaleId);
     const courses = this.courses(opts.semesterId);
-    return { scaleId: scale.id, ...gpaReport(courses, scale), courses };
+    const ordered = [...this.d.semesters()].sort((a, b) =>
+      (a.start ?? a.createdAt).localeCompare(b.start ?? b.createdAt),
+    );
+    // cumulative GPA as of the end of each semester, for the trend chart
+    const progress = ordered.map((s, i) => {
+      const upTo = new Set(ordered.slice(0, i + 1).map((x) => x.id));
+      const subset = courses.filter((c) => c.semesterId && upTo.has(c.semesterId));
+      return {
+        semesterId: s.id,
+        name: s.name,
+        unweighted: computeGpa(subset, scale, { weighted: false }).gpa,
+        weighted: computeGpa(subset, scale, { weighted: true }).gpa,
+      };
+    });
+    return { scaleId: scale.id, ...gpaReport(courses, scale), courses, progress };
   }
 
   plan(opts: { targetGpa: number; plannedCredits: number; weighted?: boolean; scaleId?: string }) {

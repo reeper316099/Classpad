@@ -23,7 +23,9 @@ import {
   exportMarkdownVault,
   gradeReportHtml,
 } from './exportService.js';
+import { clearDemo, hasDemo, loadDemo } from './demo.js';
 import { ImportService, STRATEGIES } from './importService.js';
+import { settingsPath } from './config.js';
 import type { Collection } from './collection.js';
 import { createContext, type Context } from './context.js';
 import { ApiError, notFound } from './errors.js';
@@ -42,6 +44,10 @@ export interface App {
   ctx: Context;
   token: string;
 }
+
+/** PATCH treats null as "clear this field". */
+const nullsToUndefined = (b: Record<string, unknown>) =>
+  Object.fromEntries(Object.entries(b).map(([k, v]) => [k, v === null ? undefined : v]));
 
 const Id = z.object({ id: z.string().min(1).max(64) });
 const Paging = z.object({
@@ -195,7 +201,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
       path,
       `Create ${col.name} item`,
       async (r) => {
-        const e = await col.create(strip({ ...bodySchema.parse(r.body) }));
+        const e = await col.create(nullsToUndefined(strip({ ...bodySchema.parse(r.body) })));
         await hooks.after?.(e, 'create');
         return e;
       },
@@ -207,7 +213,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
       `Update ${col.name} item`,
       async (r) => {
         const { id } = Id.parse(r.params);
-        const e = await col.update(id, strip({ ...bodySchema.parse(r.body) }));
+        const e = await col.update(id, nullsToUndefined(strip({ ...bodySchema.parse(r.body) })));
         await hooks.after?.(e, 'update');
         return e;
       },
@@ -418,6 +424,32 @@ export async function createApp(opts: AppOptions): Promise<App> {
       clearInterval(beat);
       bus.off('event', on);
     });
+  });
+
+  // ---- settings, demo data, about ----
+  route('GET', '/settings', 'UI and app settings', async () =>
+    store.readJson<Record<string, unknown>>(settingsPath, { fallback: () => ({}) }),
+  );
+  route('PUT', '/settings', 'Replace settings', async (r) => {
+    const b = z.record(z.unknown()).parse(r.body);
+    if (JSON.stringify(b).length > 100_000)
+      throw new ApiError(413, 'TOO_LARGE', 'settings too large');
+    await store.writeJson(settingsPath, b);
+    return b;
+  });
+  route('GET', '/about', 'App info', () => ({
+    app: APP_NAME,
+    demoLoaded: hasDemo(ctx),
+    counts: {
+      semesters: semesters.list().length,
+      classes: classes.list().length,
+      assignments: assignments.list().length,
+      notes: notes.list().length,
+    },
+  }));
+  route('POST', '/demo/load', 'Load invented demo data', () => loadDemo(ctx));
+  route('DELETE', '/demo', 'Remove demo data', async () => {
+    await clearDemo(ctx);
   });
 
   // ---- attachments ----

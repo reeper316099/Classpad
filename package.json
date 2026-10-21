@@ -14,14 +14,16 @@
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc -b",
+    "typecheck": "tsc -b && tsc -p apps/web --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "guard": "node scripts/guard-private.mjs",
     "build": "tsc -b",
     "dev:server": "tsc -b && node packages/server/dist/dev.js",
     "fixtures:generate": "node scripts/generate-fixtures.mjs",
-    "fixtures:check-leak": "node scripts/check-fixture-leak.mjs"
+    "fixtures:check-leak": "node scripts/check-fixture-leak.mjs",
+    "dev": "node scripts/dev.mjs",
+    "build:web": "npm run build -w @classpad/web"
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/guard-private.mjs"
@@ -30,11 +32,16 @@
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.5",
     "eslint": "^10.13.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "fast-check": "^4.10.2",
     "prettier": "^3.9.10",
     "simple-git-hooks": "^2.14.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.72.0",
     "vitest": "^5.0.5"
+  },
+  "overrides": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   }
 }
