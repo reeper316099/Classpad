@@ -21,7 +21,7 @@ function ScoreCell({ a }: { a: Assignment }) {
   const shown = text ?? scoreText(a.score);
   const commit = () => {
     if (text === null) return;
-    const r = parseScoreInput(text);
+    const r = parseScoreInput(text, a.pointsPossible);
     if (!r.ok) {
       setBad(r.error);
       return;
@@ -38,7 +38,7 @@ function ScoreCell({ a }: { a: Assignment }) {
         style={{ width: 84, borderColor: bad ? 'var(--danger)' : undefined }}
         aria-label={`Score for ${a.title}`}
         aria-invalid={!!bad}
-        title={bad || 'Type 90, 90% or 45/50'}
+        title={bad || 'Type 18, 90% or 45/50'}
         placeholder="—"
         value={shown}
         onChange={(e) => setText(e.target.value)}

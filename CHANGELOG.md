@@ -4,6 +4,7 @@
 
 ### Grading
 
+- Typing a bare score such as `18` on a 20-point assignment now records 18/20 (it was read as 18%, which dragged grades down). Write `90%` for a percent. Scores already saved as percents are not changed; re-enter them.
 - Set a class's own category weights: **Grades → Set up grading** lets you add categories (Homework, Exams…), give each a weight, drop the lowest scores, choose how a category is combined, and sort assignments into categories (with a "match by type or title" shortcut). Before, the category mode had no way to create categories, so every assignment needed its own weight. See [docs/GRADING.md](docs/GRADING.md).
 
 ### Note editor: one view, like Notion

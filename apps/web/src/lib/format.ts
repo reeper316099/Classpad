@@ -71,25 +71,33 @@ export const DAY_LABEL: Record<string, string> = {
   sun: 'Sun',
 };
 
-/** Parse the score box: "90", "90%", "45/50" -> API score object; "" -> clear. */
+/**
+ * Parse the score box: "90%", "45/50" -> API score object; "" -> clear. A bare number is points
+ * earned when the assignment has points possible ("18" on a 20-point task is 18/20), else a percent.
+ */
 export function parseScoreInput(
   text: string,
+  pointsPossible?: number | null,
 ):
   | { ok: true; score: { percent: number } | { earned: number; possible: number } | null }
   | { ok: false; error: string } {
   const t = text.trim();
   if (!t) return { ok: true, score: null };
-  let m = /^(-?\d+(?:\.\d+)?)\s*%?$/.exec(t);
-  if (m) return { ok: true, score: { percent: Number(m[1]) } };
+  let m = /^(-?\d+(?:\.\d+)?)\s*(%?)$/.exec(t);
+  if (m) {
+    if (!m[2] && pointsPossible && pointsPossible > 0)
+      return { ok: true, score: { earned: Number(m[1]), possible: pointsPossible } };
+    return { ok: true, score: { percent: Number(m[1]) } };
+  }
   m = /^(-?\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/.exec(t);
   if (m && Number(m[2]) > 0)
     return { ok: true, score: { earned: Number(m[1]), possible: Number(m[2]) } };
-  return { ok: false, error: 'Use 90, 90%, or 45/50' };
+  return { ok: false, error: 'Use 18, 90%, or 45/50' };
 }
 export function scoreText(score: unknown): string {
   const s = score as { percent?: number; earned?: number; possible?: number } | undefined;
   if (!s) return '';
-  if (s.percent != null) return `${s.percent}`;
+  if (s.percent != null) return `${s.percent}%`;
   return s.possible ? `${s.earned}/${s.possible}` : `${s.earned}`;
 }
 

@@ -115,7 +115,7 @@ function AssignmentDialog() {
   const submit = async () => {
     if (!String(f.title).trim()) return setErr('Give it a title.');
     if (!f.classId) return setErr('Pick a class first (create one if you have none).');
-    const sc = parseScoreInput(String(f.score));
+    const sc = parseScoreInput(String(f.score), num(f.pointsPossible));
     if (!sc.ok) return setErr(sc.error);
     for (const k of ['weight', 'pointsPossible', 'latePenalty'])
       if (num(f[k]) !== null && !Number.isFinite(num(f[k]))) return setErr(`${k} must be a number`);
@@ -312,7 +312,7 @@ function AssignmentDialog() {
               onChange={set('pointsPossible')}
             />
           </Field>
-          <Field label="Score" hint="90, 90%, or 45/50. Leave empty if ungraded.">
+          <Field label="Score" hint="Points earned (18), a percent (90%), or 45/50. Leave empty if ungraded.">
             <input className="input num" value={String(f.score ?? '')} onChange={set('score')} />
           </Field>
           <Field label="Late penalty (points off)">

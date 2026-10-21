@@ -26,7 +26,10 @@ describe('format helpers', () => {
     expect(parseScoreInput('abc').ok).toBe(false);
     expect(parseScoreInput('4/0').ok).toBe(false);
     expect(scoreText({ earned: 45, possible: 50 })).toBe('45/50');
-    expect(scoreText({ percent: 90 })).toBe('90');
+    expect(scoreText({ percent: 90 })).toBe('90%');
+    // a bare number is points earned when the assignment has points possible
+    expect(parseScoreInput('18', 20)).toEqual({ ok: true, score: { earned: 18, possible: 20 } });
+    expect(parseScoreInput('90%', 20)).toEqual({ ok: true, score: { percent: 90 } });
     expect(scoreText(undefined)).toBe('');
   });
   it('fmtDue shows ranges and times', () => {
