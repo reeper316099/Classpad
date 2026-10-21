@@ -16,8 +16,13 @@
     "build": "tsc -b"
   },
   "dependencies": {
-    "@classpad/shared": "*",
     "@classpad/grades": "*",
-    "@classpad/jsonstore": "*"
+    "@classpad/jsonstore": "*",
+    "@classpad/shared": "*",
+    "fastify": "^5.12.7",
+    "gray-matter": "^4.0.3",
+    "minisearch": "^7.2.0",
+    "zod": "^4.6.7",
+    "zod-to-json-schema": "^3.25.2"
   }
 }

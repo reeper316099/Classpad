@@ -16,6 +16,11 @@
     "build": "tsc -b"
   },
   "dependencies": {
+    "adm-zip": "^0.6.1",
+    "chokidar": "^5.0.0",
     "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8"
   }
 }
