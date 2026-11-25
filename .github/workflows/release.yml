@@ -27,6 +27,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22, cache: npm }
+      - uses: actions/setup-go@v5
+        with: { go-version-file: go.mod, cache: false }
       - name: Linux packaging tools (rpm, deb)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
@@ -35,6 +37,7 @@ jobs:
       # workspace packages resolve to their built output, so build before the tests
       - run: npm run build
       - run: npm test
+      - run: go test ./cmd/... ./internal/...
       - name: Build installers (unsigned)
         run: npm run desktop:dist
         env:

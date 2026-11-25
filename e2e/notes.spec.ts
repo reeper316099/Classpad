@@ -58,31 +58,33 @@ test('class page tabs are real, and notes get code blocks and toggles', async ()
   await dlg.getByRole('button', { name: 'Create note' }).click();
 
   // the editor is one view: pick blocks from the "/" menu and see them as you type
-  const editor = page.locator('.cm-content');
-  const menu = page.locator('.cm-tooltip.lp-slash li[aria-selected]');
+  const editor = page.locator('.be-page');
+  const menu = page.locator('.be-slash [role=option][aria-selected=true]');
+  await editor.locator('.af-block').first().waitFor();
   await editor.click();
   await page.keyboard.type('/code');
   await expect(menu).toContainText('Code');
-  await page.waitForTimeout(150);
   await page.keyboard.press('Enter');
   await page.keyboard.type('print("hi")');
-  await page.keyboard.press('ControlOrMeta+End');
   await page.keyboard.press('Enter');
   await page.keyboard.press('Enter');
+  await page.keyboard.press('Enter'); // two empty lines at the end leave the code block
   await page.keyboard.type('/toggle h');
-  await expect(page.locator('.cm-tooltip.lp-slash li')).toHaveCount(3);
-  await page.waitForTimeout(250);
+  await expect(page.locator('.be-slash [role=option]')).toHaveCount(3);
   await page.keyboard.press('ArrowDown'); // Toggle heading 2
   await page.keyboard.press('Enter');
   await page.keyboard.type('My dropdown');
-  await page.keyboard.press('ControlOrMeta+Home');
 
-  await expect(page.locator('.cm-lp-code-line').first()).toBeVisible();
-  const summary = page.locator('.cm-lp-toggle.cm-lp-h2');
+  await expect(page.locator('.af-code-text')).toContainText('print("hi")');
+  const summary = page.locator('.af-toggle-heading.af-h2');
   await expect(summary).toContainText('My dropdown');
-  await expect(page.locator('.cm-lp-chevron')).toHaveAttribute('aria-expanded', 'true'); // new toggles start open
-  await page.locator('.cm-lp-chevron').click();
-  await expect(page.locator('.cm-lp-chevron')).toHaveAttribute('aria-expanded', 'false');
+  const chevron = summary.locator('.af-chevron');
+  await expect(chevron).toHaveAttribute('aria-expanded', 'true'); // new toggles start open
+  await chevron.click();
+  await expect(page.locator('.af-toggle-heading .af-chevron')).toHaveAttribute(
+    'aria-expanded',
+    'false',
+  );
 
   // back on the class: the note is listed under its class
   await page.locator('aside.sidebar').getByRole('link', { name: 'Classes', exact: true }).click();

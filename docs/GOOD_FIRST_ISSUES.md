@@ -9,7 +9,7 @@ Please keep all test data invented; see [CONTRIBUTING.md](../CONTRIBUTING.md).
 4. **Print stylesheet for the report**: tighten page breaks in `/export/report`.
 5. **Budget module: monthly totals chart** using the existing chart helpers.
 6. **Flashcards: undo last answer** during a review session.
-7. **Notes: heading folding** in the CodeMirror editor.
+7. **Notes: heading folding** in the block editor (fold the blocks under a heading, like a toggle).
 8. **Accessibility**: run the axe e2e with a custom accent colour and fix any contrast failures.
 9. **Docs**: add a "migrate from a spreadsheet" guide using the CSV importer.
 10. **Tests**: more golden cases for `neededScore` with extra credit and drop-lowest together.

@@ -5,9 +5,10 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "dev": "node ../../scripts/build-editor-wasm.mjs && vite",
+    "build": "node ../../scripts/build-editor-wasm.mjs && tsc -b && vite build",
+    "preview": "vite preview",
+    "wasm": "node ../../scripts/build-editor-wasm.mjs"
   },
   "devDependencies": {
     "@testing-library/react": "^16.3.3",

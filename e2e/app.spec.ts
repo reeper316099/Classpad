@@ -147,11 +147,12 @@ test('notes: write math, then find it by search', async () => {
   const dlg = page.locator('dialog[open]');
   await dlg.getByLabel('Title').fill('E2E Math');
   await dlg.getByRole('button', { name: 'Create note' }).click();
-  const editor = page.locator('.cm-content');
+  const editor = page.locator('.be-page');
+  await editor.locator('.af-block').first().waitFor();
   await editor.click();
   await page.keyboard.type('Euler: $e^{i\\pi} + 1 = 0$ and a [[Ipsum sampling notes]] link');
   // the equation renders in place, in the same view you type in
-  await expect(page.locator('.cm-content .cm-lp-math .katex').first()).toBeVisible();
+  await expect(page.locator('.be-page .af-imath .katex').first()).toBeVisible();
   await expect(page.getByText('Saved', { exact: true })).toBeVisible();
 
   await page.getByLabel('Search notes').fill('Euler');

@@ -11,3 +11,5 @@ release/
 release/
 test-results/
 playwright-report/
+# built from Go by scripts/build-editor-wasm.mjs
+apps/web/public/editor/

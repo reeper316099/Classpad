@@ -1,10 +1,11 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Icon } from '../components/Icon.js';
 import { slugHeading } from '../components/Markdown.js';
 import { FloatingMenu, type MenuItem } from '../components/Menu.js';
 import { MarkdownEditor, type EditorHandle } from '../components/MarkdownEditor.js';
+import { BlockEditor, type BlockEditorHandle } from '../blockeditor/BlockEditor.js';
 import { Empty, Skeleton, classStyle } from '../components/ui.js';
 import { get, patch, post } from '../lib/api.js';
 import { attachmentBlobUrl } from '../lib/attachments.js';
@@ -302,7 +303,8 @@ function NoteEditor({
   const { data: classes = [] } = useClasses();
   const { data: assignments = [] } = useAssignments();
   const remove = useDeleteWithUndo<Note>('notes', (n) => `“${n.title}”`);
-  const editor = useRef<EditorHandle>(null);
+  // the block editor (default) and the raw Markdown source editor share these commands
+  const editor = useRef<BlockEditorHandle>(null);
   const modules = useUi((s) => s.modules);
   const [draft, setDraft] = useState<Draft>(() => toDraft(note));
   const [status, setStatus] = useState<'saved' | 'saving' | 'dirty' | 'error'>('saved');
@@ -672,15 +674,26 @@ function NoteEditor({
           style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}
         >
           <div className="note-pane card editor-pane">
-            <MarkdownEditor
-              ref={editor}
-              value={draft.markdown}
-              onChange={(v) => change({ markdown: v })}
-              getTitles={() => titles.current}
-              sourceMode={source}
-              onOpenWiki={openWiki}
-              onOpenAttachment={openAttachment}
-            />
+            {source ? (
+              <MarkdownEditor
+                ref={editor as Ref<EditorHandle>}
+                value={draft.markdown}
+                onChange={(v) => change({ markdown: v })}
+                getTitles={() => titles.current}
+                sourceMode
+                onOpenWiki={openWiki}
+                onOpenAttachment={openAttachment}
+              />
+            ) : (
+              <BlockEditor
+                ref={editor}
+                value={draft.markdown}
+                onChange={(v) => change({ markdown: v })}
+                getTitles={() => titles.current}
+                onOpenWiki={openWiki}
+                onOpenAttachment={openAttachment}
+              />
+            )}
             <div className="note-foot muted small" aria-label="Word count">
               {stats.words} words · {stats.minutes ? `${stats.minutes} min read` : '—'}
             </div>

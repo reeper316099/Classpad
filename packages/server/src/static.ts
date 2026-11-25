@@ -14,11 +14,16 @@ const MIME: Record<string, string> = {
   '.woff2': 'font/woff2',
   '.woff': 'font/woff',
   '.txt': 'text/plain; charset=utf-8',
+  '.wasm': 'application/wasm',
 };
 
-/** Policy for the app shell itself: everything from this origin, API on this origin, nothing remote. */
+/**
+ * Policy for the app shell itself: everything from this origin, API on this origin, nothing remote.
+ * 'wasm-unsafe-eval' lets the page compile the note editor's WebAssembly core (served from this origin);
+ * it does not allow eval() of JavaScript.
+ */
 export const APP_CSP =
-  "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+  "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
 
 export interface StaticFile {
   body: Buffer;

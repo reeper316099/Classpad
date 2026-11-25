@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Note editor: blocks, like AppFlowy
+
+- Notes are now a page of blocks you write in directly, modelled on AppFlowy's editor: the `/` menu (with a hint for every block), Markdown shortcuts as you type (`# `, `- `, `[] `, `1. `, `> ` toggle, `" ` quote, ` ```python `, `---`, `$$`, `**bold**`, `$x$`, `[[Note]]`), a hover `+` and drag handle, a block menu (Turn into, Duplicate, Move, Delete), a selection toolbar with underline, and in-place editors for equations, tables, images and links.
+- The editor's core is written in Go and runs in the page as WebAssembly: the block document, selection, undo and every editing rule. Typing takes under 1 ms per key even on a 1,200-block note. This is the first part of [moving Classpad to Go](docs/go-port/README.md).
+- Notes are still plain Markdown files. Opening a note never changes it; the first edit saves it in a tidy Markdown style, and a fuzz test checks that saving never loses text. Toggle fold state is now saved in the note.
+- Source mode (raw Markdown) is still in the `⋯` menu.
+- Building Classpad now needs Go 1.24+ as well as Node.js.
+
 ### Grading
 
 - Typing a bare score such as `18` on a 20-point assignment now records 18/20 (it was read as 18%, which dragged grades down). Write `90%` for a percent. Scores already saved as percents are not changed; re-enter them.

@@ -57,6 +57,8 @@ const env = {
 
 const build = spawnSync('npx', ['tsc', '-b'], { cwd: root, stdio: 'inherit' });
 if (build.status !== 0) process.exit(build.status ?? 1);
+const wasm = spawnSync('node', ['scripts/build-editor-wasm.mjs'], { cwd: root, stdio: 'inherit' });
+if (wasm.status !== 0) process.exit(wasm.status ?? 1);
 
 const kids = [
   [

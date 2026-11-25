@@ -1,0 +1,430 @@
+/* The block note editor (AppFlowy-style): one page of blocks, written in directly. */
+.be-scroll {
+  --be-code-bg: color-mix(in oklab, var(--text) 5.5%, transparent);
+  --be-tint: color-mix(in oklab, var(--accent) 10%, transparent);
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+.be-status {
+  max-width: 860px;
+  margin: 28px auto 0;
+  padding: 0 40px 0 64px;
+}
+.be-page {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 28px 40px 42vh 64px;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.7;
+  outline: none;
+  caret-color: var(--text);
+  overflow-wrap: anywhere;
+}
+.be-page ::selection {
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+}
+
+/* blocks */
+.af-block {
+  position: relative;
+  margin: 2px 0;
+}
+.af-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  min-height: 1.7em;
+}
+.af-text {
+  flex: 1;
+  min-width: 0;
+  white-space: pre-wrap;
+  padding: 1px 2px;
+}
+.af-empty.af-text::before {
+  content: attr(data-placeholder);
+  position: absolute;
+  color: var(--text-muted);
+  opacity: 0;
+  pointer-events: none;
+}
+.af-caret > .af-row > .af-empty::before,
+.af-heading > .af-row > .af-empty::before,
+.af-toggle-heading > .af-row > .af-empty::before,
+.be-page > .af-block:only-child > .af-row > .af-empty::before {
+  opacity: 0.7;
+}
+.af-children {
+  padding-left: 26px;
+}
+.af-children[hidden] {
+  display: none;
+}
+
+/* headings */
+.af-heading,
+.af-toggle-heading {
+  margin-top: 0.9em;
+}
+.be-page > .af-block:first-child {
+  margin-top: 0;
+}
+.af-h1 > .af-row > .af-text {
+  font-size: 1.85em;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+.af-h2 > .af-row > .af-text {
+  font-size: 1.45em;
+  font-weight: 650;
+  line-height: 1.3;
+}
+.af-h3 > .af-row > .af-text {
+  font-size: 1.2em;
+  font-weight: 650;
+}
+.af-h4 > .af-row > .af-text,
+.af-h5 > .af-row > .af-text,
+.af-h6 > .af-row > .af-text {
+  font-weight: 650;
+}
+
+/* list markers, checkbox, chevron, callout icon */
+.af-prefix {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 1.7em;
+  color: var(--text-muted);
+  user-select: none;
+}
+.af-number {
+  font-variant-numeric: tabular-nums;
+  min-width: 24px;
+  justify-content: end;
+}
+.af-check {
+  width: 18px;
+  min-width: 18px;
+  height: 18px;
+  margin: 0.3em 3px 0 2px;
+  border: 1.5px solid var(--text-muted);
+  border-radius: 5px;
+  font-size: 12px;
+  line-height: 1;
+  color: #fff;
+  cursor: pointer;
+}
+.af-check.on {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.af-check:hover {
+  border-color: var(--text);
+}
+.af-done {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.af-chevron {
+  width: 22px;
+  font-size: 0.62rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.af-chevron.open {
+  transform: rotate(90deg);
+}
+.af-chevron:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+}
+
+/* quote and callout */
+.af-quote > .af-row {
+  border-left: 3px solid var(--text);
+  padding-left: 12px;
+}
+.af-callout > .af-row {
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: var(--be-tint);
+}
+.af-icon {
+  font-size: 1.1em;
+  cursor: pointer;
+  border-radius: 5px;
+}
+.af-icon:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+}
+
+/* code */
+.af-code-wrap {
+  border-radius: 10px;
+  background: var(--be-code-bg);
+  border: 1px solid var(--border);
+  margin: 4px 0;
+}
+.af-code-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 6px 0;
+  user-select: none;
+}
+.af-code-head button {
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.af-code-head button:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+  color: var(--text);
+}
+.af-code-copy {
+  opacity: 0;
+}
+.af-code-wrap:hover .af-code-copy,
+.af-code-copy:focus-visible {
+  opacity: 1;
+}
+.af-code-text {
+  margin: 0;
+  padding: 6px 16px 14px;
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  line-height: 1.6;
+  tab-size: 2;
+  white-space: pre-wrap;
+}
+
+/* inline */
+.af-icode {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  padding: 1px 5px;
+  border-radius: 5px;
+  background: var(--be-code-bg);
+  color: var(--danger);
+}
+.af-link {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: text;
+}
+.af-wiki {
+  color: var(--primary);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  cursor: pointer;
+}
+.af-wiki::before {
+  content: '↗ ';
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+.af-imath {
+  padding: 0 2px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.af-imath:hover {
+  background: var(--be-tint);
+}
+
+/* blocks you can't type in (divider, equation, image, table, raw Markdown) */
+.af-atom {
+  margin: 6px 0;
+  border-radius: 8px;
+  outline: none;
+}
+.af-divider .af-atom {
+  padding: 8px 0;
+}
+.af-divider hr {
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--border-strong);
+}
+.af-math-block {
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+}
+.af-math-block:hover,
+.af-raw:hover {
+  background: var(--be-tint);
+}
+.af-img {
+  display: block;
+  max-width: 100%;
+  border-radius: 8px;
+}
+.af-table-wrap {
+  overflow-x: auto;
+}
+.af-table {
+  border-collapse: collapse;
+  min-width: 50%;
+}
+.af-table th,
+.af-table td {
+  border: 1px solid var(--border-strong);
+  padding: 0;
+}
+.af-table th {
+  background: var(--surface-2);
+}
+.af-cell {
+  width: 100%;
+  min-width: 80px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 5px 8px;
+}
+.af-table th .af-cell {
+  font-weight: 600;
+}
+.af-cell:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+}
+.af-table-add {
+  margin: 4px 6px 0 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px 8px;
+}
+.af-table-add:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+  color: var(--text);
+}
+.af-raw pre {
+  margin: 0;
+  padding: 8px 10px;
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  white-space: pre-wrap;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* hover handle: + adds a block, ⋮⋮ drags or opens the block menu */
+.be-handle {
+  position: absolute;
+  z-index: 4;
+  left: max(0px, calc(50% - 430px + 6px));
+  display: flex;
+  gap: 1px;
+  height: 26px;
+  align-items: center;
+}
+.be-plus,
+.be-grip {
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  line-height: 1;
+  cursor: pointer;
+}
+.be-plus {
+  font-size: 18px;
+}
+.be-grip {
+  font-size: 12px;
+  letter-spacing: -2px;
+  cursor: grab;
+  touch-action: none;
+}
+.be-plus:hover,
+.be-grip:hover {
+  background: color-mix(in oklab, var(--text) 9%, transparent);
+  color: var(--text);
+}
+.be-drop {
+  position: absolute;
+  height: 3px;
+  margin-left: max(0px, calc(50% - 430px + 64px));
+  background: var(--primary);
+  border-radius: 2px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* slash menu: AppFlowy/Notion style rows with a hint line */
+.be-slash {
+  width: 320px;
+  max-width: calc(100vw - 16px);
+}
+.be-slash-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+.be-slash-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.be-toolbar .lp-bub-btn.on {
+  background: color-mix(in oklab, var(--accent) 22%, transparent);
+  color: var(--text);
+}
+.be-toolbar .lp-bub-btn.u {
+  text-decoration: underline;
+}
+
+/* small editing popovers (link, equations, raw Markdown, image description) */
+.be-pop {
+  position: fixed;
+  z-index: 1001;
+  width: 360px;
+  max-width: calc(100vw - 16px);
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+}
+.be-pop-field {
+  width: 100%;
+  font-family: var(--font-mono);
+}
+.be-pop-preview {
+  overflow-x: auto;
+  padding: 4px 0;
+}
+.be-pop-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
