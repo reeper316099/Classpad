@@ -25,6 +25,12 @@
 - Data folders don't change: the Go store writes the same bytes as today's store and the same encrypted files, and each reads the other's files and backups. CI checks both directions on every change.
 - Building Classpad now needs Go 1.26 or newer.
 
+### Go port, step 4: importers
+
+- The importers are now also written in Go (`internal/importers`): Notion exports (zipped, nested or as a folder), CSV files, gradebook mappings, calendars (.ics in and out), Markdown folders and Classpad backups.
+- They give the same preview as today's importers for the same file, down to how odd CSVs are split and how calendar times are read. This was checked on about 110,000 generated cases and on a real Notion export. CI checks the two still agree on every change.
+- The importers moved ahead of the API in the port plan, since the API uses them. Nothing changes in the app until the API is Go (step 5).
+
 ### Grading
 
 - Typing a bare score such as `18` on a 20-point assignment now records 18/20 (it was read as 18%, which dragged grades down). Write `90%` for a percent. Scores already saved as percents are not changed; re-enter them.

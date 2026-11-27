@@ -10,7 +10,7 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
 | Local API             | Fastify on Node.js                     | Go (`net/http`) in the same process           |
 | Storage (data folder) | **Go** (done; used once the API is Go) | Go, `internal/jsonstore`                      |
 | Grade engine          | **Go** (done; used once the API is Go) | Go, `internal/grades`                         |
-| Importers             | TypeScript packages                    | Go packages under `internal/`                 |
+| Importers             | **Go** (done; used once the API is Go) | Go, `internal/importers`                      |
 | Note editor core      | **Go, compiled to WebAssembly** (done) | the same                                      |
 | Interface             | React + TypeScript                     | the same (Node.js is needed only to build it) |
 
@@ -22,16 +22,25 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    like decimal.js. It gives the same JSON as the TypeScript engine, field for field: numbers, step breakdowns
    and warnings. `scripts/grades-parity.mjs` runs the TypeScript engine on generated cases and saves the answers;
    the Go test runs the same inputs and compares. 45,000 cases over three seeds matched, and CI checks a fresh set
-   on every change. The app keeps calling the TypeScript engine until step 4, when the API (its only caller) is Go.
+   on every change. The app keeps calling the TypeScript engine until step 5, when the API (its only caller) is Go.
 3. **Storage** (done). `packages/jsonstore` → `internal/jsonstore`: atomic writes, per-file locking, corruption
    recovery from backups, migrations, encryption at rest (scrypt + AES-256-GCM), zipped backups and the watcher
    for hand edits. The on-disk format does not change: the Go store writes the same bytes as the TypeScript one
    (sorted JSON, including JavaScript's number format and key order) and the same encrypted envelopes, and each
    store reads the other's files and backups. `scripts/jsonstore-compat.mjs` records what the TypeScript store
    writes; the Go tests compare (60,000 random JSON values matched), and CI checks both directions on every
-   change. Like the grade engine, it takes over at step 4.
-4. **API** (`packages/server`): the same routes and JSON, so the interface does not change.
-5. **Importers** (`packages/importers`) and the plugin mapper.
+   change. Like the grade engine, it takes over when the API is Go (step 5).
+4. **Importers** (done). `packages/importers` → `internal/importers`: Notion exports, CSV files, gradebook
+   mappings, calendars (.ics, both ways), Markdown folders and Classpad backups. They give the same preview,
+   field for field, including the quirks of the JavaScript libraries the TypeScript code relies on: papaparse's
+   delimiter and line-ending guesses, ical.js's strict date rules, the YAML 1.2 core schema, and JavaScript's
+   own `Number()`, whitespace, sorting and URI rules. `scripts/importers-parity.mjs` runs the TypeScript
+   importers on generated synthetic inputs (cell formats, CSV quoting, whole Notion exports, zipped and nested)
+   and the Go test compares: about 110,000 cases over four seeds matched, and a real Notion export, checked
+   locally and never committed, gave an identical preview. This step moved ahead of the API because the API
+   uses the importers.
+5. **API** (`packages/server`): the same routes and JSON, so the interface does not change. Everything under it
+   (grades, storage, importers) is Go by then.
 6. **Shell**: swap Electron for Wails, then remove Node.js from the shipped app.
 
 Each step ships on its own. Until step 6 the app keeps running on Electron with the parts that are already Go.
@@ -127,6 +136,25 @@ used the general-purpose `encoding/json` and was 4× slower at reading and 2.4×
 parser and writer made for this format brought both to the numbers above. Every one of these is a few
 milliseconds for a large file, so neither store makes the app wait.
 
+### Importers (Go vs TypeScript on Node.js)
+
+The same work in both, on the synthetic inputs in `internal/importers/testdata/parity.json.gz` and the repo's
+synthetic Notion export (read into memory first, so the timing is the import and not the disk).
+
+| Work                                                      | TypeScript (Node.js 22) | Go           | Difference         |
+| --------------------------------------------------------- | ----------------------- | ------------ | ------------------ |
+| Preview the synthetic Notion export (57 files)            | 2.32 ms                 | 2.11–2.16 ms | about 1.1× faster  |
+| Preview 60 generated Notion exports (some zipped, nested) | 23.7–23.9 ms            | 18.5–19.8 ms | about 1.25× faster |
+| Read 300 CSV files and preview 80 CSV imports             | 6.57–6.61 ms            | 4.12–4.18 ms | about 1.6× faster  |
+| Read 80 calendars                                         | 1.36 ms                 | 0.41–0.42 ms | about 3.3× faster  |
+
+Method: two rounds alternating the languages, `go test -bench . -benchtime 2s -count 2 ./internal/importers`
+and `node scripts/importers-bench.mjs` (median of seven rounds after a warm-up).
+
+Two Go-only fixes came out of testing: making references unique (`#2`, `#3`…) and finding nested toggles were
+quadratic in the TypeScript algorithm (a calendar with 20,000 events sharing one UID took 58 seconds in the
+first Go version); both are now linear, with the same output. A fuzz test checks no file can crash an importer.
+
 ## Building
 
 - Go 1.26 or newer (the toolchain in CI comes from `go.mod`).
@@ -135,7 +163,11 @@ milliseconds for a large file, so neither store makes the app wait.
   TypeScript answers, then `go test ./internal/grades` checks the Go engine against them.
 - After changing the store: `npx tsc -b packages/jsonstore && node scripts/jsonstore-compat.mjs`, then
   `go test ./internal/jsonstore`.
-- Go modules used: `golang.org/x/crypto` (scrypt), `golang.org/x/text` (Unicode normalization of passphrases),
-  `golang.org/x/sys` and `github.com/fsnotify/fsnotify` (the file watcher). Everything else is the standard library.
+- After changing an importer: `npx tsc -b packages/importers && node scripts/importers-parity.mjs`, then
+  `go test ./internal/importers`. `node scripts/gen-unicode-tables.mjs` regenerates the emoji table
+  (`\p{Extended_Pictographic}`, which Go's regexp lacks) from Node's Unicode data.
+- Go modules used: `golang.org/x/crypto` (scrypt), `golang.org/x/text` (Unicode normalization),
+  `golang.org/x/sys` and `github.com/fsnotify/fsnotify` (the file watcher), and `gopkg.in/yaml.v3` (note front
+  matter). Everything else is the standard library.
 - Node.js stays a build-time tool for the interface (Vite, TypeScript) after the port. It is no longer part of
   what users download.
