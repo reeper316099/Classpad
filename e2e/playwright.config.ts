@@ -1,8 +1,9 @@
 import { defineConfig } from '@playwright/test';
 
-// The app opens its windows invisibly and without taking focus during tests (see apps/desktop
-// main.ts). Set CLASSPAD_E2E_BACKGROUND=0 to watch the tests run.
-process.env.CLASSPAD_E2E_BACKGROUND ??= '1';
+// On your own machine the app opens its windows invisibly and without taking focus during tests
+// (see apps/desktop main.ts); set CLASSPAD_E2E_BACKGROUND=0 to watch. CI has no one to disturb, and
+// an inactive window there runs CSS transitions slowly enough to upset the contrast checks.
+process.env.CLASSPAD_E2E_BACKGROUND ??= process.env.CI ? '0' : '1';
 
 export default defineConfig({
   testDir: '.',
