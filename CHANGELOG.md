@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Security
+
+- Updated zod (data validation) to 4.6.7 for GHSA-mrhx-c7xc-m3w5, where a very large list could exhaust memory during validation. Plugin files without a `wide` section still get its defaults.
+
 ### Note editor: blocks, like AppFlowy
 
 - Notes are now a page of blocks you write in directly, modelled on AppFlowy's editor: the `/` menu (with a hint for every block), Markdown shortcuts as you type (`# `, `- `, `[] `, `1. `, `> ` toggle, `" ` quote, ` ```python `, `---`, `$$`, `**bold**`, `$x$`, `[[Note]]`), a hover `+` and drag handle, a block menu (Turn into, Duplicate, Move, Delete), a selection toolbar with underline, and in-place editors for equations, tables, images and links.

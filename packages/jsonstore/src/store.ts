@@ -3,9 +3,9 @@ import { createHash, randomBytes } from 'node:crypto';
 import { EventEmitter } from 'node:events';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-import type { ZodType, ZodTypeDef } from 'zod';
+import type { ZodType } from 'zod';
 
-type Schema<T> = ZodType<T, ZodTypeDef, unknown>;
+type Schema<T> = ZodType<T, unknown>;
 import { decryptText, encryptText, isEnvelope, type Crypto } from './crypto.js';
 import { createBackup, listBackups, readFromLatestBackup } from './backup.js';
 import { StoreError } from './errors.js';

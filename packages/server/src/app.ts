@@ -24,7 +24,6 @@ import {
   TaskSchema,
 } from '@classpad/shared';
 import { z, ZodError, type ZodType } from 'zod';
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { CSV_COLLECTIONS, csvTemplate, type CsvCollection } from '@classpad/importers';
 import { AttachmentService, isInlineSafe } from './attachments.js';
 import {
@@ -268,7 +267,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
       for (const k of ['id', 'createdAt', 'updatedAt', ...(hooks.omit ?? [])]) delete b[k];
       return b;
     };
-    const bodySchema = z.record(z.unknown());
+    const bodySchema = z.record(z.string(), z.unknown());
     route('GET', path, `List ${col.name}`, (r) =>
       applyList(col.list(), r.query as Record<string, unknown>),
     );
@@ -579,7 +578,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
   );
   route('POST', '/grades/what-if', 'Hypothetical scores (never persisted)', (r) => {
     const b = z
-      .object({ classId: z.string(), overrides: z.record(ScoreInputSchema.nullable()) })
+      .object({ classId: z.string(), overrides: z.record(z.string(), ScoreInputSchema.nullable()) })
       .parse(r.body);
     return grading.whatIf(b.classId, b.overrides);
   });
@@ -781,7 +780,7 @@ export async function createApp(opts: AppOptions): Promise<App> {
     store.readJson<Record<string, unknown>>(settingsPath, { fallback: () => ({}) }),
   );
   route('PUT', '/settings', 'Replace settings', async (r) => {
-    const b = z.record(z.unknown()).parse(r.body);
+    const b = z.record(z.string(), z.unknown()).parse(r.body);
     if (JSON.stringify(b).length > 100_000)
       throw new ApiError(413, 'TOO_LARGE', 'settings too large');
     await store.writeJson(settingsPath, b);
@@ -1007,7 +1006,13 @@ export async function createApp(opts: AppOptions): Promise<App> {
             ? {
                 requestBody: {
                   content: {
-                    'application/json': { schema: zodToJsonSchema(r.body, { target: 'openApi3' }) },
+                    'application/json': {
+                      schema: z.toJSONSchema(r.body, {
+                        target: 'openapi-3.0',
+                        io: 'input',
+                        unrepresentable: 'any',
+                      }),
+                    },
                   },
                 },
               }

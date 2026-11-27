@@ -41,7 +41,7 @@ export const MappingPluginSchema = z.object({
       type: Header.optional(),
       notes: Header.optional(),
     })
-    .default({}),
+    .prefault({}),
   /** Wide layout options. */
   wide: z
     .object({
@@ -55,7 +55,7 @@ export const MappingPluginSchema = z.object({
       /** Read points possible from the header, e.g. "Essay 1 (50)" or "Quiz [20 pts]". */
       pointsInHeader: z.boolean().default(true),
     })
-    .default({}),
+    .prefault({}),
   /** How bare numbers in the score column are read. `auto`: points when points possible is known, else percent. */
   scoreFormat: z.enum(['auto', 'percent', 'points']).default('auto'),
   /** Used when the file has no class column. The user can override it at import time. */
