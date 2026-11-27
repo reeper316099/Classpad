@@ -581,3 +581,19 @@ func TestWatcherDecryptsHandEdits(t *testing.T) {
 		t.Fatal(r.events)
 	}
 }
+
+// The data folder is also the desktop shell's folder: Chromium's lock files never go in a backup.
+func TestBackupSkipsShellLockFiles(t *testing.T) {
+	s, dir := open(t)
+	must(t, s.WriteText("x.txt", "1"))
+	for _, name := range []string{"lockfile", "SingletonCookie"} {
+		must(t, os.WriteFile(filepath.Join(dir, name), []byte("held"), 0o644))
+	}
+	files, err := backupFiles(dir)
+	must(t, err)
+	for _, f := range files {
+		if f == "lockfile" || f == "SingletonCookie" {
+			t.Fatalf("backup includes %s: %v", f, files)
+		}
+	}
+}

@@ -28,7 +28,7 @@
 
 The app's `userData` folder is the data directory (override with `CLASSPAD_DATA_DIR`):
 `%APPDATA%\Classpad`, `~/Library/Application Support/Classpad`, `$XDG_CONFIG_HOME|~/.config/Classpad`.
-Chromium's own files live in its `electron/` subfolder and are excluded from backups.
+Chromium's own files live in its `electron/` subfolder and are excluded from backups, as are its single-instance lock files (`lockfile` on Windows, `Singleton*` elsewhere) next to your data.
 
 ## Commands
 

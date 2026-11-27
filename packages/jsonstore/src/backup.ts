@@ -2,6 +2,8 @@ import AdmZip from 'adm-zip';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 
+// The data folder is also the desktop shell's own folder: Chromium's single-instance lock files hold no
+// data (and on Windows the Go store cannot open "lockfile", which is kept open with delete-on-close).
 export const BACKUP_EXCLUDE = new Set([
   'electron',
   'backups',
@@ -11,6 +13,10 @@ export const BACKUP_EXCLUDE = new Set([
   'imports',
   'exports',
   '.lock',
+  'lockfile',
+  'SingletonLock',
+  'SingletonSocket',
+  'SingletonCookie',
 ]);
 
 async function walk(dir: string, rel = ''): Promise<string[]> {
