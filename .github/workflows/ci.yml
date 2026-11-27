@@ -24,7 +24,7 @@ jobs:
         with: { go-version-file: go.mod, cache: false }
       - run: npm ci
       - run: npm run guard -- --all
-      # the note editor's core is Go (compiled to WebAssembly for the app)
+      # Go: the note editor's core (compiled to WebAssembly for the app) and the grade engine
       - name: Go formatting
         shell: bash
         run: test -z "$(gofmt -l cmd internal)" || { gofmt -l cmd internal; exit 1; }
@@ -36,6 +36,12 @@ jobs:
         run: GOOS=js GOARCH=wasm go build -o /dev/null ./cmd/editorwasm
       - run: npm run lint
       - run: npm run typecheck
+      # typecheck built packages/grades; check the Go engine against it on a fresh set of cases
+      - name: Go grade engine matches the TypeScript one
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          node scripts/grades-parity.mjs --seed 7 --scale 5 --out "$RUNNER_TEMP/parity.json.gz"
+          GRADES_PARITY_FILE="$RUNNER_TEMP/parity.json.gz" go test -count=1 -run Parity ./internal/grades
       - run: npm test
       - run: npm run test:perf
       # only what ships: build-time tooling (electron-builder) is not part of the app

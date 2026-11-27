@@ -20,16 +20,17 @@ There is no cloud component.
 
 ## Packages
 
-| Package                | Responsibility                                                                                                                                                                                                                                              | Depends on          |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| `packages/grades`      | Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                                                                                            | decimal.js          |
-| `packages/jsonstore`   | Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                                                                                          | adm-zip, chokidar   |
-| `packages/shared`      | Entity schemas (Zod), enums, ULIDs, SM-2 scheduling, cloze extraction.                                                                                                                                                                                      | zod                 |
-| `packages/importers`   | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                    | shared              |
-| `packages/server`      | Fastify API, repositories, search index, import/export services, app lock.                                                                                                                                                                                  | all of the above    |
-| `apps/web`             | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                             | —                   |
-| `apps/desktop`         | Electron main + preload, packaging.                                                                                                                                                                                                                         | server, web         |
-| `internal/editor` (Go) | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md). | Go standard library |
+| Package                | Responsibility                                                                                                                                                                                                                                                                | Depends on          |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| `packages/grades`      | Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                                                                                                              | decimal.js          |
+| `packages/jsonstore`   | Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                                                                                                            | adm-zip, chokidar   |
+| `packages/shared`      | Entity schemas (Zod), enums, ULIDs, SM-2 scheduling, cloze extraction.                                                                                                                                                                                                        | zod                 |
+| `packages/importers`   | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                                      | shared              |
+| `packages/server`      | Fastify API, repositories, search index, import/export services, app lock.                                                                                                                                                                                                    | all of the above    |
+| `apps/web`             | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                                               | —                   |
+| `apps/desktop`         | Electron main + preload, packaging.                                                                                                                                                                                                                                           | server, web         |
+| `internal/editor` (Go) | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md).                   | Go standard library |
+| `internal/grades` (Go) | The grade and GPA engine ported from `packages/grades`, digit for digit (exact decimals, same steps and warnings). Checked against the TypeScript engine on generated cases (`scripts/grades-parity.mjs`). Not yet called by the app: it takes over when the API moves to Go. | Go standard library |
 
 ## Ideas that shape the code
 
@@ -54,7 +55,8 @@ Classpad has no plugin system in v1. The supported seams for contributors are:
    `packages/server/src/context.ts` and routes in `app.ts`, then a definition in
    `apps/web/src/lib/modules.ts`. The generic table page handles the rest.
 3. **An importer**: add a pure parser in `packages/importers` that returns `ImportPreview` drafts.
-4. **A grading mode or GPA scale**: `packages/grades` (schemes and presets) with golden tests.
+4. **A grading mode or GPA scale**: `packages/grades` (schemes and presets) with golden tests, and the same change in
+   `internal/grades` (Go) until the port is finished. CI checks that the two engines agree.
 
 Anything that needs network access, accounts or sync is out of scope for v1.
 

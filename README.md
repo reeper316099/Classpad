@@ -25,8 +25,8 @@ More: [architecture](docs/ARCHITECTURE.md) · [data format](docs/DATA_FORMAT.md)
 
 ## Develop
 
-Needs Node 22+ and Go 1.24+ (the note editor's core is written in Go and runs as WebAssembly; the rest of the app
-is [moving to Go](docs/go-port/README.md)).
+Needs Node 22+ and Go 1.24+ (the note editor's core is written in Go and runs as WebAssembly, the grade engine has
+been ported to Go, and the rest of the app is [moving to Go](docs/go-port/README.md)).
 
 ```bash
 npm install
