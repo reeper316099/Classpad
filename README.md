@@ -25,8 +25,8 @@ More: [architecture](docs/ARCHITECTURE.md) · [data format](docs/DATA_FORMAT.md)
 
 ## Develop
 
-Needs Node 22+ and Go 1.26+ (the note editor's core is written in Go and runs as WebAssembly, the grade engine,
-the storage layer and the importers have been ported to Go, and the rest of the app is [moving to Go](docs/go-port/README.md)).
+Needs Node 22+ and Go 1.26+ (the local API is Go, the note editor's core is Go compiled to WebAssembly, and the
+rest of the app is [moving to Go](docs/go-port/README.md)).
 
 ```bash
 npm install
@@ -52,7 +52,7 @@ See `docs/PACKAGING.md` for installers and releases.
 - `packages/grades` – pure, exact-decimal grade and GPA engine
 - `packages/jsonstore` – standalone atomic JSON/Markdown storage engine
 - `packages/shared` – Zod schemas and shared types
-- `packages/server` – local Fastify API
+- `internal/server`, `cmd/classpad-server` – the local API (Go); `packages/server` is the TypeScript original
 - `packages/importers` – Notion/CSV/ICS/Markdown importers
 - `apps/web` – React UI · `apps/desktop` – Electron shell
 - `fixtures/synthetic` – generated fake data (public)

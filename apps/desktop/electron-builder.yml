@@ -11,6 +11,9 @@ files:
   - package.json
   - '!**/*.map'
 asar: true
+# the Go API server is a program: it can't run from inside the archive
+asarUnpack:
+  - dist/bin/**
 npmRebuild: false # everything is bundled; there are no native modules to rebuild
 nodeGypRebuild: false
 compression: normal
@@ -25,6 +28,8 @@ mac:
   target:
     - target: dmg
       arch: universal
+  # the Go server is already universal (lipo); the same file goes in both halves of the universal app
+  x64ArchFiles: '**/dist/bin/classpad-server'
 dmg:
   title: Classpad
   sign: false

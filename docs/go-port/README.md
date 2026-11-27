@@ -7,10 +7,10 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
 | Piece                 | Today                                  | After the port                                |
 | --------------------- | -------------------------------------- | --------------------------------------------- |
 | Desktop shell         | Electron (bundles Chromium + Node.js)  | Wails (Go + the system web view)              |
-| Local API             | **Go** (done; the app switches next)   | Go (`net/http`) in the same process           |
-| Storage (data folder) | **Go** (done; used once the API is Go) | Go, `internal/jsonstore`                      |
-| Grade engine          | **Go** (done; used once the API is Go) | Go, `internal/grades`                         |
-| Importers             | **Go** (done; used once the API is Go) | Go, `internal/importers`                      |
+| Local API             | **Go** (done)                          | Go (`net/http`) in the same process           |
+| Storage (data folder) | **Go** (done)                          | Go, `internal/jsonstore`                      |
+| Grade engine          | **Go** (done)                          | Go, `internal/grades`                         |
+| Importers             | **Go** (done)                          | Go, `internal/importers`                      |
 | Note editor core      | **Go, compiled to WebAssembly** (done) | the same                                      |
 | Interface             | React + TypeScript                     | the same (Node.js is needed only to build it) |
 
@@ -39,7 +39,7 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    and the Go test compares: about 110,000 cases over four seeds matched, and a real Notion export, checked
    locally and never committed, gave an identical preview. This step moved ahead of the API because the API
    uses the importers.
-5. **API** (done; the desktop app switches to it next). `packages/server` → `internal/server` and
+5. **API** (done). `packages/server` → `internal/server` and
    `cmd/classpad-server`: every route, with the same JSON, status codes, error shapes and headers, so the
    interface does not change. It runs on the Go storage, grade engine and importers from steps 2 to 4.
    `scripts/api-parity.mjs` starts both servers on empty data folders, sends each the same 215 requests (demo
@@ -49,6 +49,10 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    Matching JavaScript took a few deliberate details: Go must not fuse a multiply and an add into one step
    where JavaScript rounds twice (search scores differed in the last digit on Apple Silicon), and absent
    fields must stay absent rather than become `null`. Not ported: the development-only `/openapi.json`.
+   The desktop app now starts the Go server as a child process (`apps/desktop/src/server.ts`), so every
+   end-to-end test runs against it, and `npm run dev` uses it too. The Electron main bundle shrank from 1.92 MB to
+   0.61 MB without Fastify and the rest of the TypeScript server; the Go server adds 9.1 MB per platform (19 MB
+   as a universal macOS binary) until step 6 removes Electron.
 6. **Shell**: swap Electron for Wails, then remove Node.js from the shipped app.
 
 Each step ships on its own. Until step 6 the app keeps running on Electron with the parts that are already Go.

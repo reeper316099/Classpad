@@ -1,5 +1,4 @@
 import { APP_NAME } from '@classpad/shared';
-import { defaultDataDir, startServer } from '@classpad/server';
 import {
   app,
   BrowserWindow,
@@ -15,6 +14,7 @@ import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { buildMenu } from './menu.js';
+import { defaultDataDir, startServer, type Server } from './server.js';
 import { allowFile, lockDown, revokeFile } from './security.js';
 import { WindowState } from './windowState.js';
 
@@ -37,7 +37,6 @@ const reveal = (w: BrowserWindow) => {
   w.showInactive();
 };
 
-type Server = Awaited<ReturnType<typeof startServer>>;
 let server: Server | null = null;
 let win: BrowserWindow | null = null;
 let token = '';
@@ -169,7 +168,6 @@ async function boot(): Promise<void> {
       token,
       watch: true,
       staticDir: path.join(__dirname, 'web'),
-      port: 0,
     });
   } catch (e) {
     dialog.showErrorBox(
@@ -179,6 +177,11 @@ async function boot(): Promise<void> {
     app.quit();
     return;
   }
+  server.onExit((message) => {
+    if (closing) return;
+    dialog.showErrorBox(`${APP_NAME} stopped`, message);
+    app.exit(1);
+  });
   lockDown(server.url);
   ipcMain.on('classpad:config', (e) => {
     e.returnValue = trusted(e)

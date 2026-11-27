@@ -4,6 +4,7 @@
 //   npm run dev:stop   stop any dev servers left running (frees ports 4783 and 5173)
 import { spawn, spawnSync } from 'node:child_process';
 import net from 'node:net';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -59,11 +60,26 @@ const build = spawnSync('npx', ['tsc', '-b'], { cwd: root, stdio: 'inherit' });
 if (build.status !== 0) process.exit(build.status ?? 1);
 const wasm = spawnSync('node', ['scripts/build-editor-wasm.mjs'], { cwd: root, stdio: 'inherit' });
 if (wasm.status !== 0) process.exit(wasm.status ?? 1);
+// the API server is Go (cmd/classpad-server); it reads CLASSPAD_TOKEN and CLASSPAD_DATA_DIR from env
+const serverBin = path.join(
+  os.tmpdir(),
+  `classpad-dev-server${process.platform === 'win32' ? '.exe' : ''}`,
+);
+const go = spawnSync('go', ['build', '-o', serverBin, './cmd/classpad-server'], {
+  cwd: root,
+  stdio: 'inherit',
+});
+if (go.error || go.status !== 0) {
+  console.error(
+    '\n✖ Building the Go server failed. Go 1.26 or newer is needed (https://go.dev/dl/).\n',
+  );
+  process.exit(go.status ?? 1);
+}
 
 const kids = [
   [
     'API server',
-    spawn('node', ['packages/server/dist/dev.js'], { cwd: root, env, stdio: 'inherit' }),
+    spawn(serverBin, ['--dev', '--port', String(API_PORT)], { cwd: root, env, stdio: 'inherit' }),
   ],
   [
     'web UI',

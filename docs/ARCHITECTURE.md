@@ -1,6 +1,6 @@
 # Architecture
 
-Classpad is an Electron app that talks to a small local web server inside the same process tree.
+Classpad is an Electron app that talks to a small local web server, a Go program it starts as a child process.
 There is no cloud component.
 
 ```
@@ -10,29 +10,30 @@ There is no cloud component.
 │ per-launch bearer token             │ IPC  │ preload bridge: token, port, native menu │
 │ blocks every non-local request      │      │ no Node, contextIsolation, sandbox       │
 └──────────────┬──────────────────────┘      └─────────────────────────────────────────┘
-               │ in-process
-       ┌───────▼────────┐   ┌────────────┐   ┌───────────┐   ┌────────────┐
-       │ packages/server│──▶│ jsonstore  │   │  grades   │   │ importers  │
-       │ Fastify routes │   │ files, I/O │   │ pure math │   │ pure parse │
-       └───────┬────────┘   └────────────┘   └───────────┘   └────────────┘
-               └── shared: Zod schemas, types, SRS, front matter, wiki links
+               │ child process (token in its environment; it exits when the app goes away)
+       ┌───────▼─────────┐   ┌────────────┐   ┌───────────┐   ┌────────────┐
+       │ internal/server │──▶│ jsonstore  │   │  grades   │   │ importers  │
+       │ Go, net/http    │   │ files, I/O │   │ pure math │   │ pure parse │
+       └───────┬─────────┘   └────────────┘   └───────────┘   └────────────┘
+               └── internal/schema (the entity schemas), search, front matter, wiki links (all Go)
 ```
 
 ## Packages
 
-| Package                   | Responsibility                                                                                                                                                                                                                                                                | Depends on                         |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `packages/grades`         | Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                                                                                                              | decimal.js                         |
-| `packages/jsonstore`      | Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                                                                                                            | adm-zip, chokidar                  |
-| `packages/shared`         | Entity schemas (Zod), enums, ULIDs, SM-2 scheduling, cloze extraction.                                                                                                                                                                                                        | zod                                |
-| `packages/importers`      | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                                      | shared                             |
-| `packages/server`         | Fastify API, repositories, search index, import/export services, app lock.                                                                                                                                                                                                    | all of the above                   |
-| `apps/web`                | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                                               | —                                  |
-| `apps/desktop`            | Electron main + preload, packaging.                                                                                                                                                                                                                                           | server, web                        |
-| `internal/editor` (Go)    | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md).                   | Go standard library                |
-| `internal/grades` (Go)    | The grade and GPA engine ported from `packages/grades`, digit for digit (exact decimals, same steps and warnings). Checked against the TypeScript engine on generated cases (`scripts/grades-parity.mjs`). Not yet called by the app: it takes over when the API moves to Go. | Go standard library                |
-| `internal/jsonstore` (Go) | The data folder store ported from `packages/jsonstore`: same files byte for byte, same encryption and backups, both ways compatible (checked by `scripts/jsonstore-compat.mjs`). Not yet called by the app: it takes over when the API moves to Go.                           | x/crypto, x/text, fsnotify         |
-| `internal/importers` (Go) | The importers ported from `packages/importers` (Notion, CSV, gradebook mappings, .ics, Markdown folders, backups), giving the same previews (checked by `scripts/importers-parity.mjs`). Not yet called by the app: it takes over when the API moves to Go.                   | grades, jsonstore, x/text, yaml.v3 |
+| Package                   | Responsibility                                                                                                                                                                                                                                              | Depends on                         |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| `packages/grades`         | Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                                                                                            | decimal.js                         |
+| `packages/jsonstore`      | Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                                                                                          | adm-zip, chokidar                  |
+| `packages/shared`         | Entity schemas (Zod), enums, ULIDs, SM-2 scheduling, cloze extraction.                                                                                                                                                                                      | zod                                |
+| `packages/importers`      | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                    | shared                             |
+| `packages/server`         | The TypeScript API the Go server was ported from; kept, with the other TypeScript packages, as the reference the Go code is checked against (`scripts/api-parity.mjs`).                                                                                     | all of the above                   |
+| `apps/web`                | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                             | —                                  |
+| `apps/desktop`            | Electron main + preload, packaging; starts the Go server (`apps/desktop/src/server.ts`).                                                                                                                                                                    | server, web                        |
+| `internal/editor` (Go)    | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md). | Go standard library                |
+| `internal/grades` (Go)    | The grade and GPA engine ported from `packages/grades`, digit for digit (exact decimals, same steps and warnings). Checked against the TypeScript engine on generated cases (`scripts/grades-parity.mjs`). Used by the Go API.                              | Go standard library                |
+| `internal/jsonstore` (Go) | The data folder store ported from `packages/jsonstore`: same files byte for byte, same encryption and backups, both ways compatible (checked by `scripts/jsonstore-compat.mjs`). Used by the Go API.                                                        | x/crypto, x/text, fsnotify         |
+| `internal/importers` (Go) | The importers ported from `packages/importers` (Notion, CSV, gradebook mappings, .ics, Markdown folders, backups), giving the same previews (checked by `scripts/importers-parity.mjs`). Used by the Go API.                                                | grades, jsonstore, x/text, yaml.v3 |
+| `internal/server` (Go)    | The local API the app runs (`cmd/classpad-server`): every route of `packages/server` with the same JSON, plus repositories, search, import/export, folder sync and the app lock. Checked against the TypeScript server by `scripts/api-parity.mjs`.         | all the Go packages above          |
 
 ## Ideas that shape the code
 

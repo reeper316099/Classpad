@@ -2,14 +2,19 @@
 
 ## How the desktop app is put together
 
-- `apps/desktop/src/main.ts` (Electron main process) starts the local API **in-process** on `127.0.0.1` with an
-  **ephemeral port** and a random **per-launch token**, then opens a window on that same origin.
+- `apps/desktop/src/main.ts` (Electron main process) starts the local API, the Go program
+  `classpad-server` (`cmd/classpad-server`), as a child process on `127.0.0.1` with an **ephemeral port** and a
+  random **per-launch token** (passed in its environment, never on the command line), then opens a window on
+  that same origin. The server stops when the app quits, and also when the app is killed: it exits as soon as
+  its stdin closes.
   The API serves the built web UI itself, so the page and the API share an origin (no CORS) and the token is
   never written to disk.
 - `preload.ts` exposes a tiny bridge, `window.classpad` (`api.token`, native-menu events, "show data folder",
   "save report as PDF"). The renderer has `contextIsolation`, `sandbox`, no Node, and a strict CSP.
 - Everything is bundled by esbuild (`npm run bundle -w @classpad/desktop`) into `dist/main.cjs` + `dist/preload.cjs`
-  - `dist/web/`, so the packaged app needs no `node_modules`.
+  - `dist/web/`, so the packaged app needs no `node_modules`. The same step builds the Go server into
+    `dist/bin/` (universal arm64 + x64 on macOS, with `lipo`), which is unpacked from the app archive so it can
+    run. Building the app needs Go 1.26+.
 
 ## Security model
 
