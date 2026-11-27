@@ -27,7 +27,7 @@
     "build:web": "npm run build -w @classpad/web",
     "desktop": "node scripts/build-desktop.mjs --run",
     "desktop:dist": "node scripts/package-desktop.mjs",
-    "e2e": "npm run build -w @classpad/web && playwright test -c e2e/playwright.config.ts",
+    "e2e": "npm run build && npm run build -w @classpad/web && playwright test -c e2e/playwright.config.ts",
     "dev:stop": "node scripts/dev.mjs --stop"
   },
   "simple-git-hooks": {

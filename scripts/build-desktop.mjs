@@ -31,7 +31,11 @@ const run = (cmd, args, opts = {}) => {
   }
 };
 
-if (!process.argv.includes('--skip-web')) run('npm', ['run', 'build', '-w', '@classpad/web']);
+// the interface imports the workspace packages, which build first
+if (!process.argv.includes('--skip-web')) {
+  run('npx', ['tsc', '-b']);
+  run('npm', ['run', 'build', '-w', '@classpad/web']);
+}
 const dist = path.join(root, 'apps/web/dist');
 if (!existsSync(path.join(dist, 'index.html'))) {
   console.error('✖ apps/web/dist is missing; build the web interface first');
