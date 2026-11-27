@@ -1,0 +1,1275 @@
+{
+ "stable": [
+  {
+   "input": "{\"tab\\tnew\\nline\\rcr\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"日本語\":1e-7,\"plain2\":{\"2\":9007199254740992,\"😀 emoji\":-1,\"\":5e-324}}},\"\\u0000\\u0001\\u001f\":{\" private use\":[[\"\",\"café\"],false],\"tab\\tnew\\nline\\rcr\":0.30000000000000004,\"plain3\":{\"__proto__x79\":0.1,\"😀 emoji\":false,\"plain46\":{\" private use\":\"Z\",\"plain\":\"\\u0000\\u0001\\u001f\",\"😀 emoji\":1.5e-7,\"\":\"plain\",\"\\b\\f\":0.00012164999999999999},\"\\b\\f\":[]}},\"café\":[[[\"￿\",57900,\"2\",123456789012345680000],\"😀 emoji\",[1.7976931348623157e+308,99.99999999999999,\"tab\\tnew\\nline\\rcr\",537]],5e-324],\"café\":[{\"10\":[null,true,\"Z\",99.99999999999999],\"Z\":[],\"__proto__x\":{\"日本語13\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢31\":\"quote \\\" and backslash \\\\\"},\"quote \\\" and backslash \\\\\":{\"￿\":\"10\"}}]}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f\": {\n    \"plain3\": {\n      \"\\b\\f\": [],\n      \"__proto__x79\": 0.1,\n      \"plain46\": {\n        \"\": \"plain\",\n        \"\\b\\f\": 0.00012164999999999999,\n        \"plain\": \"\\u0000\\u0001\\u001f\",\n        \"😀 emoji\": 1.5e-7,\n        \" private use\": \"Z\"\n      },\n      \"😀 emoji\": false\n    },\n    \"tab\\tnew\\nline\\rcr\": 0.30000000000000004,\n    \" private use\": [\n      [\n        \"\",\n        \"café\"\n      ],\n      false\n    ]\n  },\n  \"café\": [\n    [\n      [\n        \"￿\",\n        57900,\n        \"2\",\n        123456789012345680000\n      ],\n      \"😀 emoji\",\n      [\n        1.7976931348623157e+308,\n        99.99999999999999,\n        \"tab\\tnew\\nline\\rcr\",\n        537\n      ]\n    ],\n    5e-324\n  ],\n  \"café\": [\n    {\n      \"10\": [\n        null,\n        true,\n        \"Z\",\n        99.99999999999999\n      ],\n      \"Z\": [],\n      \"__proto__x\": {\n        \"日本語13\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢31\": \"quote \\\" and backslash \\\\\"\n      },\n      \"quote \\\" and backslash \\\\\": {\n        \"￿\": \"10\"\n      }\n    }\n  ],\n  \"tab\\tnew\\nline\\rcr\": {\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"plain2\": {\n        \"2\": 9007199254740992,\n        \"\": 5e-324,\n        \"😀 emoji\": -1\n      },\n      \"日本語\": 1e-7\n    }\n  }\n}\n"
+  },
+  {
+   "input": "[{\"__proto__x\":100000000000000000000,\"a\":true},[null,null,{\"10\":[0.00006319999999999999,false,\"</script><b>&amp;</b>\"],\"￿\":[3.7,\"line sep   para sep  \",\"</script><b>&amp;</b>\"],\"😀 emoji\":{\"café\":null,\"</script><b>&amp;</b>\":123456789012345680000},\" private use\":\"a\"}]]",
+   "output": "[\n  {\n    \"__proto__x\": 100000000000000000000,\n    \"a\": true\n  },\n  [\n    null,\n    null,\n    {\n      \"10\": [\n        0.00006319999999999999,\n        false,\n        \"</script><b>&amp;</b>\"\n      ],\n      \"😀 emoji\": {\n        \"</script><b>&amp;</b>\": 123456789012345680000,\n        \"café\": null\n      },\n      \" private use\": \"a\",\n      \"￿\": [\n        3.7,\n        \"line sep   para sep  \",\n        \"</script><b>&amp;</b>\"\n      ]\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "\"😀 emoji\"",
+   "output": "\"😀 emoji\"\n"
+  },
+  {
+   "input": "[\" private use\",{\"日本語87\":[null,[],{\"210\":false,\"quote \\\" and backslash \\\\\":false,\"\":\"日本語\"}],\"\":{}},0]",
+   "output": "[\n  \" private use\",\n  {\n    \"\": {},\n    \"日本語87\": [\n      null,\n      [],\n      {\n        \"210\": false,\n        \"\": \"日本語\",\n        \"quote \\\" and backslash \\\\\": false\n      }\n    ]\n  },\n  0\n]\n"
+  },
+  {
+   "input": "282.75",
+   "output": "282.75\n"
+  },
+  {
+   "input": "{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":true,\"😀 emoji\":[{\"__proto__x\":[false,\"plain\"],\"😀 emoji\":[9007199254740994,-2.22e-7,\"quote \\\" and backslash \\\\\"],\"￿20\":[0,\"café\",false,\"quote \\\" and backslash \\\\\"]},{\"2\":{\"plain\":100000000000000000000,\"\\u0000\\u0001\\u001f\":\"\\b\\f\",\"￿\":\"plain\",\"</script><b>&amp;</b>\":null}},[[],{},[false]],1.7976931348623157e+308],\"café\":\"__proto__x\",\"\":false}",
+   "output": "{\n  \"\": false,\n  \"café\": \"__proto__x\",\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": true,\n  \"😀 emoji\": [\n    {\n      \"__proto__x\": [\n        false,\n        \"plain\"\n      ],\n      \"😀 emoji\": [\n        9007199254740994,\n        -2.22e-7,\n        \"quote \\\" and backslash \\\\\"\n      ],\n      \"￿20\": [\n        0,\n        \"café\",\n        false,\n        \"quote \\\" and backslash \\\\\"\n      ]\n    },\n    {\n      \"2\": {\n        \"\\u0000\\u0001\\u001f\": \"\\b\\f\",\n        \"</script><b>&amp;</b>\": null,\n        \"plain\": 100000000000000000000,\n        \"￿\": \"plain\"\n      }\n    },\n    [\n      [],\n      {},\n      [\n        false\n      ]\n    ],\n    1.7976931348623157e+308\n  ]\n}\n"
+  },
+  {
+   "input": "[38199.99999999999,null,[{},[],{\"line sep   para sep  \":[99,0,\"\\b\\f\"],\"plain\":[\"\\u0000\\u0001\\u001f\",\"Z\",null,100],\"￿90\":{\"1077\":9007199254740994,\" private use\":0.3333333333333333,\"</script><b>&amp;</b>\":\"Z\",\"quote \\\" and backslash \\\\\":false,\"Z\":null},\" private use44\":\"plain\",\"</script><b>&amp;</b>\":{\"line sep   para sep  \":null}},false],[[{\"274\":90900,\"café\":\"Z\",\"\\u0000\\u0001\\u001f\":false,\"tab\\tnew\\nline\\rcr\":true},\"\\u0000\\u0001\\u001f\"],\"quote \\\" and backslash \\\\\"]]",
+   "output": "[\n  38199.99999999999,\n  null,\n  [\n    {},\n    [],\n    {\n      \"</script><b>&amp;</b>\": {\n        \"line sep   para sep  \": null\n      },\n      \"line sep   para sep  \": [\n        99,\n        0,\n        \"\\b\\f\"\n      ],\n      \"plain\": [\n        \"\\u0000\\u0001\\u001f\",\n        \"Z\",\n        null,\n        100\n      ],\n      \" private use44\": \"plain\",\n      \"￿90\": {\n        \"1077\": 9007199254740994,\n        \"</script><b>&amp;</b>\": \"Z\",\n        \"Z\": null,\n        \"quote \\\" and backslash \\\\\": false,\n        \" private use\": 0.3333333333333333\n      }\n    },\n    false\n  ],\n  [\n    [\n      {\n        \"274\": 90900,\n        \"\\u0000\\u0001\\u001f\": false,\n        \"café\": \"Z\",\n        \"tab\\tnew\\nline\\rcr\": true\n      },\n      \"\\u0000\\u0001\\u001f\"\n    ],\n    \"quote \\\" and backslash \\\\\"\n  ]\n]\n"
+  },
+  {
+   "input": "{\"line sep   para sep  \":{\"tab\\tnew\\nline\\rcr85\":4.35},\"￿\":\"__proto__x\"}",
+   "output": "{\n  \"line sep   para sep  \": {\n    \"tab\\tnew\\nline\\rcr85\": 4.35\n  },\n  \"￿\": \"__proto__x\"\n}\n"
+  },
+  {
+   "input": "0.1",
+   "output": "0.1\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"\\b\\f\":[\"tab\\tnew\\nline\\rcr\"],\"tab\\tnew\\nline\\rcr\":true,\"plain81\":-2.5e-10,\"</script><b>&amp;</b>\":{\"10\":{},\"line sep   para sep  49\":\"line sep   para sep  \",\"Z\":[{\"￿\":false,\" private use\":false,\"</script><b>&amp;</b>\":-2.5e-10,\"\":5242189966259257000,\"café\":0.000001},\"😀 emoji\",[true],{\"日本語57\":1.5e-7}],\"\\b\\f\":{\"plain37\":\"10\",\"plain\":\"tab\\tnew\\nline\\rcr\",\"Z59\":{},\"tab\\tnew\\nline\\rcr\":\"Z\"},\"￿\":\"a\"},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢2\":{}}",
+   "output": "{\n  \"\\b\\f\": [\n    \"tab\\tnew\\nline\\rcr\"\n  ],\n  \"</script><b>&amp;</b>\": {\n    \"10\": {},\n    \"\\b\\f\": {\n      \"Z59\": {},\n      \"plain\": \"tab\\tnew\\nline\\rcr\",\n      \"plain37\": \"10\",\n      \"tab\\tnew\\nline\\rcr\": \"Z\"\n    },\n    \"Z\": [\n      {\n        \"\": 5242189966259257000,\n        \"</script><b>&amp;</b>\": -2.5e-10,\n        \"café\": 0.000001,\n        \" private use\": false,\n        \"￿\": false\n      },\n      \"😀 emoji\",\n      [\n        true\n      ],\n      {\n        \"日本語57\": 1.5e-7\n      }\n    ],\n    \"line sep   para sep  49\": \"line sep   para sep  \",\n    \"￿\": \"a\"\n  },\n  \"plain81\": -2.5e-10,\n  \"tab\\tnew\\nline\\rcr\": true,\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢2\": {}\n}\n"
+  },
+  {
+   "input": "{\"2\":{\"line sep   para sep  \":[null],\"café27\":true,\"\\u0000\\u0001\\u001f74\":null,\"plain\":[[0.3333333333333333,\"</script><b>&amp;</b>\"],{\"16\":1.5e-7,\"日本語\":\"café\",\"a69\":9007199254740992,\"tab\\tnew\\nline\\rcr69\":\"2\",\"￿\":true},[null],{}],\"</script><b>&amp;</b>\":\"café\"},\"__proto__x\":{\"2\":[[\"quote \\\" and backslash \\\\\",true],\"</script><b>&amp;</b>\",[]],\"quote \\\" and backslash \\\\\":[[],{}],\"\\b\\f\":\"__proto__x\"},\"café\":[false,[0.0000846,{\"\\u0000\\u0001\\u001f57\":3.7},{\"Z\":true,\"￿\":false}]],\"\\u0000\\u0001\\u001f15\":[\"😀 emoji\"]}",
+   "output": "{\n  \"2\": {\n    \"\\u0000\\u0001\\u001f74\": null,\n    \"</script><b>&amp;</b>\": \"café\",\n    \"café27\": true,\n    \"line sep   para sep  \": [\n      null\n    ],\n    \"plain\": [\n      [\n        0.3333333333333333,\n        \"</script><b>&amp;</b>\"\n      ],\n      {\n        \"16\": 1.5e-7,\n        \"a69\": 9007199254740992,\n        \"tab\\tnew\\nline\\rcr69\": \"2\",\n        \"日本語\": \"café\",\n        \"￿\": true\n      },\n      [\n        null\n      ],\n      {}\n    ]\n  },\n  \"\\u0000\\u0001\\u001f15\": [\n    \"😀 emoji\"\n  ],\n  \"__proto__x\": {\n    \"2\": [\n      [\n        \"quote \\\" and backslash \\\\\",\n        true\n      ],\n      \"</script><b>&amp;</b>\",\n      []\n    ],\n    \"\\b\\f\": \"__proto__x\",\n    \"quote \\\" and backslash \\\\\": [\n      [],\n      {}\n    ]\n  },\n  \"café\": [\n    false,\n    [\n      0.0000846,\n      {\n        \"\\u0000\\u0001\\u001f57\": 3.7\n      },\n      {\n        \"Z\": true,\n        \"￿\": false\n      }\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[[[true,[0,\"café\",-2.5e-10],[\"plain\",-2.5e-10],99.99999999999999],[true,{\"café20\":true,\"\\u0000\\u0001\\u001f\":true},[\"￿\",\"Z\",\"10\",\"café\"]]],[{\"44\":[\"tab\\tnew\\nline\\rcr\"],\"a\":{\"10\":-1,\"plain\":false,\"quote \\\" and backslash \\\\\":\"café\",\" private use96\":false,\"tab\\tnew\\nline\\rcr\":1.5e-7},\"\\u0000\\u0001\\u001f25\":\"__proto__x\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢4\":[null]},{\"日本語67\":[3.7,5e-324,\"</script><b>&amp;</b>\",false],\"日本語\":102.30000000000001}]]",
+   "output": "[\n  [\n    [\n      true,\n      [\n        0,\n        \"café\",\n        -2.5e-10\n      ],\n      [\n        \"plain\",\n        -2.5e-10\n      ],\n      99.99999999999999\n    ],\n    [\n      true,\n      {\n        \"\\u0000\\u0001\\u001f\": true,\n        \"café20\": true\n      },\n      [\n        \"￿\",\n        \"Z\",\n        \"10\",\n        \"café\"\n      ]\n    ]\n  ],\n  [\n    {\n      \"44\": [\n        \"tab\\tnew\\nline\\rcr\"\n      ],\n      \"\\u0000\\u0001\\u001f25\": \"__proto__x\",\n      \"a\": {\n        \"10\": -1,\n        \"plain\": false,\n        \"quote \\\" and backslash \\\\\": \"café\",\n        \"tab\\tnew\\nline\\rcr\": 1.5e-7,\n        \" private use96\": false\n      },\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢4\": [\n        null\n      ]\n    },\n    {\n      \"日本語\": 102.30000000000001,\n      \"日本語67\": [\n        3.7,\n        5e-324,\n        \"</script><b>&amp;</b>\",\n        false\n      ]\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "-2.5e-10",
+   "output": "-2.5e-10\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[\"日本語\",\"￿\"]",
+   "output": "[\n  \"日本語\",\n  \"￿\"\n]\n"
+  },
+  {
+   "input": "[[{\"tab\\tnew\\nline\\rcr\":[\"a\",\"plain\",-1,\"café\"]}],false,[{\"\":\"Z\",\"\\u0000\\u0001\\u001f43\":{\" private use64\":\"</script><b>&amp;</b>\",\"tab\\tnew\\nline\\rcr\":1605.1499999999999,\"line sep   para sep  \":\"\\u0000\\u0001\\u001f\"},\"__proto__x\":{\"\\u0000\\u0001\\u001f\":1.5e-7,\"café\":100,\"😀 emoji\":\"</script><b>&amp;</b>\",\"\":99.99999999999999,\"￿\":5e-324},\"￿\":\"line sep   para sep  \"},[{\"日本語\":\"__proto__x\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"quote \\\" and backslash \\\\\",\"café31\":\"café\",\"Z\":\"Z\"}],{\"\\b\\f50\":\"café\",\"line sep   para sep  \":1e+21,\"</script><b>&amp;</b>\":[\"\"],\"😀 emoji\":{\"quote \\\" and backslash \\\\\":0,\"café59\":0,\"￿\":\"10\"},\"a\":{\"quote \\\" and backslash \\\\\":\"\\b\\f\"}}]]",
+   "output": "[\n  [\n    {\n      \"tab\\tnew\\nline\\rcr\": [\n        \"a\",\n        \"plain\",\n        -1,\n        \"café\"\n      ]\n    }\n  ],\n  false,\n  [\n    {\n      \"\": \"Z\",\n      \"\\u0000\\u0001\\u001f43\": {\n        \"line sep   para sep  \": \"\\u0000\\u0001\\u001f\",\n        \"tab\\tnew\\nline\\rcr\": 1605.1499999999999,\n        \" private use64\": \"</script><b>&amp;</b>\"\n      },\n      \"__proto__x\": {\n        \"\": 99.99999999999999,\n        \"\\u0000\\u0001\\u001f\": 1.5e-7,\n        \"café\": 100,\n        \"😀 emoji\": \"</script><b>&amp;</b>\",\n        \"￿\": 5e-324\n      },\n      \"￿\": \"line sep   para sep  \"\n    },\n    [\n      {\n        \"Z\": \"Z\",\n        \"café31\": \"café\",\n        \"日本語\": \"__proto__x\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"quote \\\" and backslash \\\\\"\n      }\n    ],\n    {\n      \"\\b\\f50\": \"café\",\n      \"</script><b>&amp;</b>\": [\n        \"\"\n      ],\n      \"a\": {\n        \"quote \\\" and backslash \\\\\": \"\\b\\f\"\n      },\n      \"line sep   para sep  \": 1e+21,\n      \"😀 emoji\": {\n        \"café59\": 0,\n        \"quote \\\" and backslash \\\\\": 0,\n        \"￿\": \"10\"\n      }\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "0.3333333333333333",
+   "output": "0.3333333333333333\n"
+  },
+  {
+   "input": "{\"</script><b>&amp;</b>\":[],\"\\b\\f\":[{\"￿\":[]}],\"￿\":null}",
+   "output": "{\n  \"\\b\\f\": [\n    {\n      \"￿\": []\n    }\n  ],\n  \"</script><b>&amp;</b>\": [],\n  \"￿\": null\n}\n"
+  },
+  {
+   "input": "[null]",
+   "output": "[\n  null\n]\n"
+  },
+  {
+   "input": "{\"plain\":{\"line sep   para sep  \":[],\"plain12\":true,\"￿\":{\"a21\":[true,true],\"￿\":[\"tab\\tnew\\nline\\rcr\",0]},\"\\u0000\\u0001\\u001f\":null},\"日本語70\":[{\"__proto__x91\":\"</script><b>&amp;</b>\"}],\"日本語44\":{}}",
+   "output": "{\n  \"plain\": {\n    \"\\u0000\\u0001\\u001f\": null,\n    \"line sep   para sep  \": [],\n    \"plain12\": true,\n    \"￿\": {\n      \"a21\": [\n        true,\n        true\n      ],\n      \"￿\": [\n        \"tab\\tnew\\nline\\rcr\",\n        0\n      ]\n    }\n  },\n  \"日本語44\": {},\n  \"日本語70\": [\n    {\n      \"__proto__x91\": \"</script><b>&amp;</b>\"\n    }\n  ]\n}\n"
+  },
+  {
+   "input": "[{\"239\":[234.00000000000003,null,3.7,{\"__proto__x\":false,\"quote \\\" and backslash \\\\\":null,\"\\b\\f29\":\"tab\\tnew\\nline\\rcr\",\"café\":9007199254740992,\"\\u0000\\u0001\\u001f\":\"line sep   para sep  \"}],\"quote \\\" and backslash \\\\\":\"café\",\"café\":{\"日本語\":true,\"line sep   para sep  \":[true,\"￿\",false,true],\"tab\\tnew\\nline\\rcr\":{\"a\":-2.5e-10,\"plain\":\" private use\",\"\\u0000\\u0001\\u001f\":100},\"plain\":{}},\"￿4\":true,\"日本語\":4.35}]",
+   "output": "[\n  {\n    \"239\": [\n      234.00000000000003,\n      null,\n      3.7,\n      {\n        \"\\u0000\\u0001\\u001f\": \"line sep   para sep  \",\n        \"\\b\\f29\": \"tab\\tnew\\nline\\rcr\",\n        \"__proto__x\": false,\n        \"café\": 9007199254740992,\n        \"quote \\\" and backslash \\\\\": null\n      }\n    ],\n    \"café\": {\n      \"line sep   para sep  \": [\n        true,\n        \"￿\",\n        false,\n        true\n      ],\n      \"plain\": {},\n      \"tab\\tnew\\nline\\rcr\": {\n        \"\\u0000\\u0001\\u001f\": 100,\n        \"a\": -2.5e-10,\n        \"plain\": \" private use\"\n      },\n      \"日本語\": true\n    },\n    \"quote \\\" and backslash \\\\\": \"café\",\n    \"日本語\": 4.35,\n    \"￿4\": true\n  }\n]\n"
+  },
+  {
+   "input": "9007199254740994",
+   "output": "9007199254740994\n"
+  },
+  {
+   "input": "{\"\":[[3.7,[false,\"café\"],[17799.999999999996]],[\" private use\",\"Z\",[0.3333333333333333,1,5e-324],{\"line sep   para sep  \":\"日本語\"}]],\"line sep   para sep  \":\"line sep   para sep  \",\"__proto__x\":{\"a\":null},\"a\":[[0,\"quote \\\" and backslash \\\\\"],[[9007199254740994,9007199254740992,\"plain\"],[2534.5,3.7,\"\\u0000\\u0001\\u001f\",3.7],{\"日本語\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"日本語49\":\"__proto__x\"}],[[true,0.3333333333333333,0.000001,\"a\"],{\"2\":9007199254740994,\"1012\":-2.5e-10,\"Z80\":true,\"café\":null},[false,0.3333333333333333,\"2\"],{\"café\":6196953087261802000}],[{\"Z2\":9007199254740994,\" private use\":\"2\",\"__proto__x11\":0.1},null]],\"plain\":\"日本語\"}",
+   "output": "{\n  \"\": [\n    [\n      3.7,\n      [\n        false,\n        \"café\"\n      ],\n      [\n        17799.999999999996\n      ]\n    ],\n    [\n      \" private use\",\n      \"Z\",\n      [\n        0.3333333333333333,\n        1,\n        5e-324\n      ],\n      {\n        \"line sep   para sep  \": \"日本語\"\n      }\n    ]\n  ],\n  \"__proto__x\": {\n    \"a\": null\n  },\n  \"a\": [\n    [\n      0,\n      \"quote \\\" and backslash \\\\\"\n    ],\n    [\n      [\n        9007199254740994,\n        9007199254740992,\n        \"plain\"\n      ],\n      [\n        2534.5,\n        3.7,\n        \"\\u0000\\u0001\\u001f\",\n        3.7\n      ],\n      {\n        \"日本語\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"日本語49\": \"__proto__x\"\n      }\n    ],\n    [\n      [\n        true,\n        0.3333333333333333,\n        0.000001,\n        \"a\"\n      ],\n      {\n        \"2\": 9007199254740994,\n        \"1012\": -2.5e-10,\n        \"Z80\": true,\n        \"café\": null\n      },\n      [\n        false,\n        0.3333333333333333,\n        \"2\"\n      ],\n      {\n        \"café\": 6196953087261802000\n      }\n    ],\n    [\n      {\n        \"Z2\": 9007199254740994,\n        \"__proto__x11\": 0.1,\n        \" private use\": \"2\"\n      },\n      null\n    ]\n  ],\n  \"line sep   para sep  \": \"line sep   para sep  \",\n  \"plain\": \"日本語\"\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{\"2\":[],\"tab\\tnew\\nline\\rcr\":{\"10\":4.35,\"￿42\":{\"__proto__x\":[9007199254740992],\"￿\":[\"\\u0000\\u0001\\u001f\",0.000001,0,0.3333333333333333],\"a\":[false,1e-7]},\"line sep   para sep  \":{\"tab\\tnew\\nline\\rcr\":\"line sep   para sep  \",\"\\u0000\\u0001\\u001f20\":[false,true,\"Z\",false],\"😀 emoji\":{\"日本語\":true}},\"Z\":{\"__proto__x90\":\"café\",\"a\":{\"1054\":1e-7,\"</script><b>&amp;</b>77\":null,\"\":1.7976931348623157e+308,\"\\b\\f50\":true},\"</script><b>&amp;</b>9\":null},\" private use\":100000000000000000000}}",
+   "output": "{\n  \"2\": [],\n  \"tab\\tnew\\nline\\rcr\": {\n    \"10\": 4.35,\n    \"Z\": {\n      \"</script><b>&amp;</b>9\": null,\n      \"__proto__x90\": \"café\",\n      \"a\": {\n        \"1054\": 1e-7,\n        \"\": 1.7976931348623157e+308,\n        \"\\b\\f50\": true,\n        \"</script><b>&amp;</b>77\": null\n      }\n    },\n    \"line sep   para sep  \": {\n      \"\\u0000\\u0001\\u001f20\": [\n        false,\n        true,\n        \"Z\",\n        false\n      ],\n      \"tab\\tnew\\nline\\rcr\": \"line sep   para sep  \",\n      \"😀 emoji\": {\n        \"日本語\": true\n      }\n    },\n    \" private use\": 100000000000000000000,\n    \"￿42\": {\n      \"__proto__x\": [\n        9007199254740992\n      ],\n      \"a\": [\n        false,\n        1e-7\n      ],\n      \"￿\": [\n        \"\\u0000\\u0001\\u001f\",\n        0.000001,\n        0,\n        0.3333333333333333\n      ]\n    }\n  }\n}\n"
+  },
+  {
+   "input": "[true,\"a\"]",
+   "output": "[\n  true,\n  \"a\"\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[[],{\"\\u0000\\u0001\\u001f\":[],\"\":[]},1e+21]",
+   "output": "[\n  [],\n  {\n    \"\": [],\n    \"\\u0000\\u0001\\u001f\": []\n  },\n  1e+21\n]\n"
+  },
+  {
+   "input": "[[],[5e-324,{\"10\":[9007199254740994],\"line sep   para sep  \":\"10\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"Z\":1e-7,\"line sep   para sep  91\":true,\"￿\":1.5e-7},\"\":{\"\":true,\"日本語\":\"😀 emoji\"}}],[1e+21,-2.5e-10,[]],[\"__proto__x\"]]",
+   "output": "[\n  [],\n  [\n    5e-324,\n    {\n      \"10\": [\n        9007199254740994\n      ],\n      \"\": {\n        \"\": true,\n        \"日本語\": \"😀 emoji\"\n      },\n      \"line sep   para sep  \": \"10\",\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"Z\": 1e-7,\n        \"line sep   para sep  91\": true,\n        \"￿\": 1.5e-7\n      }\n    }\n  ],\n  [\n    1e+21,\n    -2.5e-10,\n    []\n  ],\n  [\n    \"__proto__x\"\n  ]\n]\n"
+  },
+  {
+   "input": "\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"",
+   "output": "\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"10\":null}",
+   "output": "{\n  \"10\": null\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "[[[0.3333333333333333,{}],null,[{\" private use\":\"line sep   para sep  \",\"line sep   para sep  \":false},{\"￿68\":false,\"Z\":-841,\"café\":null,\"tab\\tnew\\nline\\rcr67\":0},[]]],{\"\\u0000\\u0001\\u001f22\":\"line sep   para sep  \",\"</script><b>&amp;</b>\":[\"😀 emoji\",null,[null,\"tab\\tnew\\nline\\rcr\"]],\"__proto__x44\":{\"😀 emoji\":\"__proto__x\",\"__proto__x\":{\"quote \\\" and backslash \\\\\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"\":null},\" private use47\":0.000078},\"\\u0000\\u0001\\u001f\":\"café\"}]",
+   "output": "[\n  [\n    [\n      0.3333333333333333,\n      {}\n    ],\n    null,\n    [\n      {\n        \"line sep   para sep  \": false,\n        \" private use\": \"line sep   para sep  \"\n      },\n      {\n        \"Z\": -841,\n        \"café\": null,\n        \"tab\\tnew\\nline\\rcr67\": 0,\n        \"￿68\": false\n      },\n      []\n    ]\n  ],\n  {\n    \"\\u0000\\u0001\\u001f\": \"café\",\n    \"\\u0000\\u0001\\u001f22\": \"line sep   para sep  \",\n    \"</script><b>&amp;</b>\": [\n      \"😀 emoji\",\n      null,\n      [\n        null,\n        \"tab\\tnew\\nline\\rcr\"\n      ]\n    ],\n    \"__proto__x44\": {\n      \"__proto__x\": {\n        \"\": null,\n        \"quote \\\" and backslash \\\\\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      },\n      \"😀 emoji\": \"__proto__x\",\n      \" private use47\": 0.000078\n    }\n  }\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "0",
+   "output": "0\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "{\"__proto__x9\":[],\"\\b\\f\":{\" private use\":false,\"Z93\":{\"tab\\tnew\\nline\\rcr\":\"😀 emoji\",\"\\u0000\\u0001\\u001f55\":{}}},\"plain\":{\"\\b\\f12\":{\"日本語\":{\"￿67\":\"a\"}},\"café\":[\"tab\\tnew\\nline\\rcr\"],\"\\b\\f\":[0,[7.67e+23]]},\"café13\":{\"Z\":[100000000000000000000,3.7]}}",
+   "output": "{\n  \"\\b\\f\": {\n    \"Z93\": {\n      \"\\u0000\\u0001\\u001f55\": {},\n      \"tab\\tnew\\nline\\rcr\": \"😀 emoji\"\n    },\n    \" private use\": false\n  },\n  \"__proto__x9\": [],\n  \"café13\": {\n    \"Z\": [\n      100000000000000000000,\n      3.7\n    ]\n  },\n  \"plain\": {\n    \"\\b\\f\": [\n      0,\n      [\n        7.67e+23\n      ]\n    ],\n    \"\\b\\f12\": {\n      \"日本語\": {\n        \"￿67\": \"a\"\n      }\n    },\n    \"café\": [\n      \"tab\\tnew\\nline\\rcr\"\n    ]\n  }\n}\n"
+  },
+  {
+   "input": "{\"99\":true,\"__proto__x\":{\"café47\":[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",{\"10\":\"￿\",\"café\":0},null,{\"a\":6.2e+23}],\"\\b\\f\":\"tab\\tnew\\nline\\rcr\"},\"\\b\\f\":{}}",
+   "output": "{\n  \"99\": true,\n  \"\\b\\f\": {},\n  \"__proto__x\": {\n    \"\\b\\f\": \"tab\\tnew\\nline\\rcr\",\n    \"café47\": [\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      {\n        \"10\": \"￿\",\n        \"café\": 0\n      },\n      null,\n      {\n        \"a\": 6.2e+23\n      }\n    ]\n  }\n}\n"
+  },
+  {
+   "input": "{\"10\":null,\"__proto__x\":{\"tab\\tnew\\nline\\rcr80\":\"quote \\\" and backslash \\\\\",\"__proto__x\":[],\"\\u0000\\u0001\\u001f\":{\" private use\":{},\"\\b\\f56\":[0,\"2\",1.5e-7,null],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢95\":false}},\"日本語\":{\"café\":\"\"}}",
+   "output": "{\n  \"10\": null,\n  \"__proto__x\": {\n    \"\\u0000\\u0001\\u001f\": {\n      \"\\b\\f56\": [\n        0,\n        \"2\",\n        1.5e-7,\n        null\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢95\": false,\n      \" private use\": {}\n    },\n    \"__proto__x\": [],\n    \"tab\\tnew\\nline\\rcr80\": \"quote \\\" and backslash \\\\\"\n  },\n  \"日本語\": {\n    \"café\": \"\"\n  }\n}\n"
+  },
+  {
+   "input": "[true]",
+   "output": "[\n  true\n]\n"
+  },
+  {
+   "input": "[{},[\"café\",null,[null]],{},{\"quote \\\" and backslash \\\\\":{\"quote \\\" and backslash \\\\31\":[\"tab\\tnew\\nline\\rcr\",false,663,true],\"quote \\\" and backslash \\\\\":[123456789012345680000]}}]",
+   "output": "[\n  {},\n  [\n    \"café\",\n    null,\n    [\n      null\n    ]\n  ],\n  {},\n  {\n    \"quote \\\" and backslash \\\\\": {\n      \"quote \\\" and backslash \\\\\": [\n        123456789012345680000\n      ],\n      \"quote \\\" and backslash \\\\31\": [\n        \"tab\\tnew\\nline\\rcr\",\n        false,\n        663,\n        true\n      ]\n    }\n  }\n]\n"
+  },
+  {
+   "input": "{\"2\":{},\" private use\":{\"Z\":[-938,false,\"café\"],\"__proto__x\":null},\"a18\":{},\"café\":{\"10\":{\"Z87\":\"quote \\\" and backslash \\\\\",\"a\":0.000001,\"line sep   para sep  \":{\"\\u0000\\u0001\\u001f\":\"line sep   para sep  \",\"quote \\\" and backslash \\\\\":\"plain\"},\"café73\":null,\"plain\":{\"café70\":100,\"tab\\tnew\\nline\\rcr\":\"a\"}},\"日本語\":100,\"😀 emoji96\":{},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[]},\"</script><b>&amp;</b>\":{\" private use\":[1,100000000000000000000,{\"__proto__x\":100,\"a43\":100}]}}",
+   "output": "{\n  \"2\": {},\n  \"</script><b>&amp;</b>\": {\n    \" private use\": [\n      1,\n      100000000000000000000,\n      {\n        \"__proto__x\": 100,\n        \"a43\": 100\n      }\n    ]\n  },\n  \"a18\": {},\n  \"café\": {\n    \"10\": {\n      \"Z87\": \"quote \\\" and backslash \\\\\",\n      \"a\": 0.000001,\n      \"café73\": null,\n      \"line sep   para sep  \": {\n        \"\\u0000\\u0001\\u001f\": \"line sep   para sep  \",\n        \"quote \\\" and backslash \\\\\": \"plain\"\n      },\n      \"plain\": {\n        \"café70\": 100,\n        \"tab\\tnew\\nline\\rcr\": \"a\"\n      }\n    },\n    \"日本語\": 100,\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [],\n    \"😀 emoji96\": {}\n  },\n  \" private use\": {\n    \"Z\": [\n      -938,\n      false,\n      \"café\"\n    ],\n    \"__proto__x\": null\n  }\n}\n"
+  },
+  {
+   "input": "-2.5e-10",
+   "output": "-2.5e-10\n"
+  },
+  {
+   "input": "[{\"quote \\\" and backslash \\\\35\":{}},[{},{\"quote \\\" and backslash \\\\\":{\"café\":9007199254740994,\"</script><b>&amp;</b>\":true},\"￿\":{\"日本語40\":100}},{\"\\u0000\\u0001\\u001f69\":{},\"quote \\\" and backslash \\\\\":{\"\\b\\f\":\"10\"},\"plain\":{\"tab\\tnew\\nline\\rcr\":-2.5e-10,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢65\":\"café\",\"__proto__x\":true,\"a49\":93799.99999999999}},{\"2\":{},\"café89\":{\"__proto__x\":true},\"日本語\":[100000000000000000000,0.3333333333333333,null,\" private use\"],\"tab\\tnew\\nline\\rcr\":9007199254740992}]]",
+   "output": "[\n  {\n    \"quote \\\" and backslash \\\\35\": {}\n  },\n  [\n    {},\n    {\n      \"quote \\\" and backslash \\\\\": {\n        \"</script><b>&amp;</b>\": true,\n        \"café\": 9007199254740994\n      },\n      \"￿\": {\n        \"日本語40\": 100\n      }\n    },\n    {\n      \"\\u0000\\u0001\\u001f69\": {},\n      \"plain\": {\n        \"__proto__x\": true,\n        \"a49\": 93799.99999999999,\n        \"tab\\tnew\\nline\\rcr\": -2.5e-10,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢65\": \"café\"\n      },\n      \"quote \\\" and backslash \\\\\": {\n        \"\\b\\f\": \"10\"\n      }\n    },\n    {\n      \"2\": {},\n      \"café89\": {\n        \"__proto__x\": true\n      },\n      \"tab\\tnew\\nline\\rcr\": 9007199254740992,\n      \"日本語\": [\n        100000000000000000000,\n        0.3333333333333333,\n        null,\n        \" private use\"\n      ]\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "{\"2\":0.000001,\"79\":null}",
+   "output": "{\n  \"2\": 0.000001,\n  \"79\": null\n}\n"
+  },
+  {
+   "input": "{\"￿12\":\"￿\",\"café\":\"quote \\\" and backslash \\\\\"}",
+   "output": "{\n  \"café\": \"quote \\\" and backslash \\\\\",\n  \"￿12\": \"￿\"\n}\n"
+  },
+  {
+   "input": "{\"café\":{\"10\":{\"10\":[false,\"2\",true,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"1011\":\" private use\"},\"a\":[\"tab\\tnew\\nline\\rcr\",0.000028,\"\"]},\"line sep   para sep  \":0.3333333333333333,\"plain\":4.35},\"</script><b>&amp;</b>\":\"café\"}",
+   "output": "{\n  \"</script><b>&amp;</b>\": \"café\",\n  \"café\": {\n    \"10\": {\n      \"10\": [\n        false,\n        \"2\",\n        true,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      ],\n      \"a\": [\n        \"tab\\tnew\\nline\\rcr\",\n        0.000028,\n        \"\"\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"1011\": \" private use\"\n      }\n    },\n    \"line sep   para sep  \": 0.3333333333333333,\n    \"plain\": 4.35\n  }\n}\n"
+  },
+  {
+   "input": "{\"quote \\\" and backslash \\\\44\":[{\"quote \\\" and backslash \\\\\":{\"2\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"38\":false,\"</script><b>&amp;</b>\":true,\"日本語\":\"10\",\"plain47\":\"2\"},\"😀 emoji\":[false]},{\"__proto__x\":[\"tab\\tnew\\nline\\rcr\",\"café\",true],\"Z3\":{\"\":0,\" private use\":-2.5e-10,\"__proto__x\":\"10\",\"café\":0}},4.35],\"tab\\tnew\\nline\\rcr\":[],\" private use\":{}}",
+   "output": "{\n  \"quote \\\" and backslash \\\\44\": [\n    {\n      \"quote \\\" and backslash \\\\\": {\n        \"2\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"38\": false,\n        \"</script><b>&amp;</b>\": true,\n        \"plain47\": \"2\",\n        \"日本語\": \"10\"\n      },\n      \"😀 emoji\": [\n        false\n      ]\n    },\n    {\n      \"Z3\": {\n        \"\": 0,\n        \"__proto__x\": \"10\",\n        \"café\": 0,\n        \" private use\": -2.5e-10\n      },\n      \"__proto__x\": [\n        \"tab\\tnew\\nline\\rcr\",\n        \"café\",\n        true\n      ]\n    },\n    4.35\n  ],\n  \"tab\\tnew\\nline\\rcr\": [],\n  \" private use\": {}\n}\n"
+  },
+  {
+   "input": "{\"10\":0}",
+   "output": "{\n  \"10\": 0\n}\n"
+  },
+  {
+   "input": "\"日本語\"",
+   "output": "\"日本語\"\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "-636",
+   "output": "-636\n"
+  },
+  {
+   "input": "[[{\"</script><b>&amp;</b>47\":null,\"😀 emoji\":false,\"\\b\\f\":{\"</script><b>&amp;</b>\":\"Z\",\"tab\\tnew\\nline\\rcr\":1.7976931348623157e+308,\"quote \\\" and backslash \\\\\":false},\"tab\\tnew\\nline\\rcr\":\"\\u0000\\u0001\\u001f\"},[],\"\\b\\f\",{\"\":5e-324,\"日本語\":[5e-324,null,true,\"</script><b>&amp;</b>\"],\"line sep   para sep  \":{}}],7.29e+22,{},[{\" private use66\":[3385.5],\"😀 emoji49\":\"</script><b>&amp;</b>\"},null,{\"64\":\"\\b\\f\",\"café\":{\" private use\":\"quote \\\" and backslash \\\\\",\"😀 emoji\":true},\"plain\":{},\"</script><b>&amp;</b>91\":[\"日本語\",false],\"__proto__x\":{\"😀 emoji\":9007199254740992,\"plain\":\"plain\"}}]]",
+   "output": "[\n  [\n    {\n      \"\\b\\f\": {\n        \"</script><b>&amp;</b>\": \"Z\",\n        \"quote \\\" and backslash \\\\\": false,\n        \"tab\\tnew\\nline\\rcr\": 1.7976931348623157e+308\n      },\n      \"</script><b>&amp;</b>47\": null,\n      \"tab\\tnew\\nline\\rcr\": \"\\u0000\\u0001\\u001f\",\n      \"😀 emoji\": false\n    },\n    [],\n    \"\\b\\f\",\n    {\n      \"\": 5e-324,\n      \"line sep   para sep  \": {},\n      \"日本語\": [\n        5e-324,\n        null,\n        true,\n        \"</script><b>&amp;</b>\"\n      ]\n    }\n  ],\n  7.29e+22,\n  {},\n  [\n    {\n      \"😀 emoji49\": \"</script><b>&amp;</b>\",\n      \" private use66\": [\n        3385.5\n      ]\n    },\n    null,\n    {\n      \"64\": \"\\b\\f\",\n      \"</script><b>&amp;</b>91\": [\n        \"日本語\",\n        false\n      ],\n      \"__proto__x\": {\n        \"plain\": \"plain\",\n        \"😀 emoji\": 9007199254740992\n      },\n      \"café\": {\n        \"😀 emoji\": true,\n        \" private use\": \"quote \\\" and backslash \\\\\"\n      },\n      \"plain\": {}\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "[{\"tab\\tnew\\nline\\rcr23\":{\"10\":true,\"😀 emoji35\":{\"210\":false,\"tab\\tnew\\nline\\rcr\":\"plain\",\"café\":0,\" private use\":0.1,\"\\b\\f\":false},\"</script><b>&amp;</b>\":9007199254740994,\"__proto__x\":null,\"\\b\\f\":\"￿\"},\"line sep   para sep  \":[{},0.30000000000000004],\"a66\":[[\"plain\",123456789012345680000,\"😀 emoji\",\"</script><b>&amp;</b>\"],[99.99999999999999,true,\"plain\",\"\\u0000\\u0001\\u001f\"]],\"café\":{\"64\":[\"plain\"]},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"__proto__x59\":[1e-7,\"\\u0000\\u0001\\u001f\",5e-324,\"line sep   para sep  \"],\"café20\":{\"😀 emoji\":4.35},\"café\":{},\"</script><b>&amp;</b>\":{}}},[{\"214\":[5e-324,1.54e+22],\"222\":\"日本語\",\"日本語36\":{\"tab\\tnew\\nline\\rcr90\":4.293e-321}},[-1,[null,1e+21,true],[false,9007199254740994],{\" private use\":1.7976931348623157e+308,\"plain24\":3.7,\"\\b\\f35\":123456789012345680000}]]]",
+   "output": "[\n  {\n    \"a66\": [\n      [\n        \"plain\",\n        123456789012345680000,\n        \"😀 emoji\",\n        \"</script><b>&amp;</b>\"\n      ],\n      [\n        99.99999999999999,\n        true,\n        \"plain\",\n        \"\\u0000\\u0001\\u001f\"\n      ]\n    ],\n    \"café\": {\n      \"64\": [\n        \"plain\"\n      ]\n    },\n    \"line sep   para sep  \": [\n      {},\n      0.30000000000000004\n    ],\n    \"tab\\tnew\\nline\\rcr23\": {\n      \"10\": true,\n      \"\\b\\f\": \"￿\",\n      \"</script><b>&amp;</b>\": 9007199254740994,\n      \"__proto__x\": null,\n      \"😀 emoji35\": {\n        \"210\": false,\n        \"\\b\\f\": false,\n        \"café\": 0,\n        \"tab\\tnew\\nline\\rcr\": \"plain\",\n        \" private use\": 0.1\n      }\n    },\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"</script><b>&amp;</b>\": {},\n      \"__proto__x59\": [\n        1e-7,\n        \"\\u0000\\u0001\\u001f\",\n        5e-324,\n        \"line sep   para sep  \"\n      ],\n      \"café\": {},\n      \"café20\": {\n        \"😀 emoji\": 4.35\n      }\n    }\n  },\n  [\n    {\n      \"214\": [\n        5e-324,\n        1.54e+22\n      ],\n      \"222\": \"日本語\",\n      \"日本語36\": {\n        \"tab\\tnew\\nline\\rcr90\": 4.293e-321\n      }\n    },\n    [\n      -1,\n      [\n        null,\n        1e+21,\n        true\n      ],\n      [\n        false,\n        9007199254740994\n      ],\n      {\n        \"\\b\\f35\": 123456789012345680000,\n        \"plain24\": 3.7,\n        \" private use\": 1.7976931348623157e+308\n      }\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "[9007199254740992,\"tab\\tnew\\nline\\rcr\"]",
+   "output": "[\n  9007199254740992,\n  \"tab\\tnew\\nline\\rcr\"\n]\n"
+  },
+  {
+   "input": "{\"a\":true,\"日本語\":{\"tab\\tnew\\nline\\rcr\":[0.3333333333333333,[1.7976931348623157e+308]],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"10\":{\"\\b\\f\":true,\"\\u0000\\u0001\\u001f71\":true,\"plain\":true},\"\":{},\"__proto__x\":{\"</script><b>&amp;</b>\":0.000001}},\"__proto__x\":243.66666666666666,\"quote \\\" and backslash \\\\\":{\"Z\":{\"café49\":1e-7},\"￿\":\"Z\",\"a\":[],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"\"}},\"line sep   para sep  85\":false,\"plain\":\"tab\\tnew\\nline\\rcr\"}",
+   "output": "{\n  \"a\": true,\n  \"line sep   para sep  85\": false,\n  \"plain\": \"tab\\tnew\\nline\\rcr\",\n  \"日本語\": {\n    \"__proto__x\": 243.66666666666666,\n    \"quote \\\" and backslash \\\\\": {\n      \"Z\": {\n        \"café49\": 1e-7\n      },\n      \"a\": [],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"\",\n      \"￿\": \"Z\"\n    },\n    \"tab\\tnew\\nline\\rcr\": [\n      0.3333333333333333,\n      [\n        1.7976931348623157e+308\n      ]\n    ],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"10\": {\n        \"\\u0000\\u0001\\u001f71\": true,\n        \"\\b\\f\": true,\n        \"plain\": true\n      },\n      \"\": {},\n      \"__proto__x\": {\n        \"</script><b>&amp;</b>\": 0.000001\n      }\n    }\n  }\n}\n"
+  },
+  {
+   "input": "[[{},[{},null,0]]]",
+   "output": "[\n  [\n    {},\n    [\n      {},\n      null,\n      0\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "[1e+21,[\"quote \\\" and backslash \\\\\",1.7976931348623157e+308,{\"256\":[false,0.3333333333333333,99.99999999999999,\"quote \\\" and backslash \\\\\"],\"\\u0000\\u0001\\u001f\":1.7976931348623157e+308,\"Z\":null,\"plain54\":{\"\\u0000\\u0001\\u001f\":\"\\b\\f\",\" private use\":100000000000000000000}}],9007199254740992,[1e+21,{},99.99999999999999,0.00013215]]",
+   "output": "[\n  1e+21,\n  [\n    \"quote \\\" and backslash \\\\\",\n    1.7976931348623157e+308,\n    {\n      \"256\": [\n        false,\n        0.3333333333333333,\n        99.99999999999999,\n        \"quote \\\" and backslash \\\\\"\n      ],\n      \"\\u0000\\u0001\\u001f\": 1.7976931348623157e+308,\n      \"Z\": null,\n      \"plain54\": {\n        \"\\u0000\\u0001\\u001f\": \"\\b\\f\",\n        \" private use\": 100000000000000000000\n      }\n    }\n  ],\n  9007199254740992,\n  [\n    1e+21,\n    {},\n    99.99999999999999,\n    0.00013215\n  ]\n]\n"
+  },
+  {
+   "input": "{\"10\":{\"2\":[{\"plain96\":100000000000000000000,\"café78\":\"😀 emoji\",\"line sep   para sep  \":\"</script><b>&amp;</b>\",\"\\b\\f51\":\"￿\",\"😀 emoji\":1},[0.000001],{\"a\":true}],\"tab\\tnew\\nline\\rcr94\":[[false,676]],\"\":null,\"</script><b>&amp;</b>\":\"😀 emoji\",\"\\u0000\\u0001\\u001f\":[[\"😀 emoji\",1.5e-7,null],9007199254740994,{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢26\":\"\\u0000\\u0001\\u001f\"},{\"quote \\\" and backslash \\\\\":\"\",\"__proto__x41\":0,\"café19\":1.5e-7}]},\"</script><b>&amp;</b>\":{},\"\\u0000\\u0001\\u001f\":{\"72\":[[],\"plain\",1e-7],\"café\":123456789012345680000,\"日本語\":false}}",
+   "output": "{\n  \"10\": {\n    \"2\": [\n      {\n        \"\\b\\f51\": \"￿\",\n        \"café78\": \"😀 emoji\",\n        \"line sep   para sep  \": \"</script><b>&amp;</b>\",\n        \"plain96\": 100000000000000000000,\n        \"😀 emoji\": 1\n      },\n      [\n        0.000001\n      ],\n      {\n        \"a\": true\n      }\n    ],\n    \"\": null,\n    \"\\u0000\\u0001\\u001f\": [\n      [\n        \"😀 emoji\",\n        1.5e-7,\n        null\n      ],\n      9007199254740994,\n      {\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢26\": \"\\u0000\\u0001\\u001f\"\n      },\n      {\n        \"__proto__x41\": 0,\n        \"café19\": 1.5e-7,\n        \"quote \\\" and backslash \\\\\": \"\"\n      }\n    ],\n    \"</script><b>&amp;</b>\": \"😀 emoji\",\n    \"tab\\tnew\\nline\\rcr94\": [\n      [\n        false,\n        676\n      ]\n    ]\n  },\n  \"\\u0000\\u0001\\u001f\": {\n    \"72\": [\n      [],\n      \"plain\",\n      1e-7\n    ],\n    \"café\": 123456789012345680000,\n    \"日本語\": false\n  },\n  \"</script><b>&amp;</b>\": {}\n}\n"
+  },
+  {
+   "input": "[[[{\"café\":\"2\",\"tab\\tnew\\nline\\rcr\":false},{\" private use\":0},[123456789012345680000],{\"日本語\":\"\"}],[{\"2\":\"\",\"105\":true,\"\\u0000\\u0001\\u001f37\":\"Z\",\"\\b\\f\":106},[\"\\u0000\\u0001\\u001f\",\"😀 emoji\",0.1,\"2\"],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",1.7976931348623157e+308],9007199254740994,{\"88\":1e+21,\"plain22\":1252000696408998100,\"café9\":\"line sep   para sep  \",\"Z\":[1.7976931348623157e+308,\"a\",0.000001],\"\":[true,false]}]]",
+   "output": "[\n  [\n    [\n      {\n        \"café\": \"2\",\n        \"tab\\tnew\\nline\\rcr\": false\n      },\n      {\n        \" private use\": 0\n      },\n      [\n        123456789012345680000\n      ],\n      {\n        \"日本語\": \"\"\n      }\n    ],\n    [\n      {\n        \"2\": \"\",\n        \"105\": true,\n        \"\\u0000\\u0001\\u001f37\": \"Z\",\n        \"\\b\\f\": 106\n      },\n      [\n        \"\\u0000\\u0001\\u001f\",\n        \"😀 emoji\",\n        0.1,\n        \"2\"\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      1.7976931348623157e+308\n    ],\n    9007199254740994,\n    {\n      \"88\": 1e+21,\n      \"\": [\n        true,\n        false\n      ],\n      \"Z\": [\n        1.7976931348623157e+308,\n        \"a\",\n        0.000001\n      ],\n      \"café9\": \"line sep   para sep  \",\n      \"plain22\": 1252000696408998100\n    }\n  ]\n]\n"
+  },
+  {
+   "input": "[[],\"2\"]",
+   "output": "[\n  [],\n  \"2\"\n]\n"
+  },
+  {
+   "input": "{\"a\":0,\"￿76\":{\" private use\":{\"1017\":null,\"\":null,\"café\":{}},\"plain38\":\"\\u0000\\u0001\\u001f\",\"Z43\":\"Z\"}}",
+   "output": "{\n  \"a\": 0,\n  \"￿76\": {\n    \"Z43\": \"Z\",\n    \"plain38\": \"\\u0000\\u0001\\u001f\",\n    \" private use\": {\n      \"1017\": null,\n      \"\": null,\n      \"café\": {}\n    }\n  }\n}\n"
+  },
+  {
+   "input": "\"plain\"",
+   "output": "\"plain\"\n"
+  },
+  {
+   "input": "\"😀 emoji\"",
+   "output": "\"😀 emoji\"\n"
+  },
+  {
+   "input": "\"line sep   para sep  \"",
+   "output": "\"line sep   para sep  \"\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "\"plain\"",
+   "output": "\"plain\"\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{\"2\":{\" private use\":false},\"10\":{\"10\":false},\"日本語51\":{\"10\":{\"\\b\\f\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢14\":\"line sep   para sep  \",\"</script><b>&amp;</b>\":\"Z\"}},\"line sep   para sep  17\":\" private use\"}}",
+   "output": "{\n  \"2\": {\n    \" private use\": false\n  },\n  \"10\": {\n    \"10\": false\n  },\n  \"日本語51\": {\n    \"10\": {\n      \"\\b\\f\": {\n        \"</script><b>&amp;</b>\": \"Z\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢14\": \"line sep   para sep  \"\n      }\n    },\n    \"line sep   para sep  17\": \" private use\"\n  }\n}\n"
+  },
+  {
+   "input": "-2.5e-10",
+   "output": "-2.5e-10\n"
+  },
+  {
+   "input": "[{\"a\":null,\"plain\":{\"267\":[\"café\"],\"quote \\\" and backslash \\\\21\":[\"café\",0.1],\"\\u0000\\u0001\\u001f\":{\"tab\\tnew\\nline\\rcr\":\"￿\",\"café\":\" private use\",\"日本語\":0,\"￿\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}}},[{\"café\":\"\\b\\f\",\"￿\":[\" private use\"],\"a4\":{},\"__proto__x\":0,\"😀 emoji\":[\"café\",\"😀 emoji\",\"</script><b>&amp;</b>\"]},\"10\",[],[]]]",
+   "output": "[\n  {\n    \"a\": null,\n    \"plain\": {\n      \"267\": [\n        \"café\"\n      ],\n      \"\\u0000\\u0001\\u001f\": {\n        \"café\": \" private use\",\n        \"tab\\tnew\\nline\\rcr\": \"￿\",\n        \"日本語\": 0,\n        \"￿\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      },\n      \"quote \\\" and backslash \\\\21\": [\n        \"café\",\n        0.1\n      ]\n    }\n  },\n  [\n    {\n      \"__proto__x\": 0,\n      \"a4\": {},\n      \"café\": \"\\b\\f\",\n      \"😀 emoji\": [\n        \"café\",\n        \"😀 emoji\",\n        \"</script><b>&amp;</b>\"\n      ],\n      \"￿\": [\n        \" private use\"\n      ]\n    },\n    \"10\",\n    [],\n    []\n  ]\n]\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "0.1",
+   "output": "0.1\n"
+  },
+  {
+   "input": "[[null,1e-7,{\"\\u0000\\u0001\\u001f\":1.7976931348623157e+308,\"\\b\\f\":false}],{\"</script><b>&amp;</b>93\":\"tab\\tnew\\nline\\rcr\",\" private use24\":[{\"__proto__x\":126100789566373890,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":null,\"</script><b>&amp;</b>0\":\"Z\",\"</script><b>&amp;</b>\":1.7976931348623157e+308,\"\\u0000\\u0001\\u001f\":\" private use\"},{},{\"\":3.7,\"plain\":\"￿\",\"\\u0000\\u0001\\u001f\":123456789012345680000}],\"😀 emoji\":9007199254740994},{}]",
+   "output": "[\n  [\n    null,\n    1e-7,\n    {\n      \"\\u0000\\u0001\\u001f\": 1.7976931348623157e+308,\n      \"\\b\\f\": false\n    }\n  ],\n  {\n    \"</script><b>&amp;</b>93\": \"tab\\tnew\\nline\\rcr\",\n    \"😀 emoji\": 9007199254740994,\n    \" private use24\": [\n      {\n        \"\\u0000\\u0001\\u001f\": \" private use\",\n        \"</script><b>&amp;</b>\": 1.7976931348623157e+308,\n        \"</script><b>&amp;</b>0\": \"Z\",\n        \"__proto__x\": 126100789566373890,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": null\n      },\n      {},\n      {\n        \"\": 3.7,\n        \"\\u0000\\u0001\\u001f\": 123456789012345680000,\n        \"plain\": \"￿\"\n      }\n    ]\n  },\n  {}\n]\n"
+  },
+  {
+   "input": "\"10\"",
+   "output": "\"10\"\n"
+  },
+  {
+   "input": "[225179981368524860,[-3.4750000000000003e-8,[],{\"😀 emoji\":\"quote \\\" and backslash \\\\\",\"a\":{},\"😀 emoji62\":[false],\"\\b\\f\":-1},\"2\"],0,[1e-7,[]]]",
+   "output": "[\n  225179981368524860,\n  [\n    -3.4750000000000003e-8,\n    [],\n    {\n      \"\\b\\f\": -1,\n      \"a\": {},\n      \"😀 emoji\": \"quote \\\" and backslash \\\\\",\n      \"😀 emoji62\": [\n        false\n      ]\n    },\n    \"2\"\n  ],\n  0,\n  [\n    1e-7,\n    []\n  ]\n]\n"
+  },
+  {
+   "input": "\"日本語\"",
+   "output": "\"日本語\"\n"
+  },
+  {
+   "input": "\"2\"",
+   "output": "\"2\"\n"
+  },
+  {
+   "input": "\"__proto__x\"",
+   "output": "\"__proto__x\"\n"
+  },
+  {
+   "input": "{\"__proto__x97\":{\"café\":100,\"plain72\":\" private use\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":123456789012345680000,\"</script><b>&amp;</b>\":{\"__proto__x\":1e-7,\"￿\":0}},\"tab\\tnew\\nline\\rcr\":{\"line sep   para sep  \":[{\"\\u0000\\u0001\\u001f10\":123456789012345680000,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":true,\"</script><b>&amp;</b>46\":\"日本語\"},{\"日本語\":\"plain\",\"café\":false,\"plain65\":0,\"\":0.1}],\"\\b\\f1\":{\"tab\\tnew\\nline\\rcr\":{\"107\":-1,\"café96\":\"a\",\"line sep   para sep  94\":3.7,\"\\b\\f72\":null,\"__proto__x\":4.35},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"\":null},\"café\":[],\"</script><b>&amp;</b>\":{},\"café14\":[4.35,\"a\",\"plain\"]}},\"quote \\\" and backslash \\\\\":5e-324}",
+   "output": "{\n  \"__proto__x97\": {\n    \"</script><b>&amp;</b>\": {\n      \"__proto__x\": 1e-7,\n      \"￿\": 0\n    },\n    \"café\": 100,\n    \"plain72\": \" private use\",\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 123456789012345680000\n  },\n  \"quote \\\" and backslash \\\\\": 5e-324,\n  \"tab\\tnew\\nline\\rcr\": {\n    \"\\b\\f1\": {\n      \"</script><b>&amp;</b>\": {},\n      \"café\": [],\n      \"café14\": [\n        4.35,\n        \"a\",\n        \"plain\"\n      ],\n      \"tab\\tnew\\nline\\rcr\": {\n        \"107\": -1,\n        \"\\b\\f72\": null,\n        \"__proto__x\": 4.35,\n        \"café96\": \"a\",\n        \"line sep   para sep  94\": 3.7\n      },\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"\": null\n      }\n    },\n    \"line sep   para sep  \": [\n      {\n        \"\\u0000\\u0001\\u001f10\": 123456789012345680000,\n        \"</script><b>&amp;</b>46\": \"日本語\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": true\n      },\n      {\n        \"\": 0.1,\n        \"café\": false,\n        \"plain65\": 0,\n        \"日本語\": \"plain\"\n      }\n    ]\n  }\n}\n"
+  },
+  {
+   "input": "{\"😀 emoji\":[[{\"😀 emoji\":false}],207.30000000000004],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"50\":[[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"2\",1.5e-7,-1],\"Z\",123456789012345680000,{\"\":0.30000000000000004,\"café\":null,\"</script><b>&amp;</b>\":false}],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":0,\"line sep   para sep  \":1},\"__proto__x\":{\"😀 emoji46\":[],\"😀 emoji\":[0,true]},\"tab\\tnew\\nline\\rcr\":[{\"</script><b>&amp;</b>\":{}}],\"￿\":99.99999999999999}",
+   "output": "{\n  \"__proto__x\": {\n    \"😀 emoji\": [\n      0,\n      true\n    ],\n    \"😀 emoji46\": []\n  },\n  \"tab\\tnew\\nline\\rcr\": [\n    {\n      \"</script><b>&amp;</b>\": {}\n    }\n  ],\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n    \"50\": [\n      [\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"2\",\n        1.5e-7,\n        -1\n      ],\n      \"Z\",\n      123456789012345680000,\n      {\n        \"\": 0.30000000000000004,\n        \"</script><b>&amp;</b>\": false,\n        \"café\": null\n      }\n    ],\n    \"line sep   para sep  \": 1,\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 0\n  },\n  \"😀 emoji\": [\n    [\n      {\n        \"😀 emoji\": false\n      }\n    ],\n    207.30000000000004\n  ],\n  \"￿\": 99.99999999999999\n}\n"
+  },
+  {
+   "input": "\"tab\\tnew\\nline\\rcr\"",
+   "output": "\"tab\\tnew\\nline\\rcr\"\n"
+  },
+  {
+   "input": "\"__proto__x\"",
+   "output": "\"__proto__x\"\n"
+  },
+  {
+   "input": "{\"2\":{\"Z\":[[1e-7],0.1,{\"10\":\"Z\"}]},\"Z\":{\"\":\"</script><b>&amp;</b>\"},\"tab\\tnew\\nline\\rcr\":{\"279\":{},\"\\b\\f49\":false,\"plain61\":[],\"café\":-2.5e-10},\"quote \\\" and backslash \\\\\":{\"café\":918,\"\\b\\f\":0,\"😀 emoji29\":{\"10\":{\"￿0\":true,\"￿\":\" private use\",\" private use86\":100,\"\\u0000\\u0001\\u001f63\":true}},\"café81\":{\"café\":[null,1.7976931348623157e+308]},\"quote \\\" and backslash \\\\7\":{\"40\":[],\"Z91\":0.3333333333333333,\"a\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢64\":0,\"quote \\\" and backslash \\\\\":0.1,\"tab\\tnew\\nline\\rcr\":-1,\"\\u0000\\u0001\\u001f\":9007199254740992},\"quote \\\" and backslash \\\\\":{\"￿\":9007199254740994}}},\"</script><b>&amp;</b>\":{\"quote \\\" and backslash \\\\\":[{\"café\":88,\"a\":7692148163548807000},null],\"😀 emoji23\":1.5e-7}}",
+   "output": "{\n  \"2\": {\n    \"Z\": [\n      [\n        1e-7\n      ],\n      0.1,\n      {\n        \"10\": \"Z\"\n      }\n    ]\n  },\n  \"</script><b>&amp;</b>\": {\n    \"quote \\\" and backslash \\\\\": [\n      {\n        \"a\": 7692148163548807000,\n        \"café\": 88\n      },\n      null\n    ],\n    \"😀 emoji23\": 1.5e-7\n  },\n  \"Z\": {\n    \"\": \"</script><b>&amp;</b>\"\n  },\n  \"quote \\\" and backslash \\\\\": {\n    \"\\b\\f\": 0,\n    \"café\": 918,\n    \"café81\": {\n      \"café\": [\n        null,\n        1.7976931348623157e+308\n      ]\n    },\n    \"quote \\\" and backslash \\\\7\": {\n      \"40\": [],\n      \"Z91\": 0.3333333333333333,\n      \"a\": {\n        \"\\u0000\\u0001\\u001f\": 9007199254740992,\n        \"quote \\\" and backslash \\\\\": 0.1,\n        \"tab\\tnew\\nline\\rcr\": -1,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢64\": 0\n      },\n      \"quote \\\" and backslash \\\\\": {\n        \"￿\": 9007199254740994\n      }\n    },\n    \"😀 emoji29\": {\n      \"10\": {\n        \"\\u0000\\u0001\\u001f63\": true,\n        \" private use86\": 100,\n        \"￿\": \" private use\",\n        \"￿0\": true\n      }\n    }\n  },\n  \"tab\\tnew\\nline\\rcr\": {\n    \"279\": {},\n    \"\\b\\f49\": false,\n    \"café\": -2.5e-10,\n    \"plain61\": []\n  }\n}\n"
+  },
+  {
+   "input": "[{\"</script><b>&amp;</b>9\":0,\"tab\\tnew\\nline\\rcr12\":{\"plain\":100000000000000000000,\"\\b\\f\":\" private use\",\"café42\":{\"￿86\":\"\\b\\f\",\"￿\":\"café\"},\"😀 emoji\":[null]},\"\\b\\f69\":{\"__proto__x\":[\"2\"],\"line sep   para sep  \":0.000001,\"日本語\":{\"__proto__x\":\"</script><b>&amp;</b>\"},\"plain84\":{\"29\":1,\"\":99.99999999999999},\"\\b\\f3\":false}},{\"\\b\\f\":{\"10\":{\"日本語34\":4.35,\"</script><b>&amp;</b>60\":0,\"quote \\\" and backslash \\\\\":true},\"tab\\tnew\\nline\\rcr61\":\"😀 emoji\",\"\\u0000\\u0001\\u001f15\":[false,\"a\",123456789012345680000,1.5e-7],\"\\u0000\\u0001\\u001f\":[false,-2.5e-10]},\"￿84\":{\"plain\":\" private use\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[]}},null]",
+   "output": "[\n  {\n    \"\\b\\f69\": {\n      \"\\b\\f3\": false,\n      \"__proto__x\": [\n        \"2\"\n      ],\n      \"line sep   para sep  \": 0.000001,\n      \"plain84\": {\n        \"29\": 1,\n        \"\": 99.99999999999999\n      },\n      \"日本語\": {\n        \"__proto__x\": \"</script><b>&amp;</b>\"\n      }\n    },\n    \"</script><b>&amp;</b>9\": 0,\n    \"tab\\tnew\\nline\\rcr12\": {\n      \"\\b\\f\": \" private use\",\n      \"café42\": {\n        \"￿\": \"café\",\n        \"￿86\": \"\\b\\f\"\n      },\n      \"plain\": 100000000000000000000,\n      \"😀 emoji\": [\n        null\n      ]\n    }\n  },\n  {\n    \"\\b\\f\": {\n      \"10\": {\n        \"</script><b>&amp;</b>60\": 0,\n        \"quote \\\" and backslash \\\\\": true,\n        \"日本語34\": 4.35\n      },\n      \"\\u0000\\u0001\\u001f\": [\n        false,\n        -2.5e-10\n      ],\n      \"\\u0000\\u0001\\u001f15\": [\n        false,\n        \"a\",\n        123456789012345680000,\n        1.5e-7\n      ],\n      \"tab\\tnew\\nline\\rcr61\": \"😀 emoji\"\n    },\n    \"￿84\": {\n      \"plain\": \" private use\",\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": []\n    }\n  },\n  null\n]\n"
+  },
+  {
+   "input": "[-1,null,[null,null,null,[{}]]]",
+   "output": "[\n  -1,\n  null,\n  [\n    null,\n    null,\n    null,\n    [\n      {}\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "{\"21\":{\"__proto__x19\":true},\"😀 emoji\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"café\":[{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢69\":\"Z\",\"quote \\\" and backslash \\\\92\":[null,true,false]}],\"line sep   para sep  \":{},\"line sep   para sep  4\":[[]]}",
+   "output": "{\n  \"21\": {\n    \"__proto__x19\": true\n  },\n  \"café\": [\n    {\n      \"quote \\\" and backslash \\\\92\": [\n        null,\n        true,\n        false\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢69\": \"Z\"\n    }\n  ],\n  \"line sep   para sep  \": {},\n  \"line sep   para sep  4\": [\n    []\n  ],\n  \"😀 emoji\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n}\n"
+  },
+  {
+   "input": "{\"￿40\":{\"219\":[{\" private use\":\"😀 emoji\",\"日本語\":\"10\"},{\"tab\\tnew\\nline\\rcr29\":null},[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",4.35,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",null],{\"1046\":1,\"</script><b>&amp;</b>\":-1,\"\\b\\f\":0,\"café\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}],\"line sep   para sep  \":[3.7,{\"10\":null,\"\":true,\"\\u0000\\u0001\\u001f\":0.30000000000000004,\" private use15\":\"a\",\"</script><b>&amp;</b>\":null},1],\"Z44\":false,\"line sep   para sep  64\":{},\"Z84\":[[\"café\",1e+21],\"a\"]},\" private use74\":{\"café\":[],\"a\":[{\"</script><b>&amp;</b>\":\"日本語\",\"\\b\\f\":4.35},[true,-1,0,\"10\"],{\"line sep   para sep  73\":92.2,\"日本語\":\"tab\\tnew\\nline\\rcr\",\"日本語0\":\"10\",\"café\":true},{\"日本語\":\"café\"}]}}",
+   "output": "{\n  \" private use74\": {\n    \"a\": [\n      {\n        \"\\b\\f\": 4.35,\n        \"</script><b>&amp;</b>\": \"日本語\"\n      },\n      [\n        true,\n        -1,\n        0,\n        \"10\"\n      ],\n      {\n        \"café\": true,\n        \"line sep   para sep  73\": 92.2,\n        \"日本語\": \"tab\\tnew\\nline\\rcr\",\n        \"日本語0\": \"10\"\n      },\n      {\n        \"日本語\": \"café\"\n      }\n    ],\n    \"café\": []\n  },\n  \"￿40\": {\n    \"219\": [\n      {\n        \"日本語\": \"10\",\n        \" private use\": \"😀 emoji\"\n      },\n      {\n        \"tab\\tnew\\nline\\rcr29\": null\n      },\n      [\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        4.35,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        null\n      ],\n      {\n        \"1046\": 1,\n        \"\\b\\f\": 0,\n        \"</script><b>&amp;</b>\": -1,\n        \"café\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      }\n    ],\n    \"Z44\": false,\n    \"Z84\": [\n      [\n        \"café\",\n        1e+21\n      ],\n      \"a\"\n    ],\n    \"line sep   para sep  \": [\n      3.7,\n      {\n        \"10\": null,\n        \"\": true,\n        \"\\u0000\\u0001\\u001f\": 0.30000000000000004,\n        \"</script><b>&amp;</b>\": null,\n        \" private use15\": \"a\"\n      },\n      1\n    ],\n    \"line sep   para sep  64\": {}\n  }\n}\n"
+  },
+  {
+   "input": "\"￿\"",
+   "output": "\"￿\"\n"
+  },
+  {
+   "input": "7.66e+22",
+   "output": "7.66e+22\n"
+  },
+  {
+   "input": "1",
+   "output": "1\n"
+  },
+  {
+   "input": "[[false,[[]],false],false,{\"quote \\\" and backslash \\\\\":-1,\"__proto__x\":[\"日本語\"],\"line sep   para sep  \":-1,\"café56\":{\"Z\":{\"café65\":4.35}},\"</script><b>&amp;</b>27\":false},{}]",
+   "output": "[\n  [\n    false,\n    [\n      []\n    ],\n    false\n  ],\n  false,\n  {\n    \"</script><b>&amp;</b>27\": false,\n    \"__proto__x\": [\n      \"日本語\"\n    ],\n    \"café56\": {\n      \"Z\": {\n        \"café65\": 4.35\n      }\n    },\n    \"line sep   para sep  \": -1,\n    \"quote \\\" and backslash \\\\\": -1\n  },\n  {}\n]\n"
+  },
+  {
+   "input": "[\"\\b\\f\",[],[],false]",
+   "output": "[\n  \"\\b\\f\",\n  [],\n  [],\n  false\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[5e-324]",
+   "output": "[\n  5e-324\n]\n"
+  },
+  {
+   "input": "0.30000000000000004",
+   "output": "0.30000000000000004\n"
+  },
+  {
+   "input": "\"\\u0000\\u0001\\u001f\"",
+   "output": "\"\\u0000\\u0001\\u001f\"\n"
+  },
+  {
+   "input": "{\"\\u0000\\u0001\\u001f7\":0.1}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f7\": 0.1\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "\"__proto__x\"",
+   "output": "\"__proto__x\"\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "5e-324",
+   "output": "5e-324\n"
+  },
+  {
+   "input": "[{\"￿13\":{\"10\":[0.000001,123456789012345680000,-1,0.1],\"\":9007199254740994,\"\\u0000\\u0001\\u001f\":\"\"},\"quote \\\" and backslash \\\\62\":{\"￿\":[0.000001,9007199254740994,0]},\"￿39\":{\"2\":[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",-2.5e-10,\"</script><b>&amp;</b>\"]},\"plain\":0.3333333333333333},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",{\"plain\":1.7976931348623157e+308,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢24\":[{\"a\":false}],\"\":null,\"\\b\\f47\":\" private use\"}]",
+   "output": "[\n  {\n    \"plain\": 0.3333333333333333,\n    \"quote \\\" and backslash \\\\62\": {\n      \"￿\": [\n        0.000001,\n        9007199254740994,\n        0\n      ]\n    },\n    \"￿13\": {\n      \"10\": [\n        0.000001,\n        123456789012345680000,\n        -1,\n        0.1\n      ],\n      \"\": 9007199254740994,\n      \"\\u0000\\u0001\\u001f\": \"\"\n    },\n    \"￿39\": {\n      \"2\": [\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        -2.5e-10,\n        \"</script><b>&amp;</b>\"\n      ]\n    }\n  },\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n  {\n    \"\": null,\n    \"\\b\\f47\": \" private use\",\n    \"plain\": 1.7976931348623157e+308,\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢24\": [\n      {\n        \"a\": false\n      }\n    ]\n  }\n]\n"
+  },
+  {
+   "input": "{\"café\":true,\"quote \\\" and backslash \\\\\":[{\" private use\":[],\"日本語\":{},\"😀 emoji\":[\"a\"],\"tab\\tnew\\nline\\rcr\":\"2\"},[[1.31e+23],[]]],\"\\b\\f\":\"\",\"__proto__x\":{\"quote \\\" and backslash \\\\\":\"😀 emoji\",\" private use\":[{\"Z\":\"Z\",\"__proto__x\":0},[false,-2.5e-10,null,0.000001],false,null],\"Z\":[],\"__proto__x86\":[{\" private use84\":5.1e+21,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":4.35,\"__proto__x\":\"café\",\"😀 emoji\":\"</script><b>&amp;</b>\",\"</script><b>&amp;</b>\":\" private use\"},[false,0.3333333333333333,\"line sep   para sep  \",-2.5e-10],false]}}",
+   "output": "{\n  \"\\b\\f\": \"\",\n  \"__proto__x\": {\n    \"Z\": [],\n    \"__proto__x86\": [\n      {\n        \"</script><b>&amp;</b>\": \" private use\",\n        \"__proto__x\": \"café\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 4.35,\n        \"😀 emoji\": \"</script><b>&amp;</b>\",\n        \" private use84\": 5.1e+21\n      },\n      [\n        false,\n        0.3333333333333333,\n        \"line sep   para sep  \",\n        -2.5e-10\n      ],\n      false\n    ],\n    \"quote \\\" and backslash \\\\\": \"😀 emoji\",\n    \" private use\": [\n      {\n        \"Z\": \"Z\",\n        \"__proto__x\": 0\n      },\n      [\n        false,\n        -2.5e-10,\n        null,\n        0.000001\n      ],\n      false,\n      null\n    ]\n  },\n  \"café\": true,\n  \"quote \\\" and backslash \\\\\": [\n    {\n      \"tab\\tnew\\nline\\rcr\": \"2\",\n      \"日本語\": {},\n      \"😀 emoji\": [\n        \"a\"\n      ],\n      \" private use\": []\n    },\n    [\n      [\n        1.31e+23\n      ],\n      []\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "[{\"1072\":[[1477180677777523000,100],[false],\"Z\"],\"line sep   para sep  \":{\"\\b\\f\":{\"232\":\" private use\",\"__proto__x86\":false,\"\":-2.5e-10},\"quote \\\" and backslash \\\\\":null,\"café\":[],\"日本語13\":[-2.5e-10,\"quote \\\" and backslash \\\\\",1.5e-7,0],\"日本語\":[-2.5e-10]},\"\\u0000\\u0001\\u001f\":{\"café68\":{}}}]",
+   "output": "[\n  {\n    \"1072\": [\n      [\n        1477180677777523000,\n        100\n      ],\n      [\n        false\n      ],\n      \"Z\"\n    ],\n    \"\\u0000\\u0001\\u001f\": {\n      \"café68\": {}\n    },\n    \"line sep   para sep  \": {\n      \"\\b\\f\": {\n        \"232\": \" private use\",\n        \"\": -2.5e-10,\n        \"__proto__x86\": false\n      },\n      \"café\": [],\n      \"quote \\\" and backslash \\\\\": null,\n      \"日本語\": [\n        -2.5e-10\n      ],\n      \"日本語13\": [\n        -2.5e-10,\n        \"quote \\\" and backslash \\\\\",\n        1.5e-7,\n        0\n      ]\n    }\n  }\n]\n"
+  },
+  {
+   "input": "0.30000000000000004",
+   "output": "0.30000000000000004\n"
+  },
+  {
+   "input": "[[],{},[[9007199254740992,[true,1e-7],\"tab\\tnew\\nline\\rcr\",0],\"￿\",false],[]]",
+   "output": "[\n  [],\n  {},\n  [\n    [\n      9007199254740992,\n      [\n        true,\n        1e-7\n      ],\n      \"tab\\tnew\\nline\\rcr\",\n      0\n    ],\n    \"￿\",\n    false\n  ],\n  []\n]\n"
+  },
+  {
+   "input": "{\"Z\":\"10\"}",
+   "output": "{\n  \"Z\": \"10\"\n}\n"
+  },
+  {
+   "input": "[[],{}]",
+   "output": "[\n  [],\n  {}\n]\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "[[[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",[\"line sep   para sep  \",false]],[{\"\\u0000\\u0001\\u001f\":\"Z\",\"line sep   para sep  \":1e-7},{\"__proto__x79\":9007199254740992,\"日本語\":false,\"\\u0000\\u0001\\u001f27\":null},[\"日本語\",1e+21]],[\"tab\\tnew\\nline\\rcr\",\"__proto__x\",[\"\\u0000\\u0001\\u001f\"],[\"日本語\"]],{\"222\":[true,-242,\"\"],\"\":{\"line sep   para sep  \":3.0000000000000004,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":3.7,\"café\":3.7},\"Z17\":[0.30000000000000004],\"😀 emoji8\":{\"日本語\":0.000616},\"quote \\\" and backslash \\\\\":[9007199254740992,5872693914091128000,5e-324]}],{\"Z\":{},\"a\":99.99999999999999}]",
+   "output": "[\n  [\n    [\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      [\n        \"line sep   para sep  \",\n        false\n      ]\n    ],\n    [\n      {\n        \"\\u0000\\u0001\\u001f\": \"Z\",\n        \"line sep   para sep  \": 1e-7\n      },\n      {\n        \"\\u0000\\u0001\\u001f27\": null,\n        \"__proto__x79\": 9007199254740992,\n        \"日本語\": false\n      },\n      [\n        \"日本語\",\n        1e+21\n      ]\n    ],\n    [\n      \"tab\\tnew\\nline\\rcr\",\n      \"__proto__x\",\n      [\n        \"\\u0000\\u0001\\u001f\"\n      ],\n      [\n        \"日本語\"\n      ]\n    ],\n    {\n      \"222\": [\n        true,\n        -242,\n        \"\"\n      ],\n      \"\": {\n        \"café\": 3.7,\n        \"line sep   para sep  \": 3.0000000000000004,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 3.7\n      },\n      \"Z17\": [\n        0.30000000000000004\n      ],\n      \"quote \\\" and backslash \\\\\": [\n        9007199254740992,\n        5872693914091128000,\n        5e-324\n      ],\n      \"😀 emoji8\": {\n        \"日本語\": 0.000616\n      }\n    }\n  ],\n  {\n    \"Z\": {},\n    \"a\": 99.99999999999999\n  }\n]\n"
+  },
+  {
+   "input": "{\"10\":[false,{\"plain\":{}},[{\"quote \\\" and backslash \\\\\":3.7,\"a8\":true,\"__proto__x\":null},[true,\"café\"],{},{\"😀 emoji\":\"\"}]],\"café\":{},\"￿\":4167.299999999999,\"a81\":[{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":false,\"café14\":100},\"line sep   para sep  \"],\" private use66\":100}",
+   "output": "{\n  \"10\": [\n    false,\n    {\n      \"plain\": {}\n    },\n    [\n      {\n        \"__proto__x\": null,\n        \"a8\": true,\n        \"quote \\\" and backslash \\\\\": 3.7\n      },\n      [\n        true,\n        \"café\"\n      ],\n      {},\n      {\n        \"😀 emoji\": \"\"\n      }\n    ]\n  ],\n  \"a81\": [\n    {\n      \"café14\": 100,\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": false\n    },\n    \"line sep   para sep  \"\n  ],\n  \"café\": {},\n  \" private use66\": 100,\n  \"￿\": 4167.299999999999\n}\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "3.7",
+   "output": "3.7\n"
+  },
+  {
+   "input": "[{\"\\b\\f\":[null]},[],null]",
+   "output": "[\n  {\n    \"\\b\\f\": [\n      null\n    ]\n  },\n  [],\n  null\n]\n"
+  },
+  {
+   "input": "{\"10\":[\" private use\",{\"107\":{\"</script><b>&amp;</b>\":true,\"plain\":9007199254740992}},{\"plain\":{\"\\b\\f\":-2.5e-10},\"tab\\tnew\\nline\\rcr86\":false,\"__proto__x\":{\" private use\":\"😀 emoji\"},\"\\b\\f\":{\"quote \\\" and backslash \\\\\":100,\"café53\":\"￿\",\"plain\":9007199254740994,\"</script><b>&amp;</b>\":\"\",\"\\b\\f\":\"￿\"}},[{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":false,\"￿\":3.7,\"\":\"2\"},[19.400000000000002,\"2\"],\"Z\",{\"51\":true,\"quote \\\" and backslash \\\\17\":\"quote \\\" and backslash \\\\\",\"😀 emoji52\":true,\"café35\":\" private use\"}]],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢16\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"\\u0000\\u0001\\u001f\",\"quote \\\" and backslash \\\\\":[null,\"10\",9007199254740994,5e-324],\"</script><b>&amp;</b>\":123456789012345680000}},\"line sep   para sep  95\":1,\"line sep   para sep  \":100000000000000000000,\" private use\":null}",
+   "output": "{\n  \"10\": [\n    \" private use\",\n    {\n      \"107\": {\n        \"</script><b>&amp;</b>\": true,\n        \"plain\": 9007199254740992\n      }\n    },\n    {\n      \"\\b\\f\": {\n        \"\\b\\f\": \"￿\",\n        \"</script><b>&amp;</b>\": \"\",\n        \"café53\": \"￿\",\n        \"plain\": 9007199254740994,\n        \"quote \\\" and backslash \\\\\": 100\n      },\n      \"__proto__x\": {\n        \" private use\": \"😀 emoji\"\n      },\n      \"plain\": {\n        \"\\b\\f\": -2.5e-10\n      },\n      \"tab\\tnew\\nline\\rcr86\": false\n    },\n    [\n      {\n        \"\": \"2\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": false,\n        \"￿\": 3.7\n      },\n      [\n        19.400000000000002,\n        \"2\"\n      ],\n      \"Z\",\n      {\n        \"51\": true,\n        \"café35\": \" private use\",\n        \"quote \\\" and backslash \\\\17\": \"quote \\\" and backslash \\\\\",\n        \"😀 emoji52\": true\n      }\n    ]\n  ],\n  \"line sep   para sep  \": 100000000000000000000,\n  \"line sep   para sep  95\": 1,\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢16\": {\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"</script><b>&amp;</b>\": 123456789012345680000,\n      \"quote \\\" and backslash \\\\\": [\n        null,\n        \"10\",\n        9007199254740994,\n        5e-324\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"\\u0000\\u0001\\u001f\"\n    }\n  },\n  \" private use\": null\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "{\"a\":{\"2\":4.35,\"\\b\\f\":1.986e-321,\"日本語\":-2.5e-10,\"tab\\tnew\\nline\\rcr\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"Z59\":{\"2\":9007199254740992,\"Z\":{\"10\":5e-324,\"tab\\tnew\\nline\\rcr\":false,\" private use\":\"a\"}}},\"café\":{\"😀 emoji\":{\"10\":[\"日本語\",\"a\",true,null],\"café81\":true,\"\\b\\f\":{\"2\":1.7976931348623157e+308,\"Z39\":\"</script><b>&amp;</b>\",\"line sep   para sep  \":-1},\"😀 emoji\":{\"\\u0000\\u0001\\u001f69\":0,\"__proto__x\":false,\"😀 emoji\":0.00008475}},\" private use78\":{\"1037\":\"日本語\",\"\\b\\f\":9007199254740994,\"￿\":[1.7976931348623157e+308,null],\"Z51\":[false],\"quote \\\" and backslash \\\\75\":[4.35,-2.5e-10,0.000001]}},\"￿\":\"Z\",\"日本語\":[4.35,{\"quote \\\" and backslash \\\\67\":{\"1041\":\"￿\",\"\\u0000\\u0001\\u001f\":null,\"😀 emoji6\":99.99999999999999},\"café\":{\"Z47\":true}},false,{\"quote \\\" and backslash \\\\\":[1.5e-7,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"],\"café\":{\"日本語\":\"tab\\tnew\\nline\\rcr\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢66\":null,\"\":false,\"tab\\tnew\\nline\\rcr\":false}}]}",
+   "output": "{\n  \"a\": {\n    \"2\": 4.35,\n    \"\\b\\f\": 1.986e-321,\n    \"Z59\": {\n      \"2\": 9007199254740992,\n      \"Z\": {\n        \"10\": 5e-324,\n        \"tab\\tnew\\nline\\rcr\": false,\n        \" private use\": \"a\"\n      }\n    },\n    \"tab\\tnew\\nline\\rcr\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n    \"日本語\": -2.5e-10\n  },\n  \"café\": {\n    \"😀 emoji\": {\n      \"10\": [\n        \"日本語\",\n        \"a\",\n        true,\n        null\n      ],\n      \"\\b\\f\": {\n        \"2\": 1.7976931348623157e+308,\n        \"Z39\": \"</script><b>&amp;</b>\",\n        \"line sep   para sep  \": -1\n      },\n      \"café81\": true,\n      \"😀 emoji\": {\n        \"\\u0000\\u0001\\u001f69\": 0,\n        \"__proto__x\": false,\n        \"😀 emoji\": 0.00008475\n      }\n    },\n    \" private use78\": {\n      \"1037\": \"日本語\",\n      \"\\b\\f\": 9007199254740994,\n      \"Z51\": [\n        false\n      ],\n      \"quote \\\" and backslash \\\\75\": [\n        4.35,\n        -2.5e-10,\n        0.000001\n      ],\n      \"￿\": [\n        1.7976931348623157e+308,\n        null\n      ]\n    }\n  },\n  \"日本語\": [\n    4.35,\n    {\n      \"café\": {\n        \"Z47\": true\n      },\n      \"quote \\\" and backslash \\\\67\": {\n        \"1041\": \"￿\",\n        \"\\u0000\\u0001\\u001f\": null,\n        \"😀 emoji6\": 99.99999999999999\n      }\n    },\n    false,\n    {\n      \"café\": {\n        \"\": false,\n        \"tab\\tnew\\nline\\rcr\": false,\n        \"日本語\": \"tab\\tnew\\nline\\rcr\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢66\": null\n      },\n      \"quote \\\" and backslash \\\\\": [\n        1.5e-7,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      ]\n    }\n  ],\n  \"￿\": \"Z\"\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "{\"plain18\":[[{\"café\":5e-324,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":false,\"café\":null},[1e+21,\"10\",\"😀 emoji\"]]]}",
+   "output": "{\n  \"plain18\": [\n    [\n      {\n        \"café\": null,\n        \"café\": 5e-324,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": false\n      },\n      [\n        1e+21,\n        \"10\",\n        \"😀 emoji\"\n      ]\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "9007199254740994",
+   "output": "9007199254740994\n"
+  },
+  {
+   "input": "{\"</script><b>&amp;</b>\":\"plain\",\"Z5\":[[[73.5,-2.5e-10],58.80000000000001,{\"日本語56\":\"\\b\\f\"},{\"10\":100000000000000000000,\"__proto__x\":-2.5e-10,\"😀 emoji47\":false,\" private use55\":\" private use\",\"__proto__x15\":3.7}],null,-1],\"quote \\\" and backslash \\\\0\":{\"plain\":null}}",
+   "output": "{\n  \"</script><b>&amp;</b>\": \"plain\",\n  \"Z5\": [\n    [\n      [\n        73.5,\n        -2.5e-10\n      ],\n      58.80000000000001,\n      {\n        \"日本語56\": \"\\b\\f\"\n      },\n      {\n        \"10\": 100000000000000000000,\n        \"__proto__x\": -2.5e-10,\n        \"__proto__x15\": 3.7,\n        \"😀 emoji47\": false,\n        \" private use55\": \" private use\"\n      }\n    ],\n    null,\n    -1\n  ],\n  \"quote \\\" and backslash \\\\0\": {\n    \"plain\": null\n  }\n}\n"
+  },
+  {
+   "input": "{\"￿\":{\"Z26\":{\"\":100000000000000000000,\"quote \\\" and backslash \\\\\":{\"café\":null,\"\":null}},\"Z\":[true,[],{\"10\":100,\"\\u0000\\u0001\\u001f\":true,\"￿\":9007199254740992,\"</script><b>&amp;</b>\":\"</script><b>&amp;</b>\"},{\"￿\":\"line sep   para sep  \",\"😀 emoji68\":null}],\"quote \\\" and backslash \\\\\":\"\"},\" private use57\":\"line sep   para sep  \"}",
+   "output": "{\n  \" private use57\": \"line sep   para sep  \",\n  \"￿\": {\n    \"Z\": [\n      true,\n      [],\n      {\n        \"10\": 100,\n        \"\\u0000\\u0001\\u001f\": true,\n        \"</script><b>&amp;</b>\": \"</script><b>&amp;</b>\",\n        \"￿\": 9007199254740992\n      },\n      {\n        \"😀 emoji68\": null,\n        \"￿\": \"line sep   para sep  \"\n      }\n    ],\n    \"Z26\": {\n      \"\": 100000000000000000000,\n      \"quote \\\" and backslash \\\\\": {\n        \"\": null,\n        \"café\": null\n      }\n    },\n    \"quote \\\" and backslash \\\\\": \"\"\n  }\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"café24\":[{\"line sep   para sep  \":9007199254740992},[{},[123456789012345680000],{\"__proto__x\":0}]]}",
+   "output": "{\n  \"café24\": [\n    {\n      \"line sep   para sep  \": 9007199254740992\n    },\n    [\n      {},\n      [\n        123456789012345680000\n      ],\n      {\n        \"__proto__x\": 0\n      }\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "[{\"\\b\\f\":2440950998034809000},null,{\"😀 emoji\":[\" private use\"],\"￿\":{\"tab\\tnew\\nline\\rcr\":{\"\\u0000\\u0001\\u001f\":0.000001}}},0]",
+   "output": "[\n  {\n    \"\\b\\f\": 2440950998034809000\n  },\n  null,\n  {\n    \"😀 emoji\": [\n      \" private use\"\n    ],\n    \"￿\": {\n      \"tab\\tnew\\nline\\rcr\": {\n        \"\\u0000\\u0001\\u001f\": 0.000001\n      }\n    }\n  },\n  0\n]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{\" private use\":true,\"</script><b>&amp;</b>70\":null,\"Z\":{\"__proto__x\":[[null],\"quote \\\" and backslash \\\\\"],\"plain\":[0.3333333333333333,\"__proto__x\",false,{\"tab\\tnew\\nline\\rcr\":\"Z\",\"\":\"tab\\tnew\\nline\\rcr\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"café\",\"a\":0.30000000000000004,\"Z23\":null}],\"a\":[{},{\"2\":0.000058,\"tab\\tnew\\nline\\rcr\":0.000001,\"😀 emoji\":\"Z\"}]},\"tab\\tnew\\nline\\rcr50\":[[[true,5e-324,\"line sep   para sep  \",\"a\"],{},true]]}",
+   "output": "{\n  \"</script><b>&amp;</b>70\": null,\n  \"Z\": {\n    \"__proto__x\": [\n      [\n        null\n      ],\n      \"quote \\\" and backslash \\\\\"\n    ],\n    \"a\": [\n      {},\n      {\n        \"2\": 0.000058,\n        \"tab\\tnew\\nline\\rcr\": 0.000001,\n        \"😀 emoji\": \"Z\"\n      }\n    ],\n    \"plain\": [\n      0.3333333333333333,\n      \"__proto__x\",\n      false,\n      {\n        \"\": \"tab\\tnew\\nline\\rcr\",\n        \"Z23\": null,\n        \"a\": 0.30000000000000004,\n        \"tab\\tnew\\nline\\rcr\": \"Z\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"café\"\n      }\n    ]\n  },\n  \"tab\\tnew\\nline\\rcr50\": [\n    [\n      [\n        true,\n        5e-324,\n        \"line sep   para sep  \",\n        \"a\"\n      ],\n      {},\n      true\n    ]\n  ],\n  \" private use\": true\n}\n"
+  },
+  {
+   "input": "{\"line sep   para sep  3\":\"😀 emoji\",\"Z\":null}",
+   "output": "{\n  \"Z\": null,\n  \"line sep   para sep  3\": \"😀 emoji\"\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[[],{\"10\":[[\"plain\",1.7976931348623157e+308,\"\",null],0.1,[\"2\"]],\"</script><b>&amp;</b>\":5.07e+23,\"Z\":{\"quote \\\" and backslash \\\\\":\"2\"},\"plain95\":\"2\"}]",
+   "output": "[\n  [],\n  {\n    \"10\": [\n      [\n        \"plain\",\n        1.7976931348623157e+308,\n        \"\",\n        null\n      ],\n      0.1,\n      [\n        \"2\"\n      ]\n    ],\n    \"</script><b>&amp;</b>\": 5.07e+23,\n    \"Z\": {\n      \"quote \\\" and backslash \\\\\": \"2\"\n    },\n    \"plain95\": \"2\"\n  }\n]\n"
+  },
+  {
+   "input": "\"plain\"",
+   "output": "\"plain\"\n"
+  },
+  {
+   "input": "{\"2\":\"\\u0000\\u0001\\u001f\",\"a\":[{\"\\u0000\\u0001\\u001f53\":{\"</script><b>&amp;</b>\":\" private use\",\"</script><b>&amp;</b>80\":\"__proto__x\",\" private use\":1e-7,\"😀 emoji41\":\"\"}},[9007199254740992],{\"</script><b>&amp;</b>\":[\"Z\",null,false],\"café35\":true},{\"__proto__x\":1.7976931348623157e+308,\" private use\":3.7,\"Z\":{\"café\":-2.5e-10,\"</script><b>&amp;</b>\":4692750811720057000,\"日本語81\":\"café\",\"__proto__x97\":\"\\b\\f\"}}],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢80\":[5e-324]}",
+   "output": "{\n  \"2\": \"\\u0000\\u0001\\u001f\",\n  \"a\": [\n    {\n      \"\\u0000\\u0001\\u001f53\": {\n        \"</script><b>&amp;</b>\": \" private use\",\n        \"</script><b>&amp;</b>80\": \"__proto__x\",\n        \"😀 emoji41\": \"\",\n        \" private use\": 1e-7\n      }\n    },\n    [\n      9007199254740992\n    ],\n    {\n      \"</script><b>&amp;</b>\": [\n        \"Z\",\n        null,\n        false\n      ],\n      \"café35\": true\n    },\n    {\n      \"Z\": {\n        \"</script><b>&amp;</b>\": 4692750811720057000,\n        \"__proto__x97\": \"\\b\\f\",\n        \"café\": -2.5e-10,\n        \"日本語81\": \"café\"\n      },\n      \"__proto__x\": 1.7976931348623157e+308,\n      \" private use\": 3.7\n    }\n  ],\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢80\": [\n    5e-324\n  ]\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "{\"2\":[[false,\"line sep   para sep  \",null,9007199254740992]],\"tab\\tnew\\nline\\rcr\":\" private use\"}",
+   "output": "{\n  \"2\": [\n    [\n      false,\n      \"line sep   para sep  \",\n      null,\n      9007199254740992\n    ]\n  ],\n  \"tab\\tnew\\nline\\rcr\": \" private use\"\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"plain\":[123456789012345680000]}",
+   "output": "{\n  \"plain\": [\n    123456789012345680000\n  ]\n}\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[-2.5e-10,[]],\"line sep   para sep  \":{\"plain\":{\"2\":{\"日本語\":\"\\b\\f\",\"\\u0000\\u0001\\u001f\":\"😀 emoji\"},\"￿\":[true,1,-2.5e-10,false],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢91\":[],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢63\":true,\"line sep   para sep  \":{}},\"tab\\tnew\\nline\\rcr94\":[{\"\\b\\f\":\"a\",\"café\":\"café\",\"￿30\":null},null,{\"\":100000000000000000000,\"__proto__x49\":99.99999999999999,\"tab\\tnew\\nline\\rcr\":\"Z\"}],\"café\":\"café\",\"\\b\\f\":{\"Z66\":[false,\"line sep   para sep  \",false,3.85e+22],\"quote \\\" and backslash \\\\\":99.99999999999999}},\"a\":false,\"line sep   para sep  94\":45.33333333333333,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢81\":{\"￿\":0.30000000000000004,\"日本語\":[],\"a\":null}}",
+   "output": "{\n  \"a\": false,\n  \"line sep   para sep  \": {\n    \"\\b\\f\": {\n      \"Z66\": [\n        false,\n        \"line sep   para sep  \",\n        false,\n        3.85e+22\n      ],\n      \"quote \\\" and backslash \\\\\": 99.99999999999999\n    },\n    \"café\": \"café\",\n    \"plain\": {\n      \"2\": {\n        \"\\u0000\\u0001\\u001f\": \"😀 emoji\",\n        \"日本語\": \"\\b\\f\"\n      },\n      \"line sep   para sep  \": {},\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢63\": true,\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢91\": [],\n      \"￿\": [\n        true,\n        1,\n        -2.5e-10,\n        false\n      ]\n    },\n    \"tab\\tnew\\nline\\rcr94\": [\n      {\n        \"\\b\\f\": \"a\",\n        \"café\": \"café\",\n        \"￿30\": null\n      },\n      null,\n      {\n        \"\": 100000000000000000000,\n        \"__proto__x49\": 99.99999999999999,\n        \"tab\\tnew\\nline\\rcr\": \"Z\"\n      }\n    ]\n  },\n  \"line sep   para sep  94\": 45.33333333333333,\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n    -2.5e-10,\n    []\n  ],\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢81\": {\n    \"a\": null,\n    \"日本語\": [],\n    \"￿\": 0.30000000000000004\n  }\n}\n"
+  },
+  {
+   "input": "{\"256\":{\"10\":\"10\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"Z4\":\"quote \\\" and backslash \\\\\"},\"tab\\tnew\\nline\\rcr\":[{\"tab\\tnew\\nline\\rcr29\":false,\"line sep   para sep  \":100,\"a94\":\"Z\"},{\"10\":\"plain\",\"\\b\\f27\":3.7},[false,1.5e-7,true,123456789012345680000],[\"￿\",3.7,\"a\",1.7976931348623157e+308]],\"quote \\\" and backslash \\\\\":[]}}",
+   "output": "{\n  \"256\": {\n    \"10\": \"10\",\n    \"quote \\\" and backslash \\\\\": [],\n    \"tab\\tnew\\nline\\rcr\": [\n      {\n        \"a94\": \"Z\",\n        \"line sep   para sep  \": 100,\n        \"tab\\tnew\\nline\\rcr29\": false\n      },\n      {\n        \"10\": \"plain\",\n        \"\\b\\f27\": 3.7\n      },\n      [\n        false,\n        1.5e-7,\n        true,\n        123456789012345680000\n      ],\n      [\n        \"￿\",\n        3.7,\n        \"a\",\n        1.7976931348623157e+308\n      ]\n    ],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"Z4\": \"quote \\\" and backslash \\\\\"\n    }\n  }\n}\n"
+  },
+  {
+   "input": "{\"￿\":[[{\"__proto__x\":false,\"日本語\":\"line sep   para sep  \",\"café\":\"tab\\tnew\\nline\\rcr\"},\"￿\"]],\"日本語57\":{\"2\":\"\",\"￿\":{\"263\":\"line sep   para sep  \",\"287\":false,\"plain\":\"a\",\"\\u0000\\u0001\\u001f\":[4.35,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",100000000000000000000,257]},\"quote \\\" and backslash \\\\\":[[null,99.99999999999999,\"tab\\tnew\\nline\\rcr\",false],{\"日本語42\":123456789012345680000,\"\\b\\f7\":\"\\u0000\\u0001\\u001f\",\"café\":\"日本語\",\"quote \\\" and backslash \\\\\":0.30000000000000004},{\"__proto__x\":true,\"￿\":1.7976931348623157e+308,\"quote \\\" and backslash \\\\77\":null}],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[null,[true,null]]},\"\\b\\f\":0.000001,\"\\b\\f95\":[]}",
+   "output": "{\n  \"\\b\\f\": 0.000001,\n  \"\\b\\f95\": [],\n  \"日本語57\": {\n    \"2\": \"\",\n    \"quote \\\" and backslash \\\\\": [\n      [\n        null,\n        99.99999999999999,\n        \"tab\\tnew\\nline\\rcr\",\n        false\n      ],\n      {\n        \"\\b\\f7\": \"\\u0000\\u0001\\u001f\",\n        \"café\": \"日本語\",\n        \"quote \\\" and backslash \\\\\": 0.30000000000000004,\n        \"日本語42\": 123456789012345680000\n      },\n      {\n        \"__proto__x\": true,\n        \"quote \\\" and backslash \\\\77\": null,\n        \"￿\": 1.7976931348623157e+308\n      }\n    ],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n      null,\n      [\n        true,\n        null\n      ]\n    ],\n    \"￿\": {\n      \"263\": \"line sep   para sep  \",\n      \"287\": false,\n      \"\\u0000\\u0001\\u001f\": [\n        4.35,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        100000000000000000000,\n        257\n      ],\n      \"plain\": \"a\"\n    }\n  },\n  \"￿\": [\n    [\n      {\n        \"__proto__x\": false,\n        \"café\": \"tab\\tnew\\nline\\rcr\",\n        \"日本語\": \"line sep   para sep  \"\n      },\n      \"￿\"\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "0.3333333333333333",
+   "output": "0.3333333333333333\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "\"a\"",
+   "output": "\"a\"\n"
+  },
+  {
+   "input": "{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{},\"tab\\tnew\\nline\\rcr19\":{\"\\b\\f62\":{\"plain\":27.900000000000006,\"__proto__x\":{\"tab\\tnew\\nline\\rcr\":\"a\",\"日本語\":0.30000000000000004}},\"café\":[[]],\"café\":{\"10\":[\"plain\",1e+21],\"￿\":[0.00001035,\"\\b\\f\",1e+21],\"a60\":0.3333333333333333,\"\\u0000\\u0001\\u001f\":null},\"\\b\\f\":null,\"line sep   para sep  \":0.000001},\"__proto__x\":[],\"café23\":\"2\"}",
+   "output": "{\n  \"__proto__x\": [],\n  \"café23\": \"2\",\n  \"tab\\tnew\\nline\\rcr19\": {\n    \"\\b\\f\": null,\n    \"\\b\\f62\": {\n      \"__proto__x\": {\n        \"tab\\tnew\\nline\\rcr\": \"a\",\n        \"日本語\": 0.30000000000000004\n      },\n      \"plain\": 27.900000000000006\n    },\n    \"café\": [\n      []\n    ],\n    \"café\": {\n      \"10\": [\n        \"plain\",\n        1e+21\n      ],\n      \"\\u0000\\u0001\\u001f\": null,\n      \"a60\": 0.3333333333333333,\n      \"￿\": [\n        0.00001035,\n        \"\\b\\f\",\n        1e+21\n      ]\n    },\n    \"line sep   para sep  \": 0.000001\n  },\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {}\n}\n"
+  },
+  {
+   "input": "{\"plain4\":[],\"\\u0000\\u0001\\u001f26\":false,\"a\":{\"__proto__x76\":[],\"\\u0000\\u0001\\u001f\":{\"quote \\\" and backslash \\\\\":{\"2\":\"a\",\"tab\\tnew\\nline\\rcr71\":0.000479,\"café\":\"tab\\tnew\\nline\\rcr\",\"\":true,\"</script><b>&amp;</b>55\":\"a\"},\"quote \\\" and backslash \\\\68\":null,\"￿\":[true]},\"line sep   para sep  \":[],\"\\b\\f\":{\"café55\":\"café\"}},\"Z\":\" private use\"}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f26\": false,\n  \"Z\": \" private use\",\n  \"a\": {\n    \"\\u0000\\u0001\\u001f\": {\n      \"quote \\\" and backslash \\\\\": {\n        \"2\": \"a\",\n        \"\": true,\n        \"</script><b>&amp;</b>55\": \"a\",\n        \"café\": \"tab\\tnew\\nline\\rcr\",\n        \"tab\\tnew\\nline\\rcr71\": 0.000479\n      },\n      \"quote \\\" and backslash \\\\68\": null,\n      \"￿\": [\n        true\n      ]\n    },\n    \"\\b\\f\": {\n      \"café55\": \"café\"\n    },\n    \"__proto__x76\": [],\n    \"line sep   para sep  \": []\n  },\n  \"plain4\": []\n}\n"
+  },
+  {
+   "input": "{\"café\":{\"café\":[[5e-324],{\"230\":0.30000000000000004,\"quote \\\" and backslash \\\\\":0.000001},\"\"]},\"Z\":false,\"tab\\tnew\\nline\\rcr\":{\"￿0\":{\"2\":\"quote \\\" and backslash \\\\\",\"__proto__x\":0.000001,\"\\u0000\\u0001\\u001f37\":[9007199254740994,null],\"Z\":[]}},\"😀 emoji\":[9007199254740992,0.30000000000000004]}",
+   "output": "{\n  \"Z\": false,\n  \"café\": {\n    \"café\": [\n      [\n        5e-324\n      ],\n      {\n        \"230\": 0.30000000000000004,\n        \"quote \\\" and backslash \\\\\": 0.000001\n      },\n      \"\"\n    ]\n  },\n  \"tab\\tnew\\nline\\rcr\": {\n    \"￿0\": {\n      \"2\": \"quote \\\" and backslash \\\\\",\n      \"\\u0000\\u0001\\u001f37\": [\n        9007199254740994,\n        null\n      ],\n      \"Z\": [],\n      \"__proto__x\": 0.000001\n    }\n  },\n  \"😀 emoji\": [\n    9007199254740992,\n    0.30000000000000004\n  ]\n}\n"
+  },
+  {
+   "input": "[{\"tab\\tnew\\nline\\rcr\":[{\"\\b\\f8\":null},[5386305154335113000,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"line sep   para sep  \"],false,\"10\"]},{\"日本語47\":{\"10\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":null,\" private use61\":1},\" private use\":\"__proto__x\",\"\\u0000\\u0001\\u001f\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢83\":\"日本語\",\"a33\":0},\"\\u0000\\u0001\\u001f37\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"Z\",\"plain\":0.1}}},1e-7,[{\"😀 emoji\":{\"1019\":false,\"plain\":null},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"￿\":0,\"\\u0000\\u0001\\u001f\":1.7976931348623157e+308,\"café94\":true},\"quote \\\" and backslash \\\\\":true,\"日本語\":[false,4.35,\"café\"]},{\"￿\":{\"quote \\\" and backslash \\\\\":100,\" private use\":\"__proto__x\",\"tab\\tnew\\nline\\rcr\":1.5e-7},\"😀 emoji\":\"</script><b>&amp;</b>\",\"\\b\\f\":{\"￿\":4.35},\"日本語\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"tab\\tnew\\nline\\rcr\",\"a\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"plain\":3.7}},[[0,0.30000000000000004,\"tab\\tnew\\nline\\rcr\",1.7976931348623157e+308]]]]",
+   "output": "[\n  {\n    \"tab\\tnew\\nline\\rcr\": [\n      {\n        \"\\b\\f8\": null\n      },\n      [\n        5386305154335113000,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"line sep   para sep  \"\n      ],\n      false,\n      \"10\"\n    ]\n  },\n  {\n    \"日本語47\": {\n      \"10\": {\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": null,\n        \" private use61\": 1\n      },\n      \"\\u0000\\u0001\\u001f\": {\n        \"a33\": 0,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢83\": \"日本語\"\n      },\n      \"\\u0000\\u0001\\u001f37\": {\n        \"plain\": 0.1,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"Z\"\n      },\n      \" private use\": \"__proto__x\"\n    }\n  },\n  1e-7,\n  [\n    {\n      \"quote \\\" and backslash \\\\\": true,\n      \"日本語\": [\n        false,\n        4.35,\n        \"café\"\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"\\u0000\\u0001\\u001f\": 1.7976931348623157e+308,\n        \"café94\": true,\n        \"￿\": 0\n      },\n      \"😀 emoji\": {\n        \"1019\": false,\n        \"plain\": null\n      }\n    },\n    {\n      \"\\b\\f\": {\n        \"￿\": 4.35\n      },\n      \"日本語\": {\n        \"a\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"plain\": 3.7,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"tab\\tnew\\nline\\rcr\"\n      },\n      \"😀 emoji\": \"</script><b>&amp;</b>\",\n      \"￿\": {\n        \"quote \\\" and backslash \\\\\": 100,\n        \"tab\\tnew\\nline\\rcr\": 1.5e-7,\n        \" private use\": \"__proto__x\"\n      }\n    },\n    [\n      [\n        0,\n        0.30000000000000004,\n        \"tab\\tnew\\nline\\rcr\",\n        1.7976931348623157e+308\n      ]\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "-2.5e-10",
+   "output": "-2.5e-10\n"
+  },
+  {
+   "input": "{\"😀 emoji76\":[0,-2.5e-10],\"Z96\":\"😀 emoji\",\"日本語\":{\"café\":{\"10\":[null],\"</script><b>&amp;</b>\":{\"plain91\":1.7976931348623157e+308}}},\"quote \\\" and backslash \\\\\":{\"a\":null,\"__proto__x40\":\"café\",\"tab\\tnew\\nline\\rcr\":{\"2\":-1,\"1037\":null,\"￿\":123456789012345680000,\"日本語\":[0]}},\"a\":[]}",
+   "output": "{\n  \"Z96\": \"😀 emoji\",\n  \"a\": [],\n  \"quote \\\" and backslash \\\\\": {\n    \"__proto__x40\": \"café\",\n    \"a\": null,\n    \"tab\\tnew\\nline\\rcr\": {\n      \"2\": -1,\n      \"1037\": null,\n      \"日本語\": [\n        0\n      ],\n      \"￿\": 123456789012345680000\n    }\n  },\n  \"日本語\": {\n    \"café\": {\n      \"10\": [\n        null\n      ],\n      \"</script><b>&amp;</b>\": {\n        \"plain91\": 1.7976931348623157e+308\n      }\n    }\n  },\n  \"😀 emoji76\": [\n    0,\n    -2.5e-10\n  ]\n}\n"
+  },
+  {
+   "input": "[{}]",
+   "output": "[\n  {}\n]\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "{\"😀 emoji47\":false,\"café\":[4359484439294640000],\"tab\\tnew\\nline\\rcr\":{\"__proto__x\":0.3333333333333333,\"</script><b>&amp;</b>\":\"line sep   para sep  \"},\"line sep   para sep  55\":[{\"\":[true,\"￿\",true]},{\"￿\":0,\"tab\\tnew\\nline\\rcr\":{\"plain\":\"😀 emoji\",\"tab\\tnew\\nline\\rcr\":1.5e-7},\"café\":[0.3333333333333333,true]},[\" private use\",[\"plain\",\"\",\"2\",3.7],[1.5e-7,null,\"\\u0000\\u0001\\u001f\",true]],false]}",
+   "output": "{\n  \"café\": [\n    4359484439294640000\n  ],\n  \"line sep   para sep  55\": [\n    {\n      \"\": [\n        true,\n        \"￿\",\n        true\n      ]\n    },\n    {\n      \"café\": [\n        0.3333333333333333,\n        true\n      ],\n      \"tab\\tnew\\nline\\rcr\": {\n        \"plain\": \"😀 emoji\",\n        \"tab\\tnew\\nline\\rcr\": 1.5e-7\n      },\n      \"￿\": 0\n    },\n    [\n      \" private use\",\n      [\n        \"plain\",\n        \"\",\n        \"2\",\n        3.7\n      ],\n      [\n        1.5e-7,\n        null,\n        \"\\u0000\\u0001\\u001f\",\n        true\n      ]\n    ],\n    false\n  ],\n  \"tab\\tnew\\nline\\rcr\": {\n    \"</script><b>&amp;</b>\": \"line sep   para sep  \",\n    \"__proto__x\": 0.3333333333333333\n  },\n  \"😀 emoji47\": false\n}\n"
+  },
+  {
+   "input": "[[]]",
+   "output": "[\n  []\n]\n"
+  },
+  {
+   "input": "[0,\"2\",[],{}]",
+   "output": "[\n  0,\n  \"2\",\n  [],\n  {}\n]\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "{\"\\u0000\\u0001\\u001f\":\"plain\"}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f\": \"plain\"\n}\n"
+  },
+  {
+   "input": "{\"Z38\":true,\"￿\":\"\\u0000\\u0001\\u001f\",\"quote \\\" and backslash \\\\85\":null}",
+   "output": "{\n  \"Z38\": true,\n  \"quote \\\" and backslash \\\\85\": null,\n  \"￿\": \"\\u0000\\u0001\\u001f\"\n}\n"
+  },
+  {
+   "input": "{\"plain\":[{\"plain\":{\" private use\":true,\"quote \\\" and backslash \\\\\":\"\\b\\f\",\"日本語60\":true,\"tab\\tnew\\nline\\rcr\":91299.99999999999}},0.000001,-1,[[\"café\",null,\"\\u0000\\u0001\\u001f\"],{\"日本語\":0,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"\\b\\f\"},[null,0],\"\\b\\f\"]],\"a\":[\"\\b\\f\",0.0006529999999999999,100000000000000000000],\"__proto__x\":[[3471.2999999999997,1e+21,[null]],[[\"10\",100000000000000000000],{\"2\":3.7,\"16\":\"日本語\",\"a\":false,\"\":\"￿\"},-2.5e-10,{}],{\"café72\":true},100000000000000000000],\"line sep   para sep  \":{},\"😀 emoji33\":{\"quote \\\" and backslash \\\\\":\"quote \\\" and backslash \\\\\"}}",
+   "output": "{\n  \"__proto__x\": [\n    [\n      3471.2999999999997,\n      1e+21,\n      [\n        null\n      ]\n    ],\n    [\n      [\n        \"10\",\n        100000000000000000000\n      ],\n      {\n        \"2\": 3.7,\n        \"16\": \"日本語\",\n        \"\": \"￿\",\n        \"a\": false\n      },\n      -2.5e-10,\n      {}\n    ],\n    {\n      \"café72\": true\n    },\n    100000000000000000000\n  ],\n  \"a\": [\n    \"\\b\\f\",\n    0.0006529999999999999,\n    100000000000000000000\n  ],\n  \"line sep   para sep  \": {},\n  \"plain\": [\n    {\n      \"plain\": {\n        \"quote \\\" and backslash \\\\\": \"\\b\\f\",\n        \"tab\\tnew\\nline\\rcr\": 91299.99999999999,\n        \"日本語60\": true,\n        \" private use\": true\n      }\n    },\n    0.000001,\n    -1,\n    [\n      [\n        \"café\",\n        null,\n        \"\\u0000\\u0001\\u001f\"\n      ],\n      {\n        \"日本語\": 0,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"\\b\\f\"\n      },\n      [\n        null,\n        0\n      ],\n      \"\\b\\f\"\n    ]\n  ],\n  \"😀 emoji33\": {\n    \"quote \\\" and backslash \\\\\": \"quote \\\" and backslash \\\\\"\n  }\n}\n"
+  },
+  {
+   "input": "{\"\":{\"2\":{\"2\":{\"\":\"tab\\tnew\\nline\\rcr\",\"\\u0000\\u0001\\u001f\":\"café\",\" private use66\":\"￿\",\"a\":0.30000000000000004,\"line sep   para sep  \":null},\"😀 emoji\":[1.7976931348623157e+308,null]},\"__proto__x19\":\"plain\",\"😀 emoji\":1e-7,\"café\":[]},\"日本語\":0.00009255}",
+   "output": "{\n  \"\": {\n    \"2\": {\n      \"2\": {\n        \"\": \"tab\\tnew\\nline\\rcr\",\n        \"\\u0000\\u0001\\u001f\": \"café\",\n        \"a\": 0.30000000000000004,\n        \"line sep   para sep  \": null,\n        \" private use66\": \"￿\"\n      },\n      \"😀 emoji\": [\n        1.7976931348623157e+308,\n        null\n      ]\n    },\n    \"__proto__x19\": \"plain\",\n    \"café\": [],\n    \"😀 emoji\": 1e-7\n  },\n  \"日本語\": 0.00009255\n}\n"
+  },
+  {
+   "input": "{\"2\":true,\"21\":\"\",\"__proto__x39\":{},\"</script><b>&amp;</b>68\":\"\\b\\f\"}",
+   "output": "{\n  \"2\": true,\n  \"21\": \"\",\n  \"</script><b>&amp;</b>68\": \"\\b\\f\",\n  \"__proto__x39\": {}\n}\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"café\":{\"</script><b>&amp;</b>\":{\"café\":\"line sep   para sep  \"},\"café\":\"2\"}}",
+   "output": "{\n  \"café\": {\n    \"</script><b>&amp;</b>\": {\n      \"café\": \"line sep   para sep  \"\n    },\n    \"café\": \"2\"\n  }\n}\n"
+  },
+  {
+   "input": "\"￿\"",
+   "output": "\"￿\"\n"
+  },
+  {
+   "input": "[{\"café13\":{\" private use\":[\"\\u0000\\u0001\\u001f\"],\"__proto__x41\":\"__proto__x\"},\"tab\\tnew\\nline\\rcr40\":[],\"</script><b>&amp;</b>\":{\"10\":{\"日本語7\":\" private use\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":false,\"plain\":\"__proto__x\",\"Z\":\"😀 emoji\",\"</script><b>&amp;</b>\":-1},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"2\":\" private use\",\"quote \\\" and backslash \\\\52\":1.5e-7,\"\\b\\f\":\"line sep   para sep  \"},\" private use\":146.66666666666666},\"quote \\\" and backslash \\\\\":{\" private use58\":1.5e-7,\"tab\\tnew\\nline\\rcr42\":{\"a\":\"\\b\\f\",\"￿24\":\"quote \\\" and backslash \\\\\"},\"</script><b>&amp;</b>\":{\"Z\":false}}},\" private use\",0.00001275,null]",
+   "output": "[\n  {\n    \"</script><b>&amp;</b>\": {\n      \"10\": {\n        \"</script><b>&amp;</b>\": -1,\n        \"Z\": \"😀 emoji\",\n        \"plain\": \"__proto__x\",\n        \"日本語7\": \" private use\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": false\n      },\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"2\": \" private use\",\n        \"\\b\\f\": \"line sep   para sep  \",\n        \"quote \\\" and backslash \\\\52\": 1.5e-7\n      },\n      \" private use\": 146.66666666666666\n    },\n    \"café13\": {\n      \"__proto__x41\": \"__proto__x\",\n      \" private use\": [\n        \"\\u0000\\u0001\\u001f\"\n      ]\n    },\n    \"quote \\\" and backslash \\\\\": {\n      \"</script><b>&amp;</b>\": {\n        \"Z\": false\n      },\n      \"tab\\tnew\\nline\\rcr42\": {\n        \"a\": \"\\b\\f\",\n        \"￿24\": \"quote \\\" and backslash \\\\\"\n      },\n      \" private use58\": 1.5e-7\n    },\n    \"tab\\tnew\\nline\\rcr40\": []\n  },\n  \" private use\",\n  0.00001275,\n  null\n]\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "{\"line sep   para sep  \":[[],[\"a\",[\"10\",\"2\",null,true]],[]],\"😀 emoji\":\"tab\\tnew\\nline\\rcr\"}",
+   "output": "{\n  \"line sep   para sep  \": [\n    [],\n    [\n      \"a\",\n      [\n        \"10\",\n        \"2\",\n        null,\n        true\n      ]\n    ],\n    []\n  ],\n  \"😀 emoji\": \"tab\\tnew\\nline\\rcr\"\n}\n"
+  },
+  {
+   "input": "[{\"\":\"a\"}]",
+   "output": "[\n  {\n    \"\": \"a\"\n  }\n]\n"
+  },
+  {
+   "input": "{\"\\b\\f\":false}",
+   "output": "{\n  \"\\b\\f\": false\n}\n"
+  },
+  {
+   "input": "[[{\"2\":{},\"1049\":{\"plain\":null,\"__proto__x74\":false,\"\\b\\f\":\"a\",\"line sep   para sep  \":\"line sep   para sep  \"},\"\\u0000\\u0001\\u001f\":{\"2\":\"\\u0000\\u0001\\u001f\",\"4\":123456789012345680000,\"￿\":false,\" private use\":-1,\"café\":\"😀 emoji\"},\"line sep   para sep  \":[\"café\",true,true,9007199254740994]},[{\"__proto__x\":\"tab\\tnew\\nline\\rcr\"},0,[]]],{},[{\"2\":{\"😀 emoji\":\"10\",\"café\":1.5e-7,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":null},\"__proto__x63\":1.7976931348623157e+308,\"tab\\tnew\\nline\\rcr\":\"</script><b>&amp;</b>\"},100000000000000000000,null,[0.1,{\"</script><b>&amp;</b>\":1,\"café41\":\"plain\"}]],[{\"280\":[]},[\"line sep   para sep  \",[\"line sep   para sep  \",null]]]]",
+   "output": "[\n  [\n    {\n      \"2\": {},\n      \"1049\": {\n        \"\\b\\f\": \"a\",\n        \"__proto__x74\": false,\n        \"line sep   para sep  \": \"line sep   para sep  \",\n        \"plain\": null\n      },\n      \"\\u0000\\u0001\\u001f\": {\n        \"2\": \"\\u0000\\u0001\\u001f\",\n        \"4\": 123456789012345680000,\n        \"café\": \"😀 emoji\",\n        \" private use\": -1,\n        \"￿\": false\n      },\n      \"line sep   para sep  \": [\n        \"café\",\n        true,\n        true,\n        9007199254740994\n      ]\n    },\n    [\n      {\n        \"__proto__x\": \"tab\\tnew\\nline\\rcr\"\n      },\n      0,\n      []\n    ]\n  ],\n  {},\n  [\n    {\n      \"2\": {\n        \"café\": 1.5e-7,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": null,\n        \"😀 emoji\": \"10\"\n      },\n      \"__proto__x63\": 1.7976931348623157e+308,\n      \"tab\\tnew\\nline\\rcr\": \"</script><b>&amp;</b>\"\n    },\n    100000000000000000000,\n    null,\n    [\n      0.1,\n      {\n        \"</script><b>&amp;</b>\": 1,\n        \"café41\": \"plain\"\n      }\n    ]\n  ],\n  [\n    {\n      \"280\": []\n    },\n    [\n      \"line sep   para sep  \",\n      [\n        \"line sep   para sep  \",\n        null\n      ]\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "{\"tab\\tnew\\nline\\rcr36\":{\"\\b\\f\":[]},\"café\":{\"quote \\\" and backslash \\\\\":null,\"tab\\tnew\\nline\\rcr\":{\"240\":{\"82\":false,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":null},\"￿42\":[9007199254740992,1e+21],\"</script><b>&amp;</b>\":{\"tab\\tnew\\nline\\rcr\":3.7,\"Z\":1.5e-7,\"café32\":100},\"\\b\\f29\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢2\":true,\"Z42\":\"quote \\\" and backslash \\\\\",\"😀 emoji\":\"10\"}},\"line sep   para sep  \":{\"a\":[]},\"café\":{\"10\":1,\"23\":[4.35,true,\"\\b\\f\"],\"😀 emoji7\":{\"10\":1e+21,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢15\":false,\"café\":0.30000000000000004,\"</script><b>&amp;</b>\":true,\"\\b\\f\":false},\"\\b\\f\":{\"line sep   para sep  12\":false,\"café\":4.35,\"￿71\":null,\"😀 emoji\":-1.6325e-7},\"Z38\":[]}}}",
+   "output": "{\n  \"café\": {\n    \"café\": {\n      \"10\": 1,\n      \"23\": [\n        4.35,\n        true,\n        \"\\b\\f\"\n      ],\n      \"\\b\\f\": {\n        \"café\": 4.35,\n        \"line sep   para sep  12\": false,\n        \"😀 emoji\": -1.6325e-7,\n        \"￿71\": null\n      },\n      \"Z38\": [],\n      \"😀 emoji7\": {\n        \"10\": 1e+21,\n        \"\\b\\f\": false,\n        \"</script><b>&amp;</b>\": true,\n        \"café\": 0.30000000000000004,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢15\": false\n      }\n    },\n    \"line sep   para sep  \": {\n      \"a\": []\n    },\n    \"quote \\\" and backslash \\\\\": null,\n    \"tab\\tnew\\nline\\rcr\": {\n      \"240\": {\n        \"82\": false,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": null\n      },\n      \"\\b\\f29\": {\n        \"Z42\": \"quote \\\" and backslash \\\\\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢2\": true,\n        \"😀 emoji\": \"10\"\n      },\n      \"</script><b>&amp;</b>\": {\n        \"Z\": 1.5e-7,\n        \"café32\": 100,\n        \"tab\\tnew\\nline\\rcr\": 3.7\n      },\n      \"￿42\": [\n        9007199254740992,\n        1e+21\n      ]\n    }\n  },\n  \"tab\\tnew\\nline\\rcr36\": {\n    \"\\b\\f\": []\n  }\n}\n"
+  },
+  {
+   "input": "[[[[null,false,\"\"]],null,{\"quote \\\" and backslash \\\\75\":\"tab\\tnew\\nline\\rcr\",\"\":[\"😀 emoji\",\"</script><b>&amp;</b>\",0.0000715],\"quote \\\" and backslash \\\\24\":{\"\\u0000\\u0001\\u001f\":false,\"\\b\\f83\":0,\"</script><b>&amp;</b>\":false,\"\\b\\f54\":null},\"\\b\\f\":-1,\"line sep   para sep  \":{}},{\"😀 emoji\":{\"</script><b>&amp;</b>33\":0,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"Z\"},\"a\":\"a\"}],true]",
+   "output": "[\n  [\n    [\n      [\n        null,\n        false,\n        \"\"\n      ]\n    ],\n    null,\n    {\n      \"\": [\n        \"😀 emoji\",\n        \"</script><b>&amp;</b>\",\n        0.0000715\n      ],\n      \"\\b\\f\": -1,\n      \"line sep   para sep  \": {},\n      \"quote \\\" and backslash \\\\24\": {\n        \"\\u0000\\u0001\\u001f\": false,\n        \"\\b\\f54\": null,\n        \"\\b\\f83\": 0,\n        \"</script><b>&amp;</b>\": false\n      },\n      \"quote \\\" and backslash \\\\75\": \"tab\\tnew\\nline\\rcr\"\n    },\n    {\n      \"a\": \"a\",\n      \"😀 emoji\": {\n        \"</script><b>&amp;</b>33\": 0,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"Z\"\n      }\n    }\n  ],\n  true\n]\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "-1",
+   "output": "-1\n"
+  },
+  {
+   "input": "0.30000000000000004",
+   "output": "0.30000000000000004\n"
+  },
+  {
+   "input": "{\"café\":null,\"a\":[{\"10\":{\" private use\":9007199254740992,\"line sep   para sep  \":\"Z\",\"plain83\":false,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":0.1},\"café\":\"tab\\tnew\\nline\\rcr\",\"café7\":\"café\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[99.99999999999999,1.5e-7],\"__proto__x38\":-1},[99.99999999999999],0.000001],\"\\u0000\\u0001\\u001f98\":{\"line sep   para sep  \":[],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"2\":[3.7,0,\"a\"],\"10\":\"café\",\"__proto__x\":false,\"tab\\tnew\\nline\\rcr\":{\"1012\":\"plain\"},\"café14\":[true]},\"￿20\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"\\u0000\\u0001\\u001f\":\"plain\"},\"</script><b>&amp;</b>\":{\"日本語52\":{\"😀 emoji\":0,\"😀 emoji34\":{\"quote \\\" and backslash \\\\31\":-1},\"\\u0000\\u0001\\u001f\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢51\":[-2.5e-10,null,1.5e-7]},\" private use2\":0.3333333333333333,\"plain\":[{\"日本語\":1},\"plain\"],\"__proto__x\":{\"2\":0,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":-1,\"quote \\\" and backslash \\\\12\":{}},\"line sep   para sep  \":true}}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f98\": {\n    \"\\u0000\\u0001\\u001f\": \"plain\",\n    \"line sep   para sep  \": [],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"2\": [\n        3.7,\n        0,\n        \"a\"\n      ],\n      \"10\": \"café\",\n      \"__proto__x\": false,\n      \"café14\": [\n        true\n      ],\n      \"tab\\tnew\\nline\\rcr\": {\n        \"1012\": \"plain\"\n      }\n    },\n    \"￿20\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n  },\n  \"</script><b>&amp;</b>\": {\n    \"__proto__x\": {\n      \"2\": 0,\n      \"quote \\\" and backslash \\\\12\": {},\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": -1\n    },\n    \"line sep   para sep  \": true,\n    \"plain\": [\n      {\n        \"日本語\": 1\n      },\n      \"plain\"\n    ],\n    \"日本語52\": {\n      \"\\u0000\\u0001\\u001f\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢51\": [\n        -2.5e-10,\n        null,\n        1.5e-7\n      ],\n      \"😀 emoji\": 0,\n      \"😀 emoji34\": {\n        \"quote \\\" and backslash \\\\31\": -1\n      }\n    },\n    \" private use2\": 0.3333333333333333\n  },\n  \"a\": [\n    {\n      \"10\": {\n        \"line sep   para sep  \": \"Z\",\n        \"plain83\": false,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 0.1,\n        \" private use\": 9007199254740992\n      },\n      \"__proto__x38\": -1,\n      \"café\": \"tab\\tnew\\nline\\rcr\",\n      \"café7\": \"café\",\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n        99.99999999999999,\n        1.5e-7\n      ]\n    },\n    [\n      99.99999999999999\n    ],\n    0.000001\n  ],\n  \"café\": null\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[\"café\",\"quote \\\" and backslash \\\\\",9007199254740992]",
+   "output": "[\n  \"café\",\n  \"quote \\\" and backslash \\\\\",\n  9007199254740992\n]\n"
+  },
+  {
+   "input": "4.35",
+   "output": "4.35\n"
+  },
+  {
+   "input": "{\"line sep   para sep  \":{\"￿\":{},\"Z\":{\"\":[9007199254740994,9007199254740992,false],\"\\u0000\\u0001\\u001f12\":\" private use\",\"__proto__x\":{\"63\":0.3333333333333333,\"Z71\":\"10\",\"café56\":96800,\"日本語\":46000,\"quote \\\" and backslash \\\\\":false}},\"a57\":[true,0.30000000000000004,100,{}],\" private use\":null}}",
+   "output": "{\n  \"line sep   para sep  \": {\n    \"Z\": {\n      \"\": [\n        9007199254740994,\n        9007199254740992,\n        false\n      ],\n      \"\\u0000\\u0001\\u001f12\": \" private use\",\n      \"__proto__x\": {\n        \"63\": 0.3333333333333333,\n        \"Z71\": \"10\",\n        \"café56\": 96800,\n        \"quote \\\" and backslash \\\\\": false,\n        \"日本語\": 46000\n      }\n    },\n    \"a57\": [\n      true,\n      0.30000000000000004,\n      100,\n      {}\n    ],\n    \" private use\": null,\n    \"￿\": {}\n  }\n}\n"
+  },
+  {
+   "input": "0",
+   "output": "0\n"
+  },
+  {
+   "input": "{\"2\":false,\"tab\\tnew\\nline\\rcr10\":\"￿\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\" private use\":\"café\"},\"</script><b>&amp;</b>\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}",
+   "output": "{\n  \"2\": false,\n  \"</script><b>&amp;</b>\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n  \"tab\\tnew\\nline\\rcr10\": \"￿\",\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n    \" private use\": \"café\"\n  }\n}\n"
+  },
+  {
+   "input": "\"plain\"",
+   "output": "\"plain\"\n"
+  },
+  {
+   "input": "[{\"210\":{\"tab\\tnew\\nline\\rcr\":\"\\b\\f\"},\"\\u0000\\u0001\\u001f\":-568,\"__proto__x\":[\"plain\",\"__proto__x\",{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢32\":0.3333333333333333,\"__proto__x\":100,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":-1},\"a\"],\"tab\\tnew\\nline\\rcr13\":\"plain\"},99.99999999999999,\"quote \\\" and backslash \\\\\",\"日本語\"]",
+   "output": "[\n  {\n    \"210\": {\n      \"tab\\tnew\\nline\\rcr\": \"\\b\\f\"\n    },\n    \"\\u0000\\u0001\\u001f\": -568,\n    \"__proto__x\": [\n      \"plain\",\n      \"__proto__x\",\n      {\n        \"__proto__x\": 100,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": -1,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢32\": 0.3333333333333333\n      },\n      \"a\"\n    ],\n    \"tab\\tnew\\nline\\rcr13\": \"plain\"\n  },\n  99.99999999999999,\n  \"quote \\\" and backslash \\\\\",\n  \"日本語\"\n]\n"
+  },
+  {
+   "input": "{\"\":{\"tab\\tnew\\nline\\rcr\":{},\"line sep   para sep  24\":[\"😀 emoji\",[null],\"日本語\",\" private use\"]},\"\\b\\f32\":{\"café\":[{\"1048\":\"\\u0000\\u0001\\u001f\",\"café\":1.7976931348623157e+308,\"plain\":\"￿\",\"__proto__x96\":1e+21},{\" private use\":null,\"Z\":true,\"日本語\":\"</script><b>&amp;</b>\"},[null,\"😀 emoji\",123456789012345680000,\"10\"]],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[99.99999999999999]},\"plain\":{\"2\":{},\"__proto__x52\":[{\"2\":\"</script><b>&amp;</b>\",\"246\":123456789012345680000,\"line sep   para sep  77\":\"10\"}],\" private use80\":{\"café91\":\"</script><b>&amp;</b>\"}},\"tab\\tnew\\nline\\rcr71\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢54\":[\"</script><b>&amp;</b>\"]},\"日本語4\":[9007199254740994]}",
+   "output": "{\n  \"\": {\n    \"line sep   para sep  24\": [\n      \"😀 emoji\",\n      [\n        null\n      ],\n      \"日本語\",\n      \" private use\"\n    ],\n    \"tab\\tnew\\nline\\rcr\": {}\n  },\n  \"\\b\\f32\": {\n    \"café\": [\n      {\n        \"1048\": \"\\u0000\\u0001\\u001f\",\n        \"__proto__x96\": 1e+21,\n        \"café\": 1.7976931348623157e+308,\n        \"plain\": \"￿\"\n      },\n      {\n        \"Z\": true,\n        \"日本語\": \"</script><b>&amp;</b>\",\n        \" private use\": null\n      },\n      [\n        null,\n        \"😀 emoji\",\n        123456789012345680000,\n        \"10\"\n      ]\n    ],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n      99.99999999999999\n    ]\n  },\n  \"plain\": {\n    \"2\": {},\n    \"__proto__x52\": [\n      {\n        \"2\": \"</script><b>&amp;</b>\",\n        \"246\": 123456789012345680000,\n        \"line sep   para sep  77\": \"10\"\n      }\n    ],\n    \" private use80\": {\n      \"café91\": \"</script><b>&amp;</b>\"\n    }\n  },\n  \"tab\\tnew\\nline\\rcr71\": {\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢54\": [\n      \"</script><b>&amp;</b>\"\n    ]\n  },\n  \"日本語4\": [\n    9007199254740994\n  ]\n}\n"
+  },
+  {
+   "input": "[{\"Z\":{\"1020\":{\"\":null,\"日本語\":100000000000000000000,\"日本語37\":null},\" private use\":{\"\":1e+21,\"café\":null},\"😀 emoji\":{\"line sep   para sep  86\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":true,\"</script><b>&amp;</b>54\":\"\",\"a\":0.3333333333333333},\"\\u0000\\u0001\\u001f\":\" private use\"},\"café\":\"</script><b>&amp;</b>\",\"\\b\\f\":null},1.86e+23]",
+   "output": "[\n  {\n    \"\\b\\f\": null,\n    \"Z\": {\n      \"1020\": {\n        \"\": null,\n        \"日本語\": 100000000000000000000,\n        \"日本語37\": null\n      },\n      \"\\u0000\\u0001\\u001f\": \" private use\",\n      \"😀 emoji\": {\n        \"</script><b>&amp;</b>54\": \"\",\n        \"a\": 0.3333333333333333,\n        \"line sep   para sep  86\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": true\n      },\n      \" private use\": {\n        \"\": 1e+21,\n        \"café\": null\n      }\n    },\n    \"café\": \"</script><b>&amp;</b>\"\n  },\n  1.86e+23\n]\n"
+  },
+  {
+   "input": "[[],[{\"\\u0000\\u0001\\u001f29\":false,\"\\u0000\\u0001\\u001f46\":[123456789012345680000,100],\"Z\":false,\"😀 emoji\":2610}],-1,599.9999999999999]",
+   "output": "[\n  [],\n  [\n    {\n      \"\\u0000\\u0001\\u001f29\": false,\n      \"\\u0000\\u0001\\u001f46\": [\n        123456789012345680000,\n        100\n      ],\n      \"Z\": false,\n      \"😀 emoji\": 2610\n    }\n  ],\n  -1,\n  599.9999999999999\n]\n"
+  },
+  {
+   "input": "\"a\"",
+   "output": "\"a\"\n"
+  },
+  {
+   "input": "-1",
+   "output": "-1\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "[[[{\"\\u0000\\u0001\\u001f91\":false},[9007199254740994,1.5e-7]],null]]",
+   "output": "[\n  [\n    [\n      {\n        \"\\u0000\\u0001\\u001f91\": false\n      },\n      [\n        9007199254740994,\n        1.5e-7\n      ]\n    ],\n    null\n  ]\n]\n"
+  },
+  {
+   "input": "\"￿\"",
+   "output": "\"￿\"\n"
+  },
+  {
+   "input": "{\"Z47\":\"10\",\" private use\":{\"line sep   para sep  \":{\"99\":{\"日本語2\":\"plain\",\"a\":1e-7},\"\\b\\f\":\"😀 emoji\",\" private use\":{\"café65\":\"a\",\"￿86\":1,\"quote \\\" and backslash \\\\\":100000000000000000000},\"￿\":{\"</script><b>&amp;</b>9\":\"tab\\tnew\\nline\\rcr\",\"__proto__x\":\"line sep   para sep  \",\"quote \\\" and backslash \\\\97\":false,\"café\":\"￿\"},\"Z\":{\"4\":\"line sep   para sep  \",\"日本語\":-1,\"a\":true,\"café\":123456789012345680000,\"quote \\\" and backslash \\\\\":3.7}},\"tab\\tnew\\nline\\rcr25\":1.5e-7,\"\\u0000\\u0001\\u001f1\":[{\"298\":\"\\u0000\\u0001\\u001f\",\"plain16\":4.35,\"tab\\tnew\\nline\\rcr\":\"plain\"},{\"253\":\"tab\\tnew\\nline\\rcr\",\"__proto__x97\":false,\"café\":\"2\",\"😀 emoji\":false,\"Z\":true}]},\"\\u0000\\u0001\\u001f32\":{\"😀 emoji\":{\"37\":true},\"__proto__x\":{\"café31\":[1e-7,0],\"plain\":{}},\"line sep   para sep  16\":{\"line sep   para sep  \":{\"\\u0000\\u0001\\u001f64\":\"10\",\"\\u0000\\u0001\\u001f45\":null},\"￿6\":{\"café\":\"😀 emoji\",\"</script><b>&amp;</b>78\":false,\"\\b\\f37\":\"\\b\\f\"},\" private use\":[0.1,\"10\"],\"\":\"\"},\"café\":false,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[[],\"10\"]}}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f32\": {\n    \"__proto__x\": {\n      \"café31\": [\n        1e-7,\n        0\n      ],\n      \"plain\": {}\n    },\n    \"café\": false,\n    \"line sep   para sep  16\": {\n      \"\": \"\",\n      \"line sep   para sep  \": {\n        \"\\u0000\\u0001\\u001f45\": null,\n        \"\\u0000\\u0001\\u001f64\": \"10\"\n      },\n      \" private use\": [\n        0.1,\n        \"10\"\n      ],\n      \"￿6\": {\n        \"\\b\\f37\": \"\\b\\f\",\n        \"</script><b>&amp;</b>78\": false,\n        \"café\": \"😀 emoji\"\n      }\n    },\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n      [],\n      \"10\"\n    ],\n    \"😀 emoji\": {\n      \"37\": true\n    }\n  },\n  \"Z47\": \"10\",\n  \" private use\": {\n    \"\\u0000\\u0001\\u001f1\": [\n      {\n        \"298\": \"\\u0000\\u0001\\u001f\",\n        \"plain16\": 4.35,\n        \"tab\\tnew\\nline\\rcr\": \"plain\"\n      },\n      {\n        \"253\": \"tab\\tnew\\nline\\rcr\",\n        \"Z\": true,\n        \"__proto__x97\": false,\n        \"café\": \"2\",\n        \"😀 emoji\": false\n      }\n    ],\n    \"line sep   para sep  \": {\n      \"99\": {\n        \"a\": 1e-7,\n        \"日本語2\": \"plain\"\n      },\n      \"\\b\\f\": \"😀 emoji\",\n      \"Z\": {\n        \"4\": \"line sep   para sep  \",\n        \"a\": true,\n        \"café\": 123456789012345680000,\n        \"quote \\\" and backslash \\\\\": 3.7,\n        \"日本語\": -1\n      },\n      \" private use\": {\n        \"café65\": \"a\",\n        \"quote \\\" and backslash \\\\\": 100000000000000000000,\n        \"￿86\": 1\n      },\n      \"￿\": {\n        \"</script><b>&amp;</b>9\": \"tab\\tnew\\nline\\rcr\",\n        \"__proto__x\": \"line sep   para sep  \",\n        \"café\": \"￿\",\n        \"quote \\\" and backslash \\\\97\": false\n      }\n    },\n    \"tab\\tnew\\nline\\rcr25\": 1.5e-7\n  }\n}\n"
+  },
+  {
+   "input": "[{\"10\":[4.35,\"日本語\",[\"a\",0,\"\\u0000\\u0001\\u001f\"]],\"__proto__x\":{\"__proto__x\":{\"tab\\tnew\\nline\\rcr89\":123456789012345680000,\"café25\":\"😀 emoji\",\"😀 emoji\":8.6e+22},\"</script><b>&amp;</b>50\":[\" private use\",false,1e+21],\"😀 emoji\":0.1},\"quote \\\" and backslash \\\\32\":{\"café\":false},\"\\b\\f\":\"line sep   para sep  \",\"tab\\tnew\\nline\\rcr\":null},{},\"\\u0000\\u0001\\u001f\"]",
+   "output": "[\n  {\n    \"10\": [\n      4.35,\n      \"日本語\",\n      [\n        \"a\",\n        0,\n        \"\\u0000\\u0001\\u001f\"\n      ]\n    ],\n    \"\\b\\f\": \"line sep   para sep  \",\n    \"__proto__x\": {\n      \"</script><b>&amp;</b>50\": [\n        \" private use\",\n        false,\n        1e+21\n      ],\n      \"__proto__x\": {\n        \"café25\": \"😀 emoji\",\n        \"tab\\tnew\\nline\\rcr89\": 123456789012345680000,\n        \"😀 emoji\": 8.6e+22\n      },\n      \"😀 emoji\": 0.1\n    },\n    \"quote \\\" and backslash \\\\32\": {\n      \"café\": false\n    },\n    \"tab\\tnew\\nline\\rcr\": null\n  },\n  {},\n  \"\\u0000\\u0001\\u001f\"\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "{\"café\":[\"café\",[[123456789012345680000,1],[0.1,true,null]]]}",
+   "output": "{\n  \"café\": [\n    \"café\",\n    [\n      [\n        123456789012345680000,\n        1\n      ],\n      [\n        0.1,\n        true,\n        null\n      ]\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "[[],{\"\\b\\f\":[[],\"a\",{\"\\b\\f\":1,\"😀 emoji\":0.0000968}]},[[{\"tab\\tnew\\nline\\rcr53\":\"quote \\\" and backslash \\\\\",\"plain\":99.99999999999999},null,{\"￿37\":null,\"tab\\tnew\\nline\\rcr\":null,\"__proto__x\":0}],null]]",
+   "output": "[\n  [],\n  {\n    \"\\b\\f\": [\n      [],\n      \"a\",\n      {\n        \"\\b\\f\": 1,\n        \"😀 emoji\": 0.0000968\n      }\n    ]\n  },\n  [\n    [\n      {\n        \"plain\": 99.99999999999999,\n        \"tab\\tnew\\nline\\rcr53\": \"quote \\\" and backslash \\\\\"\n      },\n      null,\n      {\n        \"__proto__x\": 0,\n        \"tab\\tnew\\nline\\rcr\": null,\n        \"￿37\": null\n      }\n    ],\n    null\n  ]\n]\n"
+  },
+  {
+   "input": "[[[],[[null,4.35],{\"2\":0,\"10\":0.3333333333333333,\"café10\":0.3333333333333333,\"café\":null,\"line sep   para sep  \":1e-7}],\"￿\"]]",
+   "output": "[\n  [\n    [],\n    [\n      [\n        null,\n        4.35\n      ],\n      {\n        \"2\": 0,\n        \"10\": 0.3333333333333333,\n        \"café\": null,\n        \"café10\": 0.3333333333333333,\n        \"line sep   para sep  \": 1e-7\n      }\n    ],\n    \"￿\"\n  ]\n]\n"
+  },
+  {
+   "input": "{\"日本語\":[[[100000000000000000000,\"café\",\"😀 emoji\"],{\"10\":9007199254740992,\"1051\":-1,\"</script><b>&amp;</b>\":100000000000000000000,\"￿\":\"10\",\"\\u0000\\u0001\\u001f\":\"tab\\tnew\\nline\\rcr\"}],{\"plain\":[0,123456789012345680000],\"__proto__x\":[214.80000000000004,\"2\"],\"😀 emoji89\":{\"10\":17800,\"😀 emoji\":\"￿\",\"\\u0000\\u0001\\u001f86\":-1}}]}",
+   "output": "{\n  \"日本語\": [\n    [\n      [\n        100000000000000000000,\n        \"café\",\n        \"😀 emoji\"\n      ],\n      {\n        \"10\": 9007199254740992,\n        \"1051\": -1,\n        \"\\u0000\\u0001\\u001f\": \"tab\\tnew\\nline\\rcr\",\n        \"</script><b>&amp;</b>\": 100000000000000000000,\n        \"￿\": \"10\"\n      }\n    ],\n    {\n      \"__proto__x\": [\n        214.80000000000004,\n        \"2\"\n      ],\n      \"plain\": [\n        0,\n        123456789012345680000\n      ],\n      \"😀 emoji89\": {\n        \"10\": 17800,\n        \"\\u0000\\u0001\\u001f86\": -1,\n        \"😀 emoji\": \"￿\"\n      }\n    }\n  ]\n}\n"
+  },
+  {
+   "input": "{\"\":{},\"café\":null}",
+   "output": "{\n  \"\": {},\n  \"café\": null\n}\n"
+  },
+  {
+   "input": "{\"plain\":[[[9007199254740992],[\"2\",0.000757]],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",[],[true]]}",
+   "output": "{\n  \"plain\": [\n    [\n      [\n        9007199254740992\n      ],\n      [\n        \"2\",\n        0.000757\n      ]\n    ],\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n    [],\n    [\n      true\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "[1e-7,{\"日本語\":0,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":3.7,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢74\":{\"a92\":{},\"__proto__x\":{\"\\b\\f\":\"\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":null,\"__proto__x73\":-311,\"a36\":123456789012345680000,\"￿\":\"__proto__x\"},\"Z\":{\"1058\":0.30000000000000004,\"café12\":null,\"\":100}},\"a\":[[2149.7000000000003,false],{\"\":0,\"café\":false,\"</script><b>&amp;</b>35\":0.1,\"line sep   para sep  \":1.5e-7},\"\\u0000\\u0001\\u001f\"]},0.00007819999999999999]",
+   "output": "[\n  1e-7,\n  {\n    \"a\": [\n      [\n        2149.7000000000003,\n        false\n      ],\n      {\n        \"\": 0,\n        \"</script><b>&amp;</b>35\": 0.1,\n        \"café\": false,\n        \"line sep   para sep  \": 1.5e-7\n      },\n      \"\\u0000\\u0001\\u001f\"\n    ],\n    \"日本語\": 0,\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 3.7,\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢74\": {\n      \"Z\": {\n        \"1058\": 0.30000000000000004,\n        \"\": 100,\n        \"café12\": null\n      },\n      \"__proto__x\": {\n        \"\\b\\f\": \"\",\n        \"__proto__x73\": -311,\n        \"a36\": 123456789012345680000,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": null,\n        \"￿\": \"__proto__x\"\n      },\n      \"a92\": {}\n    }\n  },\n  0.00007819999999999999\n]\n"
+  },
+  {
+   "input": "{\"__proto__x\":[]}",
+   "output": "{\n  \"__proto__x\": []\n}\n"
+  },
+  {
+   "input": "[\"plain\"]",
+   "output": "[\n  \"plain\"\n]\n"
+  },
+  {
+   "input": "[\"tab\\tnew\\nline\\rcr\"]",
+   "output": "[\n  \"tab\\tnew\\nline\\rcr\"\n]\n"
+  },
+  {
+   "input": "null",
+   "output": "null\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "[false]",
+   "output": "[\n  false\n]\n"
+  },
+  {
+   "input": "{\"10\":-2.5e-10}",
+   "output": "{\n  \"10\": -2.5e-10\n}\n"
+  },
+  {
+   "input": "{\"café\":{\"</script><b>&amp;</b>25\":[{},0.30000000000000004,1.5e-7],\"\\b\\f22\":[-1,-1,\" private use\",{\"Z\":null,\"café\":false,\"😀 emoji\":3.7,\" private use\":\"10\"}]}}",
+   "output": "{\n  \"café\": {\n    \"\\b\\f22\": [\n      -1,\n      -1,\n      \" private use\",\n      {\n        \"Z\": null,\n        \"café\": false,\n        \"😀 emoji\": 3.7,\n        \" private use\": \"10\"\n      }\n    ],\n    \"</script><b>&amp;</b>25\": [\n      {},\n      0.30000000000000004,\n      1.5e-7\n    ]\n  }\n}\n"
+  },
+  {
+   "input": "[\"quote \\\" and backslash \\\\\",[{\"</script><b>&amp;</b>\":\"quote \\\" and backslash \\\\\",\"日本語\":100}],{\"10\":[\"￿\",{\"a\":\"10\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢72\":5e-324,\"__proto__x\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"},[\"quote \\\" and backslash \\\\\",0.1,-2.5e-10,\"😀 emoji\"]],\"</script><b>&amp;</b>59\":{\"30\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"1078\":\"2\",\"a\":null,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":false},\"Z\":{\"225\":{},\"plain\":{\"café\":2.974e-321},\"a42\":\"__proto__x\"},\"quote \\\" and backslash \\\\\":{\"44\":{},\" private use\":3784.4999999999995,\"\\u0000\\u0001\\u001f\":{\"café\":false,\"￿\":123456789012345680000,\" private use\":0}},\"café\":null},{\"quote \\\" and backslash \\\\\":[{},1e+21],\"line sep   para sep  \":\"Z\",\"café51\":{\"</script><b>&amp;</b>\":\"2\"},\"__proto__x\":{\"a\":[],\"日本語\":23.400000000000002,\"￿\":9007199254740992}}]",
+   "output": "[\n  \"quote \\\" and backslash \\\\\",\n  [\n    {\n      \"</script><b>&amp;</b>\": \"quote \\\" and backslash \\\\\",\n      \"日本語\": 100\n    }\n  ],\n  {\n    \"10\": [\n      \"￿\",\n      {\n        \"__proto__x\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"a\": \"10\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢72\": 5e-324\n      },\n      [\n        \"quote \\\" and backslash \\\\\",\n        0.1,\n        -2.5e-10,\n        \"😀 emoji\"\n      ]\n    ],\n    \"</script><b>&amp;</b>59\": {\n      \"30\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      \"1078\": \"2\",\n      \"a\": null,\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": false\n    },\n    \"Z\": {\n      \"225\": {},\n      \"a42\": \"__proto__x\",\n      \"plain\": {\n        \"café\": 2.974e-321\n      }\n    },\n    \"café\": null,\n    \"quote \\\" and backslash \\\\\": {\n      \"44\": {},\n      \"\\u0000\\u0001\\u001f\": {\n        \"café\": false,\n        \" private use\": 0,\n        \"￿\": 123456789012345680000\n      },\n      \" private use\": 3784.4999999999995\n    }\n  },\n  {\n    \"__proto__x\": {\n      \"a\": [],\n      \"日本語\": 23.400000000000002,\n      \"￿\": 9007199254740992\n    },\n    \"café51\": {\n      \"</script><b>&amp;</b>\": \"2\"\n    },\n    \"line sep   para sep  \": \"Z\",\n    \"quote \\\" and backslash \\\\\": [\n      {},\n      1e+21\n    ]\n  }\n]\n"
+  },
+  {
+   "input": "\"Z\"",
+   "output": "\"Z\"\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[{\"16\":[1e+21,{\"2\":100,\"1032\":null,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":true,\"\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"café\":true},[null],123456789012345680000],\"Z\":\"café\",\"line sep   para sep  \":{\"\\u0000\\u0001\\u001f\":\"\\b\\f\",\"line sep   para sep  \":[],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{},\"😀 emoji\":{\"242\":5e-324,\"\\u0000\\u0001\\u001f\":\"</script><b>&amp;</b>\",\"\\b\\f\":1,\"</script><b>&amp;</b>19\":null,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":9007199254740992}},\"tab\\tnew\\nline\\rcr\":[]},{\"😀 emoji53\":null,\"Z\":{},\"plain50\":9007199254740992,\"quote \\\" and backslash \\\\\":{\"10\":[true,3.7,\" private use\",0.30000000000000004],\"Z\":[9007199254740992]},\" private use50\":{\"café\":true,\"\\b\\f36\":{\"2\":true,\"\\b\\f\":9007199254740994,\"😀 emoji\":0.000001},\"日本語\":-2.5e-10,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\" private use\":null,\"café\":9007199254740992,\"</script><b>&amp;</b>82\":3.7,\"café56\":99.99999999999999},\"tab\\tnew\\nline\\rcr\":{\"line sep   para sep  86\":0}}},\"line sep   para sep  \",[[\"日本語\"],[{\"Z15\":1.764e-321},{\"2\":null,\"café\":\"café\",\"\\b\\f10\":\"tab\\tnew\\nline\\rcr\",\"quote \\\" and backslash \\\\\":1e+21,\"日本語\":487.19999999999993},[8.16049375371605e+22,false,null,3.7],true]]]",
+   "output": "[\n  {\n    \"16\": [\n      1e+21,\n      {\n        \"2\": 100,\n        \"1032\": null,\n        \"\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"café\": true,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": true\n      },\n      [\n        null\n      ],\n      123456789012345680000\n    ],\n    \"Z\": \"café\",\n    \"line sep   para sep  \": {\n      \"\\u0000\\u0001\\u001f\": \"\\b\\f\",\n      \"line sep   para sep  \": [],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {},\n      \"😀 emoji\": {\n        \"242\": 5e-324,\n        \"\\u0000\\u0001\\u001f\": \"</script><b>&amp;</b>\",\n        \"\\b\\f\": 1,\n        \"</script><b>&amp;</b>19\": null,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 9007199254740992\n      }\n    },\n    \"tab\\tnew\\nline\\rcr\": []\n  },\n  {\n    \"Z\": {},\n    \"plain50\": 9007199254740992,\n    \"quote \\\" and backslash \\\\\": {\n      \"10\": [\n        true,\n        3.7,\n        \" private use\",\n        0.30000000000000004\n      ],\n      \"Z\": [\n        9007199254740992\n      ]\n    },\n    \"😀 emoji53\": null,\n    \" private use50\": {\n      \"\\b\\f36\": {\n        \"2\": true,\n        \"\\b\\f\": 9007199254740994,\n        \"😀 emoji\": 0.000001\n      },\n      \"café\": true,\n      \"tab\\tnew\\nline\\rcr\": {\n        \"line sep   para sep  86\": 0\n      },\n      \"日本語\": -2.5e-10,\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"</script><b>&amp;</b>82\": 3.7,\n        \"café\": 9007199254740992,\n        \"café56\": 99.99999999999999,\n        \" private use\": null\n      }\n    }\n  },\n  \"line sep   para sep  \",\n  [\n    [\n      \"日本語\"\n    ],\n    [\n      {\n        \"Z15\": 1.764e-321\n      },\n      {\n        \"2\": null,\n        \"\\b\\f10\": \"tab\\tnew\\nline\\rcr\",\n        \"café\": \"café\",\n        \"quote \\\" and backslash \\\\\": 1e+21,\n        \"日本語\": 487.19999999999993\n      },\n      [\n        8.16049375371605e+22,\n        false,\n        null,\n        3.7\n      ],\n      true\n    ]\n  ]\n]\n"
+  },
+  {
+   "input": "{\"10\":\"\",\"105\":{\"日本語19\":{\"\":-1,\" private use\":{\"tab\\tnew\\nline\\rcr\":2640.45,\"</script><b>&amp;</b>\":null,\"Z\":\"tab\\tnew\\nline\\rcr\",\"line sep   para sep  \":0.000001}},\"😀 emoji0\":{},\"\":123456789012345680000},\"café\":{\"2\":\"</script><b>&amp;</b>\",\"79\":306,\"tab\\tnew\\nline\\rcr29\":{},\"__proto__x\":\"a\",\"\\b\\f\":{\"2\":\"tab\\tnew\\nline\\rcr\",\"😀 emoji\":[],\"tab\\tnew\\nline\\rcr55\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}}}",
+   "output": "{\n  \"10\": \"\",\n  \"105\": {\n    \"\": 123456789012345680000,\n    \"日本語19\": {\n      \"\": -1,\n      \" private use\": {\n        \"</script><b>&amp;</b>\": null,\n        \"Z\": \"tab\\tnew\\nline\\rcr\",\n        \"line sep   para sep  \": 0.000001,\n        \"tab\\tnew\\nline\\rcr\": 2640.45\n      }\n    },\n    \"😀 emoji0\": {}\n  },\n  \"café\": {\n    \"2\": \"</script><b>&amp;</b>\",\n    \"79\": 306,\n    \"\\b\\f\": {\n      \"2\": \"tab\\tnew\\nline\\rcr\",\n      \"tab\\tnew\\nline\\rcr55\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n      \"😀 emoji\": []\n    },\n    \"__proto__x\": \"a\",\n    \"tab\\tnew\\nline\\rcr29\": {}\n  }\n}\n"
+  },
+  {
+   "input": "\"</script><b>&amp;</b>\"",
+   "output": "\"</script><b>&amp;</b>\"\n"
+  },
+  {
+   "input": "{\"plain97\":[]}",
+   "output": "{\n  \"plain97\": []\n}\n"
+  },
+  {
+   "input": "{\"261\":{\"2\":{\"￿\":[\"\",9007199254740992],\"😀 emoji\":[],\"tab\\tnew\\nline\\rcr\":100}},\"😀 emoji\":[]}",
+   "output": "{\n  \"261\": {\n    \"2\": {\n      \"tab\\tnew\\nline\\rcr\": 100,\n      \"😀 emoji\": [],\n      \"￿\": [\n        \"\",\n        9007199254740992\n      ]\n    }\n  },\n  \"😀 emoji\": []\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "-2.5e-10",
+   "output": "-2.5e-10\n"
+  },
+  {
+   "input": "[\"￿\",0.000001,{\"1064\":273.30000000000007,\"__proto__x\":{\"\\b\\f\":null,\"a\":{\"__proto__x\":0.3333333333333333,\"quote \\\" and backslash \\\\\":9007199254740992,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"Z\"},\"</script><b>&amp;</b>15\":[\"\",\"\\u0000\\u0001\\u001f\"],\"plain\":{\"1052\":\"\\b\\f\",\"\\u0000\\u0001\\u001f\":\"￿\",\"\":0.3333333333333333,\"\\b\\f\":null,\"tab\\tnew\\nline\\rcr93\":\"a\"}}},\"10\"]",
+   "output": "[\n  \"￿\",\n  0.000001,\n  {\n    \"1064\": 273.30000000000007,\n    \"__proto__x\": {\n      \"\\b\\f\": null,\n      \"</script><b>&amp;</b>15\": [\n        \"\",\n        \"\\u0000\\u0001\\u001f\"\n      ],\n      \"a\": {\n        \"__proto__x\": 0.3333333333333333,\n        \"quote \\\" and backslash \\\\\": 9007199254740992,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"Z\"\n      },\n      \"plain\": {\n        \"1052\": \"\\b\\f\",\n        \"\": 0.3333333333333333,\n        \"\\u0000\\u0001\\u001f\": \"￿\",\n        \"\\b\\f\": null,\n        \"tab\\tnew\\nline\\rcr93\": \"a\"\n      }\n    }\n  },\n  \"10\"\n]\n"
+  },
+  {
+   "input": "[\"café\",\"\\b\\f\",{\"quote \\\" and backslash \\\\\":{\"😀 emoji\":\"2\",\"a\":{\" private use\":0.1,\"Z\":true},\"café\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":\"__proto__x\",\"日本語90\":5e-324,\"\":1e-7}},\"\\b\\f\":373.70000000000005},{\"a\":[{\"10\":true,\"82\":\"😀 emoji\",\"__proto__x\":\"__proto__x\",\"￿\":false}]}]",
+   "output": "[\n  \"café\",\n  \"\\b\\f\",\n  {\n    \"\\b\\f\": 373.70000000000005,\n    \"quote \\\" and backslash \\\\\": {\n      \"a\": {\n        \"Z\": true,\n        \" private use\": 0.1\n      },\n      \"café\": {\n        \"\": 1e-7,\n        \"日本語90\": 5e-324,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": \"__proto__x\"\n      },\n      \"😀 emoji\": \"2\"\n    }\n  },\n  {\n    \"a\": [\n      {\n        \"10\": true,\n        \"82\": \"😀 emoji\",\n        \"__proto__x\": \"__proto__x\",\n        \"￿\": false\n      }\n    ]\n  }\n]\n"
+  },
+  {
+   "input": "\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"",
+   "output": "\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n"
+  },
+  {
+   "input": "0.000001",
+   "output": "0.000001\n"
+  },
+  {
+   "input": "\" private use\"",
+   "output": "\" private use\"\n"
+  },
+  {
+   "input": "[[],[{},\"tab\\tnew\\nline\\rcr\"]]",
+   "output": "[\n  [],\n  [\n    {},\n    \"tab\\tnew\\nline\\rcr\"\n  ]\n]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "\"café\"",
+   "output": "\"café\"\n"
+  },
+  {
+   "input": "[{\"2\":true,\"10\":\"\\b\\f\",\"café\":\"line sep   para sep  \",\"\\b\\f\":{\"日本語\":[\"café\",\"line sep   para sep  \",\"\\u0000\\u0001\\u001f\"],\"café85\":[\" private use\",\"\\b\\f\",\"Z\",\"plain\"],\"café\":{\"__proto__x94\":null,\"</script><b>&amp;</b>77\":5e-324,\"café\":\"tab\\tnew\\nline\\rcr\"},\"café\":{\"a\":null},\"a47\":[false]}},{},[{\"日本語30\":[],\"\":\"café\"}],0.000001]",
+   "output": "[\n  {\n    \"2\": true,\n    \"10\": \"\\b\\f\",\n    \"\\b\\f\": {\n      \"a47\": [\n        false\n      ],\n      \"café\": {\n        \"</script><b>&amp;</b>77\": 5e-324,\n        \"__proto__x94\": null,\n        \"café\": \"tab\\tnew\\nline\\rcr\"\n      },\n      \"café85\": [\n        \" private use\",\n        \"\\b\\f\",\n        \"Z\",\n        \"plain\"\n      ],\n      \"café\": {\n        \"a\": null\n      },\n      \"日本語\": [\n        \"café\",\n        \"line sep   para sep  \",\n        \"\\u0000\\u0001\\u001f\"\n      ]\n    },\n    \"café\": \"line sep   para sep  \"\n  },\n  {},\n  [\n    {\n      \"\": \"café\",\n      \"日本語30\": []\n    }\n  ],\n  0.000001\n]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{\"tab\\tnew\\nline\\rcr\":{\"café77\":[{\"\\u0000\\u0001\\u001f\":\"\",\"plain\":true,\"Z\":100,\"__proto__x70\":\"plain\"},[\"café\"]],\"￿\":{},\"café68\":false,\"plain86\":{\"2\":null,\"tab\\tnew\\nline\\rcr\":0.30000000000000004,\"line sep   para sep  31\":[\"café\",\"__proto__x\",true],\"__proto__x\":[false,false,9007199254740992],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"2\":-2.5e-10,\"tab\\tnew\\nline\\rcr\":0.30000000000000004,\"__proto__x\":1.5e-7,\"quote \\\" and backslash \\\\\":true}},\"café52\":{\"\\b\\f\":[\" private use\",0.3333333333333333,100000000000000000000],\"a\":{\"line sep   para sep  \":0.0000177},\"café\":{\"1024\":true,\"Z1\":false}}},\"\\b\\f\":{\"\\b\\f2\":[[7.67e+22],\"plain\",[\"__proto__x\"]]},\" private use\":[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",[null,{}],{\"tab\\tnew\\nline\\rcr\":99.99999999999999,\"Z\":[1e-7,0.00008415,123456789012345680000,\"quote \\\" and backslash \\\\\"],\"plain\":{\"￿\":1e-7,\"a\":99.99999999999999,\"\\b\\f\":99.99999999999999,\"日本語\":-59}},true]}",
+   "output": "{\n  \"\\b\\f\": {\n    \"\\b\\f2\": [\n      [\n        7.67e+22\n      ],\n      \"plain\",\n      [\n        \"__proto__x\"\n      ]\n    ]\n  },\n  \"tab\\tnew\\nline\\rcr\": {\n    \"café77\": [\n      {\n        \"\\u0000\\u0001\\u001f\": \"\",\n        \"Z\": 100,\n        \"__proto__x70\": \"plain\",\n        \"plain\": true\n      },\n      [\n        \"café\"\n      ]\n    ],\n    \"café52\": {\n      \"\\b\\f\": [\n        \" private use\",\n        0.3333333333333333,\n        100000000000000000000\n      ],\n      \"a\": {\n        \"line sep   para sep  \": 0.0000177\n      },\n      \"café\": {\n        \"1024\": true,\n        \"Z1\": false\n      }\n    },\n    \"café68\": false,\n    \"plain86\": {\n      \"2\": null,\n      \"__proto__x\": [\n        false,\n        false,\n        9007199254740992\n      ],\n      \"line sep   para sep  31\": [\n        \"café\",\n        \"__proto__x\",\n        true\n      ],\n      \"tab\\tnew\\nline\\rcr\": 0.30000000000000004,\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"2\": -2.5e-10,\n        \"__proto__x\": 1.5e-7,\n        \"quote \\\" and backslash \\\\\": true,\n        \"tab\\tnew\\nline\\rcr\": 0.30000000000000004\n      }\n    },\n    \"￿\": {}\n  },\n  \" private use\": [\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n    [\n      null,\n      {}\n    ],\n    {\n      \"Z\": [\n        1e-7,\n        0.00008415,\n        123456789012345680000,\n        \"quote \\\" and backslash \\\\\"\n      ],\n      \"plain\": {\n        \"\\b\\f\": 99.99999999999999,\n        \"a\": 99.99999999999999,\n        \"日本語\": -59,\n        \"￿\": 1e-7\n      },\n      \"tab\\tnew\\nline\\rcr\": 99.99999999999999\n    },\n    true\n  ]\n}\n"
+  },
+  {
+   "input": "99.99999999999999",
+   "output": "99.99999999999999\n"
+  },
+  {
+   "input": "[true,1]",
+   "output": "[\n  true,\n  1\n]\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "{\"日本語35\":{\"line sep   para sep  \":[[]],\"\\b\\f\":{},\"plain\":1.7976931348623157e+308,\"line sep   para sep  45\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢31\":{},\"Z\":true,\"￿71\":\" private use\"}",
+   "output": "{\n  \"Z\": true,\n  \"日本語35\": {\n    \"\\b\\f\": {},\n    \"line sep   para sep  \": [\n      []\n    ],\n    \"line sep   para sep  45\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n    \"plain\": 1.7976931348623157e+308\n  },\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢31\": {},\n  \"￿71\": \" private use\"\n}\n"
+  },
+  {
+   "input": "{\"日本語\":{\"266\":[null,{\"249\":\"10\",\"</script><b>&amp;</b>\":6.604938212160494e+22,\"__proto__x24\":1.7976931348623157e+308},\"10\"],\"café\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[null,null,0,4.35],\"\\u0000\\u0001\\u001f\":[153]},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"1019\":{},\"1084\":\"a\",\" private use\":\"2\",\"￿\":{}},\"line sep   para sep  \":{\"tab\\tnew\\nline\\rcr\":{\"😀 emoji\":\"café\",\"日本語\":false,\"quote \\\" and backslash \\\\\":9007199254740992,\"Z70\":\"__proto__x\"}}},\"a4\":\"￿\",\"__proto__x\":{},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢75\":{\"1015\":[[],-1,[\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",123456789012345680000]],\"tab\\tnew\\nline\\rcr\":[{}],\"quote \\\" and backslash \\\\74\":\"\"},\"￿\":{\"\\b\\f\":9007199254740994,\"line sep   para sep  \":3.7}}",
+   "output": "{\n  \"__proto__x\": {},\n  \"a4\": \"￿\",\n  \"日本語\": {\n    \"266\": [\n      null,\n      {\n        \"249\": \"10\",\n        \"</script><b>&amp;</b>\": 6.604938212160494e+22,\n        \"__proto__x24\": 1.7976931348623157e+308\n      },\n      \"10\"\n    ],\n    \"café\": {\n      \"\\u0000\\u0001\\u001f\": [\n        153\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n        null,\n        null,\n        0,\n        4.35\n      ]\n    },\n    \"line sep   para sep  \": {\n      \"tab\\tnew\\nline\\rcr\": {\n        \"Z70\": \"__proto__x\",\n        \"quote \\\" and backslash \\\\\": 9007199254740992,\n        \"日本語\": false,\n        \"😀 emoji\": \"café\"\n      }\n    },\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"1019\": {},\n      \"1084\": \"a\",\n      \" private use\": \"2\",\n      \"￿\": {}\n    }\n  },\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢75\": {\n    \"1015\": [\n      [],\n      -1,\n      [\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        123456789012345680000\n      ]\n    ],\n    \"quote \\\" and backslash \\\\74\": \"\",\n    \"tab\\tnew\\nline\\rcr\": [\n      {}\n    ]\n  },\n  \"￿\": {\n    \"\\b\\f\": 9007199254740994,\n    \"line sep   para sep  \": 3.7\n  }\n}\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "{\"café22\":1,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"</script><b>&amp;</b>\":-1},\"tab\\tnew\\nline\\rcr56\":\"café\"}",
+   "output": "{\n  \"café22\": 1,\n  \"tab\\tnew\\nline\\rcr56\": \"café\",\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n    \"</script><b>&amp;</b>\": -1\n  }\n}\n"
+  },
+  {
+   "input": "[{},4.35,1.7283950461728395e+22]",
+   "output": "[\n  {},\n  4.35,\n  1.7283950461728395e+22\n]\n"
+  },
+  {
+   "input": "[[{\"￿\":0,\"😀 emoji\":\"日本語\",\"café\":\"日本語\",\"café\":[0,9007199254740992,1,null]},0]]",
+   "output": "[\n  [\n    {\n      \"café\": \"日本語\",\n      \"café\": [\n        0,\n        9007199254740992,\n        1,\n        null\n      ],\n      \"😀 emoji\": \"日本語\",\n      \"￿\": 0\n    },\n    0\n  ]\n]\n"
+  },
+  {
+   "input": "true",
+   "output": "true\n"
+  },
+  {
+   "input": "[{\"café\":1e+21,\"\\u0000\\u0001\\u001f\":{\"😀 emoji\":{}},\"\\b\\f\":{},\"</script><b>&amp;</b>\":{\" private use\":{\"café\":null,\"tab\\tnew\\nline\\rcr\":\"2\",\"quote \\\" and backslash \\\\\":\"\\b\\f\"},\"café\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢20\":9007199254740992},\"\":\"plain\",\"quote \\\" and backslash \\\\\":\"line sep   para sep  \"},\"😀 emoji\":5e-324}]",
+   "output": "[\n  {\n    \"\\u0000\\u0001\\u001f\": {\n      \"😀 emoji\": {}\n    },\n    \"\\b\\f\": {},\n    \"</script><b>&amp;</b>\": {\n      \"\": \"plain\",\n      \"café\": {\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢20\": 9007199254740992\n      },\n      \"quote \\\" and backslash \\\\\": \"line sep   para sep  \",\n      \" private use\": {\n        \"café\": null,\n        \"quote \\\" and backslash \\\\\": \"\\b\\f\",\n        \"tab\\tnew\\nline\\rcr\": \"2\"\n      }\n    },\n    \"café\": 1e+21,\n    \"😀 emoji\": 5e-324\n  }\n]\n"
+  },
+  {
+   "input": "[[],[\"\",false,1],{},{\"café\":{},\"line sep   para sep  \":\"\\u0000\\u0001\\u001f\"}]",
+   "output": "[\n  [],\n  [\n    \"\",\n    false,\n    1\n  ],\n  {},\n  {\n    \"café\": {},\n    \"line sep   para sep  \": \"\\u0000\\u0001\\u001f\"\n  }\n]\n"
+  },
+  {
+   "input": "\"\\u0000\\u0001\\u001f\"",
+   "output": "\"\\u0000\\u0001\\u001f\"\n"
+  },
+  {
+   "input": "{\"日本語79\":\"__proto__x\",\"￿\":\"\\b\\f\"}",
+   "output": "{\n  \"日本語79\": \"__proto__x\",\n  \"￿\": \"\\b\\f\"\n}\n"
+  },
+  {
+   "input": "{\"1089\":{\"104\":{\"295\":9007199254740994,\"😀 emoji50\":[\"line sep   para sep  \"],\"\\b\\f49\":[\"\\u0000\\u0001\\u001f\",3.7,\"\"],\" private use\":[]},\"café80\":0.1,\"\\u0000\\u0001\\u001f\":false},\"__proto__x\":[],\"日本語\":true,\"café\":{\"日本語68\":{\"\\u0000\\u0001\\u001f\":\" private use\",\"😀 emoji24\":{\"line sep   para sep  83\":\"tab\\tnew\\nline\\rcr\",\"café\":\"\\u0000\\u0001\\u001f\"},\"quote \\\" and backslash \\\\\":0,\"café\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢8\":5e-324}}},\"\\b\\f\":\"Z\"}",
+   "output": "{\n  \"1089\": {\n    \"104\": {\n      \"295\": 9007199254740994,\n      \"\\b\\f49\": [\n        \"\\u0000\\u0001\\u001f\",\n        3.7,\n        \"\"\n      ],\n      \"😀 emoji50\": [\n        \"line sep   para sep  \"\n      ],\n      \" private use\": []\n    },\n    \"\\u0000\\u0001\\u001f\": false,\n    \"café80\": 0.1\n  },\n  \"\\b\\f\": \"Z\",\n  \"__proto__x\": [],\n  \"café\": {\n    \"日本語68\": {\n      \"\\u0000\\u0001\\u001f\": \" private use\",\n      \"café\": {\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢8\": 5e-324\n      },\n      \"quote \\\" and backslash \\\\\": 0,\n      \"😀 emoji24\": {\n        \"café\": \"\\u0000\\u0001\\u001f\",\n        \"line sep   para sep  83\": \"tab\\tnew\\nline\\rcr\"\n      }\n    }\n  },\n  \"日本語\": true\n}\n"
+  },
+  {
+   "input": "\"日本語\"",
+   "output": "\"日本語\"\n"
+  },
+  {
+   "input": "[{\"plain93\":[{},[],{\"2\":0,\"Z78\":0,\"tab\\tnew\\nline\\rcr85\":true},{}],\"__proto__x\":\"10\",\"\\b\\f\":1443},[],\"￿\"]",
+   "output": "[\n  {\n    \"\\b\\f\": 1443,\n    \"__proto__x\": \"10\",\n    \"plain93\": [\n      {},\n      [],\n      {\n        \"2\": 0,\n        \"Z78\": 0,\n        \"tab\\tnew\\nline\\rcr85\": true\n      },\n      {}\n    ]\n  },\n  [],\n  \"￿\"\n]\n"
+  },
+  {
+   "input": "[true,[{\"café\":\"a\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢48\":true,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":[123456789012345680000,true,\"plain\",\"\\u0000\\u0001\\u001f\"],\"__proto__x\":{\"2\":\"café\",\" private use90\":-1,\"café\":\"</script><b>&amp;</b>\",\"￿\":\"2\"}},[false,\"__proto__x\",\"</script><b>&amp;</b>\"]],{\"2\":[{\"\":false}],\" private use82\":[[\" private use\",4.35]]}]",
+   "output": "[\n  true,\n  [\n    {\n      \"__proto__x\": {\n        \"2\": \"café\",\n        \"café\": \"</script><b>&amp;</b>\",\n        \" private use90\": -1,\n        \"￿\": \"2\"\n      },\n      \"café\": \"a\",\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": [\n        123456789012345680000,\n        true,\n        \"plain\",\n        \"\\u0000\\u0001\\u001f\"\n      ],\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢48\": true\n    },\n    [\n      false,\n      \"__proto__x\",\n      \"</script><b>&amp;</b>\"\n    ]\n  ],\n  {\n    \"2\": [\n      {\n        \"\": false\n      }\n    ],\n    \" private use82\": [\n      [\n        \" private use\",\n        4.35\n      ]\n    ]\n  }\n]\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[{},false,{\"￿\":{\"\\u0000\\u0001\\u001f\":[\" private use\"]},\" private use\":{\"￿\":{\"quote \\\" and backslash \\\\74\":5e-324,\"__proto__x52\":-2.5e-10,\"plain\":null,\"a71\":\"tab\\tnew\\nline\\rcr\",\"日本語86\":\"\"},\"\\b\\f\":{},\"line sep   para sep  \":[false,\"quote \\\" and backslash \\\\\",-2.5e-10],\"quote \\\" and backslash \\\\\":[1e-7],\"tab\\tnew\\nline\\rcr\":\"\"}},{\"86\":{\"</script><b>&amp;</b>\":{\"line sep   para sep  \":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\"日本語\":1,\"quote \\\" and backslash \\\\\":0,\"café9\":true,\"a\":-1.1500000000000001e-7}},\"__proto__x\":{\"__proto__x\":false},\"tab\\tnew\\nline\\rcr\":1.146e-321,\"￿\":{},\" private use\":{\"Z\":true}}]",
+   "output": "[\n  {},\n  false,\n  {\n    \" private use\": {\n      \"\\b\\f\": {},\n      \"line sep   para sep  \": [\n        false,\n        \"quote \\\" and backslash \\\\\",\n        -2.5e-10\n      ],\n      \"quote \\\" and backslash \\\\\": [\n        1e-7\n      ],\n      \"tab\\tnew\\nline\\rcr\": \"\",\n      \"￿\": {\n        \"__proto__x52\": -2.5e-10,\n        \"a71\": \"tab\\tnew\\nline\\rcr\",\n        \"plain\": null,\n        \"quote \\\" and backslash \\\\74\": 5e-324,\n        \"日本語86\": \"\"\n      }\n    },\n    \"￿\": {\n      \"\\u0000\\u0001\\u001f\": [\n        \" private use\"\n      ]\n    }\n  },\n  {\n    \"86\": {\n      \"</script><b>&amp;</b>\": {\n        \"a\": -1.1500000000000001e-7,\n        \"café9\": true,\n        \"line sep   para sep  \": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        \"quote \\\" and backslash \\\\\": 0,\n        \"日本語\": 1\n      }\n    },\n    \"__proto__x\": {\n      \"__proto__x\": false\n    },\n    \"tab\\tnew\\nline\\rcr\": 1.146e-321,\n    \" private use\": {\n      \"Z\": true\n    },\n    \"￿\": {}\n  }\n]\n"
+  },
+  {
+   "input": "{\"\":{\"51\":[{}],\"café69\":[1,{\"日本語\":8.654320909765432e+22},[0.1,\"</script><b>&amp;</b>\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"]],\"￿\":[],\"a\":true}}",
+   "output": "{\n  \"\": {\n    \"51\": [\n      {}\n    ],\n    \"a\": true,\n    \"café69\": [\n      1,\n      {\n        \"日本語\": 8.654320909765432e+22\n      },\n      [\n        0.1,\n        \"</script><b>&amp;</b>\",\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n      ]\n    ],\n    \"￿\": []\n  }\n}\n"
+  },
+  {
+   "input": "{\"\":[\"2\"],\"tab\\tnew\\nline\\rcr12\":[[[\"quote \\\" and backslash \\\\\",0,false],{\"2\":null,\"line sep   para sep  1\":\"\\u0000\\u0001\\u001f\",\"￿19\":0.000001,\"a93\":123456789012345680000,\"😀 emoji93\":false},[]],\"plain\",{\"\":[0.30000000000000004,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",0.000001,2601.2999999999997],\"plain\":{\"1092\":null,\"￿92\":3.7,\"line sep   para sep  96\":null,\"日本語\":\" private use\",\"a63\":\"\"},\"__proto__x\":{\"1015\":\"日本語\",\"日本語\":0.30000000000000004,\"line sep   para sep  \":null,\"tab\\tnew\\nline\\rcr\":0.0000974},\"￿\":{\"a42\":true,\"\\u0000\\u0001\\u001f38\":\"</script><b>&amp;</b>\"},\"line sep   para sep  0\":{}},{\"91\":[true,\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",9007199254740992,0.000001],\"日本語\":null,\"line sep   para sep  \":739,\"Z44\":\"café\",\"\\u0000\\u0001\\u001f\":false}]}",
+   "output": "{\n  \"\": [\n    \"2\"\n  ],\n  \"tab\\tnew\\nline\\rcr12\": [\n    [\n      [\n        \"quote \\\" and backslash \\\\\",\n        0,\n        false\n      ],\n      {\n        \"2\": null,\n        \"a93\": 123456789012345680000,\n        \"line sep   para sep  1\": \"\\u0000\\u0001\\u001f\",\n        \"😀 emoji93\": false,\n        \"￿19\": 0.000001\n      },\n      []\n    ],\n    \"plain\",\n    {\n      \"\": [\n        0.30000000000000004,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        0.000001,\n        2601.2999999999997\n      ],\n      \"__proto__x\": {\n        \"1015\": \"日本語\",\n        \"line sep   para sep  \": null,\n        \"tab\\tnew\\nline\\rcr\": 0.0000974,\n        \"日本語\": 0.30000000000000004\n      },\n      \"line sep   para sep  0\": {},\n      \"plain\": {\n        \"1092\": null,\n        \"a63\": \"\",\n        \"line sep   para sep  96\": null,\n        \"日本語\": \" private use\",\n        \"￿92\": 3.7\n      },\n      \"￿\": {\n        \"\\u0000\\u0001\\u001f38\": \"</script><b>&amp;</b>\",\n        \"a42\": true\n      }\n    },\n    {\n      \"91\": [\n        true,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n        9007199254740992,\n        0.000001\n      ],\n      \"\\u0000\\u0001\\u001f\": false,\n      \"Z44\": \"café\",\n      \"line sep   para sep  \": 739,\n      \"日本語\": null\n    }\n  ]\n}\n"
+  },
+  {
+   "input": "{\"quote \\\" and backslash \\\\\":[[{\"1025\":true,\"\\u0000\\u0001\\u001f19\":\"</script><b>&amp;</b>\",\"quote \\\" and backslash \\\\\":100000000000000000000},{\"76\":1,\"a91\":true,\"\\u0000\\u0001\\u001f\":0},\"\"],[[0.0005059999999999999,0.30000000000000004],{\"😀 emoji88\":true,\"\\u0000\\u0001\\u001f1\":-1},null]]}",
+   "output": "{\n  \"quote \\\" and backslash \\\\\": [\n    [\n      {\n        \"1025\": true,\n        \"\\u0000\\u0001\\u001f19\": \"</script><b>&amp;</b>\",\n        \"quote \\\" and backslash \\\\\": 100000000000000000000\n      },\n      {\n        \"76\": 1,\n        \"\\u0000\\u0001\\u001f\": 0,\n        \"a91\": true\n      },\n      \"\"\n    ],\n    [\n      [\n        0.0005059999999999999,\n        0.30000000000000004\n      ],\n      {\n        \"\\u0000\\u0001\\u001f1\": -1,\n        \"😀 emoji88\": true\n      },\n      null\n    ]\n  ]\n}\n"
+  },
+  {
+   "input": "{\"日本語\":null,\"quote \\\" and backslash \\\\\":null}",
+   "output": "{\n  \"quote \\\" and backslash \\\\\": null,\n  \"日本語\": null\n}\n"
+  },
+  {
+   "input": "{\"Z76\":[{},[1.7976931348623157e+308,{\"Z\":\"😀 emoji\"},[9007199254740992],{\"￿\":\"tab\\tnew\\nline\\rcr\",\"line sep   para sep  \":\"Z\"}]],\" private use\":0.1,\"Z57\":100000000000000000000,\"</script><b>&amp;</b>\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}",
+   "output": "{\n  \"</script><b>&amp;</b>\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\",\n  \"Z57\": 100000000000000000000,\n  \"Z76\": [\n    {},\n    [\n      1.7976931348623157e+308,\n      {\n        \"Z\": \"😀 emoji\"\n      },\n      [\n        9007199254740992\n      ],\n      {\n        \"line sep   para sep  \": \"Z\",\n        \"￿\": \"tab\\tnew\\nline\\rcr\"\n      }\n    ]\n  ],\n  \" private use\": 0.1\n}\n"
+  },
+  {
+   "input": "{\"10\":{},\"\\u0000\\u0001\\u001f82\":[],\"Z\":[{\"Z95\":[true,29800,0.30000000000000004,\"😀 emoji\"],\"￿\":\"café\",\"plain\":\"quote \\\" and backslash \\\\\"}],\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{},\"\":{}}",
+   "output": "{\n  \"10\": {},\n  \"\": {},\n  \"\\u0000\\u0001\\u001f82\": [],\n  \"Z\": [\n    {\n      \"Z95\": [\n        true,\n        29800,\n        0.30000000000000004,\n        \"😀 emoji\"\n      ],\n      \"plain\": \"quote \\\" and backslash \\\\\",\n      \"￿\": \"café\"\n    }\n  ],\n  \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {}\n}\n"
+  },
+  {
+   "input": "{\" private use\":[],\"日本語\":3.127e-321}",
+   "output": "{\n  \"日本語\": 3.127e-321,\n  \" private use\": []\n}\n"
+  },
+  {
+   "input": "{\"a\":\"plain\"}",
+   "output": "{\n  \"a\": \"plain\"\n}\n"
+  },
+  {
+   "input": "1.5e-7",
+   "output": "1.5e-7\n"
+  },
+  {
+   "input": "{}",
+   "output": "{}\n"
+  },
+  {
+   "input": "[{\"tab\\tnew\\nline\\rcr\":{\"89\":true,\"日本語52\":[]},\"__proto__x12\":[[5e-324,0.0001257,\"\\b\\f\"],[\"café\",null]],\"日本語23\":{\" private use\":9007199254740992,\"café\":99.99999999999999,\"a45\":true,\"a19\":-487},\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":{\"10\":\"</script><b>&amp;</b>\",\"Z\":null,\"tab\\tnew\\nline\\rcr\":\"a\",\"￿\":null,\"__proto__x\":null}},\"__proto__x\":[1.5e-7,{\"plain77\":false},\"quote \\\" and backslash \\\\\"]}]",
+   "output": "[\n  {\n    \"__proto__x\": [\n      1.5e-7,\n      {\n        \"plain77\": false\n      },\n      \"quote \\\" and backslash \\\\\"\n    ],\n    \"__proto__x12\": [\n      [\n        5e-324,\n        0.0001257,\n        \"\\b\\f\"\n      ],\n      [\n        \"café\",\n        null\n      ]\n    ],\n    \"tab\\tnew\\nline\\rcr\": {\n      \"89\": true,\n      \"日本語52\": []\n    },\n    \"日本語23\": {\n      \"a19\": -487,\n      \"a45\": true,\n      \"café\": 99.99999999999999,\n      \" private use\": 9007199254740992\n    },\n    \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n      \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": {\n        \"10\": \"</script><b>&amp;</b>\",\n        \"Z\": null,\n        \"__proto__x\": null,\n        \"tab\\tnew\\nline\\rcr\": \"a\",\n        \"￿\": null\n      }\n    }\n  }\n]\n"
+  },
+  {
+   "input": "{\"café\":{\"café\":{\"\":null,\"plain65\":{\"</script><b>&amp;</b>58\":null,\"__proto__x\":\"line sep   para sep  \"},\"quote \\\" and backslash \\\\\":[\"line sep   para sep  \",0,0.30000000000000004,null]},\"__proto__x61\":[[\"10\"]],\"\\b\\f32\":false,\"\":{\"\\u0000\\u0001\\u001f\":[null],\"café46\":{\"café46\":0.3333333333333333}},\"😀 emoji\":0.30000000000000004},\"quote \\\" and backslash \\\\9\":{\" private use34\":[-1,[123456789012345680000],[0],{}],\"😀 emoji63\":0.000001,\"a\":1}}",
+   "output": "{\n  \"café\": {\n    \"\": {\n      \"\\u0000\\u0001\\u001f\": [\n        null\n      ],\n      \"café46\": {\n        \"café46\": 0.3333333333333333\n      }\n    },\n    \"\\b\\f32\": false,\n    \"__proto__x61\": [\n      [\n        \"10\"\n      ]\n    ],\n    \"café\": {\n      \"\": null,\n      \"plain65\": {\n        \"</script><b>&amp;</b>58\": null,\n        \"__proto__x\": \"line sep   para sep  \"\n      },\n      \"quote \\\" and backslash \\\\\": [\n        \"line sep   para sep  \",\n        0,\n        0.30000000000000004,\n        null\n      ]\n    },\n    \"😀 emoji\": 0.30000000000000004\n  },\n  \"quote \\\" and backslash \\\\9\": {\n    \"a\": 1,\n    \"😀 emoji63\": 0.000001,\n    \" private use34\": [\n      -1,\n      [\n        123456789012345680000\n      ],\n      [\n        0\n      ],\n      {}\n    ]\n  }\n}\n"
+  },
+  {
+   "input": "false",
+   "output": "false\n"
+  },
+  {
+   "input": "0",
+   "output": "0\n"
+  },
+  {
+   "input": "[{},{\"café\":[{\"268\":100,\" private use\":5188146770730811000,\"__proto__x40\":1,\"plain77\":\"café\",\"\\b\\f22\":0.30000000000000004},{\"日本語79\":100},[\"</script><b>&amp;</b>\",false]]},[[\"￿\",[1,\"café\"],{},{\"2\":\"\",\" private use\":9007199254740994,\"a86\":\"Z\",\"</script><b>&amp;</b>59\":\"日本語\"}],[{\"2\":null,\"104\":\"</script><b>&amp;</b>\",\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":9007199254740994,\"\":123456789012345680000},[null,\" private use\",true,0.3333333333333333],[0,\"a\"],{\"10\":1e-7,\"café\":null,\"a\":\"a\"}]],true]",
+   "output": "[\n  {},\n  {\n    \"café\": [\n      {\n        \"268\": 100,\n        \"\\b\\f22\": 0.30000000000000004,\n        \"__proto__x40\": 1,\n        \"plain77\": \"café\",\n        \" private use\": 5188146770730811000\n      },\n      {\n        \"日本語79\": 100\n      },\n      [\n        \"</script><b>&amp;</b>\",\n        false\n      ]\n    ]\n  },\n  [\n    [\n      \"￿\",\n      [\n        1,\n        \"café\"\n      ],\n      {},\n      {\n        \"2\": \"\",\n        \"</script><b>&amp;</b>59\": \"日本語\",\n        \"a86\": \"Z\",\n        \" private use\": 9007199254740994\n      }\n    ],\n    [\n      {\n        \"2\": null,\n        \"104\": \"</script><b>&amp;</b>\",\n        \"\": 123456789012345680000,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 9007199254740994\n      },\n      [\n        null,\n        \" private use\",\n        true,\n        0.3333333333333333\n      ],\n      [\n        0,\n        \"a\"\n      ],\n      {\n        \"10\": 1e-7,\n        \"a\": \"a\",\n        \"café\": null\n      }\n    ]\n  ],\n  true\n]\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "{\"café\":false}",
+   "output": "{\n  \"café\": false\n}\n"
+  },
+  {
+   "input": "{\"plain6\":[],\"</script><b>&amp;</b>19\":\"10\",\"café\":[],\"plain\":{\"\\b\\f40\":5008002785635993000,\"￿\":{\"a45\":[null,\"\\u0000\\u0001\\u001f\",4.35,123456789012345680000],\"a\":[true,-813]}},\"\\u0000\\u0001\\u001f\":{\"10\":\"a\",\"😀 emoji59\":[[0.3333333333333333],{\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\":0,\"￿\":null,\"😀 emoji\":\"😀 emoji\",\"café\":5e-324},false,[false]],\"__proto__x\":{\"\":{\"2\":\"￿\",\"quote \\\" and backslash \\\\\":5e-324,\"😀 emoji\":\"a\",\"￿87\":\"日本語\"},\"\\b\\f\":\"10\",\"</script><b>&amp;</b>3\":\"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"}}}",
+   "output": "{\n  \"\\u0000\\u0001\\u001f\": {\n    \"10\": \"a\",\n    \"__proto__x\": {\n      \"\": {\n        \"2\": \"￿\",\n        \"quote \\\" and backslash \\\\\": 5e-324,\n        \"😀 emoji\": \"a\",\n        \"￿87\": \"日本語\"\n      },\n      \"\\b\\f\": \"10\",\n      \"</script><b>&amp;</b>3\": \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\"\n    },\n    \"😀 emoji59\": [\n      [\n        0.3333333333333333\n      ],\n      {\n        \"café\": 5e-324,\n        \"𝔘𝔫𝔦𝔠𝔬𝔡𝔢\": 0,\n        \"😀 emoji\": \"😀 emoji\",\n        \"￿\": null\n      },\n      false,\n      [\n        false\n      ]\n    ]\n  },\n  \"</script><b>&amp;</b>19\": \"10\",\n  \"café\": [],\n  \"plain\": {\n    \"\\b\\f40\": 5008002785635993000,\n    \"￿\": {\n      \"a\": [\n        true,\n        -813\n      ],\n      \"a45\": [\n        null,\n        \"\\u0000\\u0001\\u001f\",\n        4.35,\n        123456789012345680000\n      ]\n    }\n  },\n  \"plain6\": []\n}\n"
+  },
+  {
+   "input": "[]",
+   "output": "[]\n"
+  },
+  {
+   "input": "[\"10\"]",
+   "output": "[\n  \"10\"\n]\n"
+  },
+  {
+   "input": "{\"2\":[[{\"__proto__x\":true,\"\\b\\f\":\"\\u0000\\u0001\\u001f\"},[true,false],[],\"line sep   para sep  \"],{}],\"a\":[],\"</script><b>&amp;</b>\":{\" private use84\":[[],null],\"a\":{\"2\":[0,\"café\",false,1e+21],\"39\":[\" private use\",1.7976931348623157e+308],\"a78\":{\"line sep   para sep  \":\" private use\"},\"café\":{\"a24\":true,\"café19\":9007199254740992,\"a74\":0.30000000000000004,\"日本語11\":\"tab\\tnew\\nline\\rcr\",\"￿84\":1.5e-7},\"日本語\":\"café\"}},\"__proto__x\":{},\"line sep   para sep  \":\"plain\"}",
+   "output": "{\n  \"2\": [\n    [\n      {\n        \"\\b\\f\": \"\\u0000\\u0001\\u001f\",\n        \"__proto__x\": true\n      },\n      [\n        true,\n        false\n      ],\n      [],\n      \"line sep   para sep  \"\n    ],\n    {}\n  ],\n  \"</script><b>&amp;</b>\": {\n    \"a\": {\n      \"2\": [\n        0,\n        \"café\",\n        false,\n        1e+21\n      ],\n      \"39\": [\n        \" private use\",\n        1.7976931348623157e+308\n      ],\n      \"a78\": {\n        \"line sep   para sep  \": \" private use\"\n      },\n      \"café\": {\n        \"a24\": true,\n        \"a74\": 0.30000000000000004,\n        \"café19\": 9007199254740992,\n        \"日本語11\": \"tab\\tnew\\nline\\rcr\",\n        \"￿84\": 1.5e-7\n      },\n      \"日本語\": \"café\"\n    },\n    \" private use84\": [\n      [],\n      null\n    ]\n  },\n  \"__proto__x\": {},\n  \"a\": [],\n  \"line sep   para sep  \": \"plain\"\n}\n"
+  },
+  {
+   "input": "{\"a\":1,\"a\":2}",
+   "output": "{\n  \"a\": 2\n}\n"
+  },
+  {
+   "input": " [ 1 , {\"b\" : -0 } ] ",
+   "output": "[\n  1,\n  {\n    \"b\": 0\n  }\n]\n"
+  },
+  {
+   "input": "{\"x\":1e400}",
+   "output": "{\n  \"x\": null\n}\n"
+  },
+  {
+   "input": "\"\\ud83d\\ude00\"",
+   "output": "\"😀\"\n"
+  }
+ ],
+ "keys": [
+  {
+   "pass": "correct horse",
+   "salt": "000102030405060708090a0b0c0d0e0f",
+   "key": "5c662628ac4eb1068a287e2aa2a202ae248e98db04d61d3327e7342db6ec7097"
+  },
+  {
+   "pass": "café",
+   "salt": "ffeeddccbbaa99887766554433221100",
+   "key": "a62bcf1be04b89121cae14fdcaa3e6759b471c720a5c7765aa587b5d0e602d0b"
+  },
+  {
+   "pass": "café",
+   "salt": "ffeeddccbbaa99887766554433221100",
+   "key": "a62bcf1be04b89121cae14fdcaa3e6759b471c720a5c7765aa587b5d0e602d0b"
+  },
+  {
+   "pass": "ﬁle Ⅸ",
+   "salt": "0123456789abcdef0123456789abcdef",
+   "key": "51f421257c03f97fe5497c242a5f72846dd31c10556afd64014b373091e8c2e5"
+  },
+  {
+   "pass": "",
+   "salt": "00000000000000000000000000000000",
+   "key": "2b89a64cf5271142e00236ebd886413e02d879612eaa837ac18d677204157fa1"
+  }
+ ],
+ "envelopes": [
+  {
+   "key": "5c662628ac4eb1068a287e2aa2a202ae248e98db04d61d3327e7342db6ec7097",
+   "rel": "data/journal/2031-01.json",
+   "text": "{\n  \"note\": \"a synthetic diary line\"\n}\n",
+   "envelope": "{\"classpad\":\"enc1\",\"iv\":\"9jmzj7lIq88/Hx1A\",\"tag\":\"RDSUCgKBupsvpZj2gd+SYw==\",\"data\":\"fCWCoTifeLTqh8KtvsPScMxcwRIUc0agC7uJ8Cg2vB1eHxhaTcGt\"}\n"
+  },
+  {
+   "key": "5c662628ac4eb1068a287e2aa2a202ae248e98db04d61d3327e7342db6ec7097",
+   "rel": "data/notes/n.md",
+   "text": "# Heading\n\nSome *text* with ünïcödé and 😀.\n",
+   "envelope": "{\"classpad\":\"enc1\",\"iv\":\"pEykLYNvVh6688k1\",\"tag\":\"Ymn1lFYOVKzMynm7C+/3EA==\",\"data\":\"xvSD6BVFJZ/vWyk6uGn7aTBIKrb4w/wueLCHDOS/m2JmaNqZYxsVr851l7WLPb9xQN4=\"}\n"
+  },
+  {
+   "key": "5c662628ac4eb1068a287e2aa2a202ae248e98db04d61d3327e7342db6ec7097",
+   "rel": "data/empty.txt",
+   "text": "",
+   "envelope": "{\"classpad\":\"enc1\",\"iv\":\"wo6KFFtr6kMy+6JP\",\"tag\":\"QhfnZasTXTdENH3rsAuS2w==\",\"data\":\"\"}\n"
+  }
+ ],
+ "backup": {
+  "zip": "UEsDBBQAAAgIACeqel0rWlETGAAAABYAAAALAAAAY29uZmlnLmpzb26r5lJQUCrJSM1NVbJSUEpJLMpW4qrlAgBQSwMEFAAACAgAJ6p6XWwrM68LAAAACQAAABQAAABkYXRhL25vdGVzL2Egbm90ZS5tZFNWcFTIyy9J5QIAUEsDBBQAAAgIACeqel2KAr6jPwAAAEgAAAAVAAAAZGF0YS90YXNrcy90YXNrcy5qc29uq+ZSUFDKLEnNLVayUojmUlBQUKgGkyDhFCUrBaUQQyWwQC2XgkKsDkh5cXJGam5iWGpRcWZ+npKVgiFXLRcAUEsBAhQDFAAACAgAJ6p6XStaURMYAAAAFgAAAAsAAAAAAAAAAAAAAKSBAAAAAGNvbmZpZy5qc29uUEsBAhQDFAAACAgAJ6p6XWwrM68LAAAACQAAABQAAAAAAAAAAAAAAKSBQQAAAGRhdGEvbm90ZXMvYSBub3RlLm1kUEsBAhQDFAAACAgAJ6p6XYoCvqM/AAAASAAAABUAAAAAAAAAAAAAAKSBfgAAAGRhdGEvdGFza3MvdGFza3MuanNvblBLBQYAAAAAAwADAL4AAADwAAAAAAA=",
+  "files": {
+   "data/tasks/tasks.json": "{\n  \"items\": [\n    {\n      \"id\": \"T1\"\n    }\n  ],\n  \"schemaVersion\": 1\n}\n",
+   "data/notes/a note.md": "# A note\n",
+   "config.json": "{\n  \"theme\": \"dark\"\n}\n"
+  }
+ }
+}

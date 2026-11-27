@@ -4,14 +4,15 @@ Classpad is moving from Electron + Node.js to Go. The goal is one Go program wit
 run time. The interface stays HTML/TypeScript, shown in the operating system's own web view through
 [Wails](https://wails.io) (WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux).
 
-| Piece                   | Today                                  | After the port                                |
-| ----------------------- | -------------------------------------- | --------------------------------------------- |
-| Desktop shell           | Electron (bundles Chromium + Node.js)  | Wails (Go + the system web view)              |
-| Local API and storage   | Fastify on Node.js                     | Go (`net/http`) in the same process           |
-| Grade engine            | **Go** (done; used once the API is Go) | Go, `internal/grades`                         |
-| Importers               | TypeScript packages                    | Go packages under `internal/`                 |
-| Note editor core        | **Go, compiled to WebAssembly** (done) | the same                                      |
-| Interface               | React + TypeScript                     | the same (Node.js is needed only to build it) |
+| Piece                 | Today                                  | After the port                                |
+| --------------------- | -------------------------------------- | --------------------------------------------- |
+| Desktop shell         | Electron (bundles Chromium + Node.js)  | Wails (Go + the system web view)              |
+| Local API             | Fastify on Node.js                     | Go (`net/http`) in the same process           |
+| Storage (data folder) | **Go** (done; used once the API is Go) | Go, `internal/jsonstore`                      |
+| Grade engine          | **Go** (done; used once the API is Go) | Go, `internal/grades`                         |
+| Importers             | TypeScript packages                    | Go packages under `internal/`                 |
+| Note editor core      | **Go, compiled to WebAssembly** (done) | the same                                      |
+| Interface             | React + TypeScript                     | the same (Node.js is needed only to build it) |
 
 ## Order
 
@@ -22,8 +23,13 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    and warnings. `scripts/grades-parity.mjs` runs the TypeScript engine on generated cases and saves the answers;
    the Go test runs the same inputs and compares. 45,000 cases over three seeds matched, and CI checks a fresh set
    on every change. The app keeps calling the TypeScript engine until step 4, when the API (its only caller) is Go.
-3. **Storage** (`packages/jsonstore`): atomic writes, encryption at rest, backups, the file watcher. The on-disk
-   format does not change, so existing data folders keep working.
+3. **Storage** (done). `packages/jsonstore` → `internal/jsonstore`: atomic writes, per-file locking, corruption
+   recovery from backups, migrations, encryption at rest (scrypt + AES-256-GCM), zipped backups and the watcher
+   for hand edits. The on-disk format does not change: the Go store writes the same bytes as the TypeScript one
+   (sorted JSON, including JavaScript's number format and key order) and the same encrypted envelopes, and each
+   store reads the other's files and backups. `scripts/jsonstore-compat.mjs` records what the TypeScript store
+   writes; the Go tests compare (60,000 random JSON values matched), and CI checks both directions on every
+   change. Like the grade engine, it takes over at step 4.
 4. **API** (`packages/server`): the same routes and JSON, so the interface does not change.
 5. **Importers** (`packages/importers`) and the plugin mapper.
 6. **Shell**: swap Electron for Wails, then remove Node.js from the shipped app.
@@ -99,11 +105,37 @@ good at long loops like these. Both engines do the same amount of it, step texts
 page is computed in a few milliseconds; the real savings from Go come at step 6, when Node.js and Chromium
 leave the download.
 
+### Storage (Go vs TypeScript on Node.js)
+
+The same work in both stores on the same synthetic data: a data file of 2,000 assignment-like records (657 KB of
+JSON, identical bytes from both) in a folder with 200 notes. Saves are atomic and flushed to disk (`fsync`; both
+use `F_FULLFSYNC` on macOS).
+
+| Work                                     | TypeScript (Node.js 22) | Go           | Difference         |
+| ---------------------------------------- | ----------------------- | ------------ | ------------------ |
+| Turn the data into stable JSON (no disk) | 3.56–3.63 ms            | 2.55–2.64 ms | about 1.4× faster  |
+| Save the file                            | 7.74–7.90 ms            | 6.53–6.83 ms | about 1.2× faster  |
+| Read and parse the file                  | 1.49–1.51 ms            | 1.70–1.80 ms | about 1.15× slower |
+| Save and read it encrypted               | 13.4–13.5 ms            | 13.9–14.8 ms | about the same     |
+| Back up the folder (zip of 201 files)    | 33.5–33.5 ms            | 20.7–23.4 ms | about 1.5× faster  |
+
+Method: as for the grade engine, two rounds alternating the stores: `go test -bench . -benchtime 2s -count 2
+./internal/jsonstore` and `node scripts/jsonstore-bench.mjs` (median of seven rounds after a warm-up).
+
+Reading is the one place Node.js stays ahead: `JSON.parse` is C++ inside V8 and very fast. The first Go version
+used the general-purpose `encoding/json` and was 4× slower at reading and 2.4× slower at writing; a small JSON
+parser and writer made for this format brought both to the numbers above. Every one of these is a few
+milliseconds for a large file, so neither store makes the app wait.
+
 ## Building
 
-- Go 1.24 or newer (the toolchain in CI comes from `go.mod`).
+- Go 1.26 or newer (the toolchain in CI comes from `go.mod`).
 - `go test ./cmd/... ./internal/...` runs the Go tests; `node scripts/build-editor-wasm.mjs` builds the editor core for the app.
 - After changing the grade engine: `npx tsc -b packages/grades && node scripts/grades-parity.mjs` regenerates the
   TypeScript answers, then `go test ./internal/grades` checks the Go engine against them.
+- After changing the store: `npx tsc -b packages/jsonstore && node scripts/jsonstore-compat.mjs`, then
+  `go test ./internal/jsonstore`.
+- Go modules used: `golang.org/x/crypto` (scrypt), `golang.org/x/text` (Unicode normalization of passphrases),
+  `golang.org/x/sys` and `github.com/fsnotify/fsnotify` (the file watcher). Everything else is the standard library.
 - Node.js stays a build-time tool for the interface (Vite, TypeScript) after the port. It is no longer part of
   what users download.

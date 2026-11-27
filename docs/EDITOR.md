@@ -87,7 +87,7 @@ The core is Go, under `internal/editor/`:
   slash insert, move, paste and copy, undo/redo, and the view diff sent to the page (only changed blocks).
 - `cmd/editorwasm/`: the WebAssembly bridge (`globalThis.classpadEditor`).
 
-`scripts/build-editor-wasm.mjs` builds it to `apps/web/public/editor/` (Go 1.24+ needed; `npm run dev` and the web
+`scripts/build-editor-wasm.mjs` builds it to `apps/web/public/editor/` (Go 1.26+ needed; `npm run dev` and the web
 build run it). The page side is `apps/web/src/blockeditor/`: `core.ts` (loading and the typed command API),
 `render.ts` (drawing blocks and mapping DOM points to block positions), `BlockEditor.tsx` (events, menus, handles),
 and `items.ts` (the block menu). The Source mode editor is the CodeMirror one in `apps/web/src/editor/`.

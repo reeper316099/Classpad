@@ -16,7 +16,7 @@ const go = (args, env = {}) =>
 const goroot = go(['env', 'GOROOT']);
 if (goroot.status !== 0) {
   console.error(
-    'Go is required to build the note editor (https://go.dev/dl/, version 1.24 or newer).',
+    'Go is required to build the note editor (https://go.dev/dl/, version 1.26 or newer).',
   );
   process.exit(1);
 }

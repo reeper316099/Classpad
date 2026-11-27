@@ -42,6 +42,15 @@ jobs:
         run: |
           node scripts/grades-parity.mjs --seed 7 --scale 5 --out "$RUNNER_TEMP/parity.json.gz"
           GRADES_PARITY_FILE="$RUNNER_TEMP/parity.json.gz" go test -count=1 -run Parity ./internal/grades
+      # the Go store must write the same bytes as packages/jsonstore and read its files, both ways
+      - name: Go storage reads and writes the same files as the TypeScript one
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          node scripts/jsonstore-compat.mjs --seed 7 --count 3000 --out "$RUNNER_TEMP/compat.json"
+          JSONSTORE_COMPAT_FILE="$RUNNER_TEMP/compat.json" go test -count=1 -run Compat ./internal/jsonstore
+          mkdir "$RUNNER_TEMP/go-data"
+          JSONSTORE_GO_OUT="$RUNNER_TEMP/go-data" go test -count=1 -run CompatExport ./internal/jsonstore
+          node scripts/jsonstore-compat.mjs --verify "$RUNNER_TEMP/go-data"
       - run: npm test
       - run: npm run test:perf
       # only what ships: build-time tooling (electron-builder) is not part of the app

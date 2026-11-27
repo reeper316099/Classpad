@@ -15,6 +15,12 @@
 - The grade and GPA engine is now also written in Go (`internal/grades`): current grade with its step-by-step breakdown, what-if, the score needed for a target, sensitivity, projection, GPA, retakes and the GPA planner. It gives the same answers as the TypeScript engine digit for digit, checked on 45,000 generated cases, and CI checks the two still agree on every change.
 - Nothing changes in the app yet: the Go engine takes over when the local API moves to Go (step 4). See [docs/go-port](docs/go-port/README.md).
 
+### Go port, step 3: storage
+
+- The data folder store is now also written in Go (`internal/jsonstore`): atomic saves, per-file locking, recovery of corrupt files from backups, migrations, encryption at rest, zipped backups and the watcher for hand edits.
+- Data folders don't change: the Go store writes the same bytes as today's store and the same encrypted files, and each reads the other's files and backups. CI checks both directions on every change.
+- Building Classpad now needs Go 1.26 or newer.
+
 ### Grading
 
 - Typing a bare score such as `18` on a 20-point assignment now records 18/20 (it was read as 18%, which dragged grades down). Write `90%` for a percent. Scores already saved as percents are not changed; re-enter them.
