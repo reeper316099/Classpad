@@ -30,21 +30,48 @@ func nowISO() string { return ISO(Now()) }
 
 const crockford = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
 
-// NewID returns a ULID: 48 bits of milliseconds and 80 random bits, Crockford base32.
+// NewID returns a ULID: 48 bits of milliseconds and 80 random bits, Crockford base32. Like ulid's
+// monotonicFactory, an id made in the same millisecond as the last one is the last one plus one, so
+// ids sort in the order they were made.
 var NewID = func() string {
-	var b [26]byte
+	idMu.Lock()
+	defer idMu.Unlock()
 	ms := uint64(Now().UnixMilli())
-	for i := 9; i >= 0; i-- {
-		b[i] = crockford[ms&31]
-		ms >>= 5
+	if ms <= lastIDMs && lastIDMs != 0 {
+		ms = lastIDMs
+		// increment the random part (base 32, rightmost digit first); 80 bits never overflow in practice
+		for i := 15; i >= 0; i-- {
+			if lastRand[i] < 31 {
+				lastRand[i]++
+				break
+			}
+			lastRand[i] = 0
+		}
+	} else {
+		var r [16]byte
+		rand.Read(r[:])
+		for i := range r {
+			lastRand[i] = r[i] & 31
+		}
+		lastIDMs = ms
 	}
-	var r [16]byte
-	rand.Read(r[:])
+	var b [26]byte
+	t := ms
+	for i := 9; i >= 0; i-- {
+		b[i] = crockford[t&31]
+		t >>= 5
+	}
 	for i := 10; i < 26; i++ {
-		b[i] = crockford[r[i-10]&31]
+		b[i] = crockford[lastRand[i-10]]
 	}
 	return string(b[:])
 }
+
+var (
+	idMu     sync.Mutex
+	lastIDMs uint64
+	lastRand [16]byte
+)
 
 // ---------------- errors ----------------
 

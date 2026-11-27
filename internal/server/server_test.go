@@ -232,3 +232,14 @@ func benchRoute(b *testing.B, path string) {
 func BenchmarkListSorted(b *testing.B) { benchRoute(b, "/api/v1/assignments?limit=100&sort=due") }
 func BenchmarkGpa(b *testing.B)        { benchRoute(b, "/api/v1/gpa") }
 func BenchmarkReport(b *testing.B)     { benchRoute(b, "/api/v1/export/report") }
+
+func TestNewIDIsMonotonic(t *testing.T) {
+	prev := NewID()
+	for range 10_000 {
+		id := NewID()
+		if len(id) != 26 || id <= prev {
+			t.Fatalf("%q after %q", id, prev)
+		}
+		prev = id
+	}
+}

@@ -510,6 +510,15 @@ writeFileSync(path.join(root, 'go.json'), JSON.stringify(goRec.log.map(ng), null
 console.log(
   `${n} requests, ${n - diffs} identical, ${diffs} different${diffs ? ` (details: ${path.join(root, 'diff.json')})` : ''}`,
 );
-for (const d of report.slice(0, 15)) console.log(`  #${d.i} ${d.ts?.req ?? d.go?.req}`);
+for (const d of report.slice(0, 15)) {
+  console.log(`  #${d.i} ${d.ts?.req ?? d.go?.req}`);
+  // where the two answers start to differ, so a CI log is enough to see the problem
+  const a = JSON.stringify(d.ts) ?? '';
+  const b = JSON.stringify(d.go) ?? '';
+  let k = 0;
+  while (k < a.length && a[k] === b[k]) k++;
+  console.log(`    ts: …${a.slice(Math.max(0, k - 120), k + 200)}`);
+  console.log(`    go: …${b.slice(Math.max(0, k - 120), k + 200)}`);
+}
 if (!keep && !diffs && !failed) rmSync(root, { recursive: true, force: true });
 process.exit(diffs || failed ? 1 : 0);
