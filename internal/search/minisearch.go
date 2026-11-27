@@ -504,7 +504,8 @@ func (ms *MiniSearch) addFieldLength(doc, fid, count, length int) {
 	}
 	fl[fid] = length
 	ms.fieldLength[doc] = fl
-	ms.avgFieldLen[fid] = (ms.avgFieldLen[fid]*float64(count) + float64(length)) / float64(count+1)
+	// float64(...) rounds the product on its own: Go may otherwise fuse a*b+c (FMA), unlike JavaScript
+	ms.avgFieldLen[fid] = (float64(ms.avgFieldLen[fid]*float64(count)) + float64(length)) / float64(count+1)
 }
 
 func (ms *MiniSearch) removeFieldLength(fid, count, length int) {
@@ -512,7 +513,7 @@ func (ms *MiniSearch) removeFieldLength(fid, count, length int) {
 		ms.avgFieldLen[fid] = 0
 		return
 	}
-	ms.avgFieldLen[fid] = (ms.avgFieldLen[fid]*float64(count) - float64(length)) / float64(count-1)
+	ms.avgFieldLen[fid] = (float64(ms.avgFieldLen[fid]*float64(count)) - float64(length)) / float64(count-1)
 }
 
 func (ms *MiniSearch) addTerm(fid, doc int, term u16) {
@@ -650,7 +651,9 @@ func bm25(termFreq, matching, total int, fieldLength, avg float64) float64 {
 	const k, b, d = 1.2, 0.7, 0.5
 	idf := math.Log(1 + (float64(total)-float64(matching)+0.5)/(float64(matching)+0.5))
 	tf := float64(termFreq)
-	return idf * (d + tf*(k+1)/(tf+k*(1-b+b*fieldLength/avg)))
+	// each product is rounded before the sum (no fused multiply-add), as in JavaScript
+	inner := float64(1-b) + float64(b*fieldLength/avg)
+	return idf * (d + float64(tf*(k+1))/(tf+float64(k*inner)))
 }
 
 func addUnique(list []u16, t u16) []u16 {

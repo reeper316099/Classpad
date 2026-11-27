@@ -42,6 +42,17 @@ func (o *Obj) Get(k string) any {
 	return o.m[k]
 }
 
+// GetU is Get with absent keys read as Undefined (a JavaScript property read).
+func (o *Obj) GetU(k string) any {
+	if o == nil {
+		return Undefined
+	}
+	if v, ok := o.m[k]; ok {
+		return v
+	}
+	return Undefined
+}
+
 func (o *Obj) Has(k string) bool {
 	if o == nil {
 		return false
@@ -348,8 +359,14 @@ func isIndex(k string) bool {
 	if k == "" || len(k) > 10 || (len(k) > 1 && k[0] == '0') {
 		return false
 	}
-	n, err := strconv.ParseUint(k, 10, 64)
-	return err == nil && n < 1<<32-1
+	var n uint64
+	for i := 0; i < len(k); i++ {
+		if k[i] < '0' || k[i] > '9' {
+			return false // checked by hand: a failed ParseUint allocates its error
+		}
+		n = n*10 + uint64(k[i]-'0')
+	}
+	return n < 1<<32-1
 }
 
 func writeString(b *strings.Builder, s string) {

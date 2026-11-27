@@ -7,7 +7,7 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
 | Piece                 | Today                                  | After the port                                |
 | --------------------- | -------------------------------------- | --------------------------------------------- |
 | Desktop shell         | Electron (bundles Chromium + Node.js)  | Wails (Go + the system web view)              |
-| Local API             | Fastify on Node.js                     | Go (`net/http`) in the same process           |
+| Local API             | **Go** (done; the app switches next)   | Go (`net/http`) in the same process           |
 | Storage (data folder) | **Go** (done; used once the API is Go) | Go, `internal/jsonstore`                      |
 | Grade engine          | **Go** (done; used once the API is Go) | Go, `internal/grades`                         |
 | Importers             | **Go** (done; used once the API is Go) | Go, `internal/importers`                      |
@@ -39,8 +39,16 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    and the Go test compares: about 110,000 cases over four seeds matched, and a real Notion export, checked
    locally and never committed, gave an identical preview. This step moved ahead of the API because the API
    uses the importers.
-5. **API** (`packages/server`): the same routes and JSON, so the interface does not change. Everything under it
-   (grades, storage, importers) is Go by then.
+5. **API** (done; the desktop app switches to it next). `packages/server` → `internal/server` and
+   `cmd/classpad-server`: every route, with the same JSON, status codes, error shapes and headers, so the
+   interface does not change. It runs on the Go storage, grade engine and importers from steps 2 to 4.
+   `scripts/api-parity.mjs` starts both servers on empty data folders, sends each the same 215 requests (demo
+   data, every collection, grades and GPA, search, notes and flashcards, the study timer, attachments, every
+   export, imports with undo, folder sync, the lock with encryption at rest, and bad input of every kind) and
+   compares the answers after replacing ids and timestamps: all 215 match, and CI runs it on Linux and macOS.
+   Matching JavaScript took a few deliberate details: Go must not fuse a multiply and an add into one step
+   where JavaScript rounds twice (search scores differed in the last digit on Apple Silicon), and absent
+   fields must stay absent rather than become `null`. Not ported: the development-only `/openapi.json`.
 6. **Shell**: swap Electron for Wails, then remove Node.js from the shipped app.
 
 Each step ships on its own. Until step 6 the app keeps running on Electron with the parts that are already Go.
@@ -155,6 +163,28 @@ Two Go-only fixes came out of testing: making references unique (`#2`, `#3`…) 
 quadratic in the TypeScript algorithm (a calendar with 20,000 events sharing one UID took 58 seconds in the
 first Go version); both are now linear, with the same output. A fuzz test checks no file can crash an importer.
 
+### API server (Go vs TypeScript on Node.js)
+
+Each server as its own process on a fresh data folder, then loaded with the demo data.
+
+| Measure                                    | TypeScript (Node.js 22) | Go           | Difference           |
+| ------------------------------------------ | ----------------------- | ------------ | -------------------- |
+| Start-up until it answers (median of 10)   | 343–347 ms              | 34–37 ms     | about 10× faster     |
+| Memory, idle                               | 94.9–96.1 MB RSS        | 14.1–14.3 MB | about 6.7× less      |
+| Memory after the demo data and 1,800 calls | 142.8–143.1 MB RSS      | 21.9–22.2 MB | about 6.5× less      |
+| `GET /health`                              | 0.18 ms                 | 0.10 ms      | about 1.7× faster    |
+| `GET /assignments?limit=100&sort=due`      | 0.63 ms                 | 0.34–0.36 ms | about 1.8× faster    |
+| `GET /search?q=lorem`                      | 0.21 ms                 | 0.11–0.12 ms | about 1.8× faster    |
+| `GET /stats/overview`                      | 0.57–0.58 ms            | 0.54–0.55 ms | about the same       |
+| `GET /gpa`                                 | 0.40 ms                 | 0.45 ms      | Go about 1.1× slower |
+| `GET /export/report`                       | 0.38 ms                 | 0.44–0.45 ms | Go about 1.2× slower |
+
+Method: `node scripts/api-bench.mjs --go <binary>` twice (Go built with `-ldflags="-s -w"`, 9.1 MB); request
+times are the median of 300 calls after 20 warm-up calls, over loopback HTTP. The first Go version sorted lists
+at 1.0 ms: it rebuilt collation keys on every comparison, and now builds one per item. GPA and the report are
+still slower because the Go side turns engine results into JSON through an extra encode-and-parse step; both
+stay under half a millisecond.
+
 ## Building
 
 - Go 1.26 or newer (the toolchain in CI comes from `go.mod`).
@@ -163,6 +193,8 @@ first Go version); both are now linear, with the same output. A fuzz test checks
   TypeScript answers, then `go test ./internal/grades` checks the Go engine against them.
 - After changing the store: `npx tsc -b packages/jsonstore && node scripts/jsonstore-compat.mjs`, then
   `go test ./internal/jsonstore`.
+- After changing the API: `npx tsc -b packages/server`, `go build -o /tmp/classpad-server ./cmd/classpad-server`,
+  then `node scripts/api-parity.mjs --go /tmp/classpad-server` (add `--keep` to look at both transcripts).
 - After changing an importer: `npx tsc -b packages/importers && node scripts/importers-parity.mjs`, then
   `go test ./internal/importers`. `node scripts/gen-unicode-tables.mjs` regenerates the emoji table
   (`\p{Extended_Pictographic}`, which Go's regexp lacks) from Node's Unicode data.

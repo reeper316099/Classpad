@@ -56,6 +56,14 @@ jobs:
         run: |
           node scripts/importers-parity.mjs --seed 7 --scale 3 --out "$RUNNER_TEMP/importers.json.gz"
           IMPORTERS_PARITY_FILE="$RUNNER_TEMP/importers.json.gz" go test -count=1 -run Parity ./internal/importers
+      # the same scripted session against both API servers; macOS runs on arm64, where Go may fuse
+      # multiply-adds that JavaScript rounds separately
+      - name: Go API server answers like the TypeScript one
+        if: matrix.os != 'windows-latest'
+        run: |
+          npx tsc -b packages/server
+          go build -o "$RUNNER_TEMP/classpad-server" ./cmd/classpad-server
+          node scripts/api-parity.mjs --go "$RUNNER_TEMP/classpad-server"
       - run: npm test
       - run: npm run test:perf
       # only what ships: build-time tooling (electron-builder) is not part of the app
