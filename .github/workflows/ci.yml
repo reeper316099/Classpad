@@ -24,6 +24,9 @@ jobs:
         with: { go-version-file: go.mod, cache: false }
       - run: npm ci
       - run: npm run guard -- --all
+      - name: Linux libraries for the desktop app (GTK 4, WebKitGTK 6.0)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev
       # Go: the note editor's core (compiled to WebAssembly for the app), grades, storage and importers
       - name: Go formatting
         shell: bash
@@ -85,8 +88,18 @@ jobs:
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod, cache: false }
       - run: npm ci
+      - name: Linux libraries for the desktop app (GTK 4, WebKitGTK 6.0)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev
       - name: Build the desktop bundle
         run: npm run bundle -w @classpad/desktop
+      # the Wails app checks itself in a hidden window: bridge, in-process API, live updates, interface
+      - name: Wails desktop app self-test
+        shell: bash
+        run: |
+          node scripts/build-desktop.mjs --skip-web --out "$RUNNER_TEMP/classpad-app"
+          export CLASSPAD_SELFTEST=1 CLASSPAD_DATA_DIR="$RUNNER_TEMP/selftest-data"
+          if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a "$RUNNER_TEMP/classpad-app"; else "$RUNNER_TEMP/classpad-app"; fi
       - name: End-to-end tests (Linux needs a virtual display)
         if: runner.os == 'Linux'
         run: xvfb-run -a npx playwright test -c e2e/playwright.config.ts

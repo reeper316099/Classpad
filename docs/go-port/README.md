@@ -53,7 +53,15 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    end-to-end test runs against it, and `npm run dev` uses it too. The Electron main bundle shrank from 1.92 MB to
    0.61 MB without Fastify and the rest of the TypeScript server; the Go server adds 9.1 MB per platform (19 MB
    as a universal macOS binary) until step 6 removes Electron.
-6. **Shell**: swap Electron for Wails, then remove Node.js from the shipped app.
+6. **Shell** (in progress): Electron → Wails 3. `cmd/classpad` is the Wails app. The API runs in the same
+   process and the web view calls its handler directly, so it no longer listens on a network port at all. A
+   bridge script (`cmd/classpad/bridge.js`) gives the page the same `window.classpad` the Electron preload did:
+   native menu, folder picker, paste, the report window (printing replaces "save as PDF": the system print
+   dialog saves PDFs), exports through a native Save dialog, live updates as app events, and external links
+   opened in the browser. `CLASSPAD_SELFTEST=1` starts it hidden and checks itself (bridge, in-process API and
+   token, live updates, the interface, the editor core, the report); CI runs that on all three systems. Electron
+   stays the shipped app until packaging and the end-to-end tests move over, then it and Node.js leave the
+   download.
 
 Each step ships on its own. Until step 6 the app keeps running on Electron with the parts that are already Go.
 
@@ -203,8 +211,11 @@ stay under half a millisecond.
 - After changing an importer: `npx tsc -b packages/importers && node scripts/importers-parity.mjs`, then
   `go test ./internal/importers`. `node scripts/gen-unicode-tables.mjs` regenerates the emoji table
   (`\p{Extended_Pictographic}`, which Go's regexp lacks) from Node's Unicode data.
+- The desktop app: `node scripts/build-desktop.mjs` (builds the web interface, embeds it, and builds
+  `cmd/classpad` into `build/`). On Linux it needs GTK 4 and WebKitGTK 6.0 (`libgtk-4-dev libwebkitgtk-6.0-dev`
+  on Debian and Ubuntu); macOS and Windows need nothing extra.
 - Go modules used: `golang.org/x/crypto` (scrypt), `golang.org/x/text` (Unicode normalization),
-  `golang.org/x/sys` and `github.com/fsnotify/fsnotify` (the file watcher), and `gopkg.in/yaml.v3` (note front
-  matter). Everything else is the standard library.
+  `golang.org/x/sys` and `github.com/fsnotify/fsnotify` (the file watcher), `gopkg.in/yaml.v3` (note front
+  matter), and `github.com/wailsapp/wails/v3` (the desktop shell). Everything else is the standard library.
 - Node.js stays a build-time tool for the interface (Vite, TypeScript) after the port. It is no longer part of
   what users download.

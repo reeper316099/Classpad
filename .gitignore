@@ -13,3 +13,7 @@ test-results/
 playwright-report/
 # built from Go by scripts/build-editor-wasm.mjs
 apps/web/public/editor/
+# the desktop app embeds the built web interface (scripts/build-desktop.mjs)
+cmd/classpad/web/*
+!cmd/classpad/web/README.txt
+/build/

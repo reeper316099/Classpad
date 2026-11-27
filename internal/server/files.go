@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"io/fs"
 	"net/url"
 	"os"
 	"path"
@@ -398,6 +399,44 @@ func ReadStatic(root, urlPath string) *StaticFile {
 		return nil
 	}
 	return try(filepath.Join(base, "index.html"))
+}
+
+// ReadStaticFS is ReadStatic over an embedded file system (the desktop app carries the web UI
+// inside its binary).
+func ReadStaticFS(fsys fs.FS, urlPath string) *StaticFile {
+	p := strings.SplitN(strings.SplitN(urlPath, "?", 2)[0], "#", 2)[0]
+	rel, err := url.PathUnescape(p)
+	if err != nil || strings.Contains(rel, "\x00") {
+		return nil
+	}
+	clean := strings.TrimPrefix(path.Clean("/"+rel), "/")
+	try := func(name string) *StaticFile {
+		st, err := fs.Stat(fsys, name)
+		if err != nil || !st.Mode().IsRegular() {
+			return nil
+		}
+		body, err := fs.ReadFile(fsys, name)
+		if err != nil {
+			return nil
+		}
+		typ := staticMIME[strings.ToLower(path.Ext(name))]
+		if typ == "" {
+			typ = "application/octet-stream"
+		}
+		return &StaticFile{Body: body, Type: typ,
+			Immutable: reHashedName.MatchString(path.Base(name)) && strings.Contains("/"+name, "/assets/")}
+	}
+	target := clean
+	if target == "" {
+		target = "index.html"
+	}
+	if f := try(target); f != nil {
+		return f
+	}
+	if nodeExt(rel) != "" {
+		return nil
+	}
+	return try("index.html")
 }
 
 // nodeExt is path.extname: no extension when the only dot leads the name (".hidden") or for "..".

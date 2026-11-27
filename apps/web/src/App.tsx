@@ -49,13 +49,21 @@ const client = new QueryClient({
 function LiveUpdates() {
   const qc = useQueryClient();
   useEffect(() => {
-    if (typeof EventSource === 'undefined') return;
-    const es = new EventSource(eventsUrl());
     let t: ReturnType<typeof setTimeout> | undefined;
-    es.onmessage = () => {
+    const changed = () => {
       clearTimeout(t);
       t = setTimeout(() => void refreshAll(qc), 150);
     };
+    // the desktop app delivers changes as app events; a browser reads the /events stream
+    const off = window.classpad?.onEvent?.(changed);
+    if (off)
+      return () => {
+        clearTimeout(t);
+        off();
+      };
+    if (typeof EventSource === 'undefined') return;
+    const es = new EventSource(eventsUrl());
+    es.onmessage = changed;
     return () => {
       clearTimeout(t);
       es.close();

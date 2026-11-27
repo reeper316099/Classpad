@@ -5,7 +5,7 @@ export interface ApiConfig {
 
 declare global {
   interface Window {
-    /** Present only inside the desktop app (injected by the preload script). */
+    /** Present only inside the desktop app (the shell's bridge script provides it). */
     classpad?: {
       api: ApiConfig;
       platform: string;
@@ -17,11 +17,15 @@ declare global {
       paste(): Promise<void>;
       openReport(hide?: boolean): Promise<void>;
       saveReportPdf(): Promise<{ saved: boolean; path?: string }>;
+      /** Live updates as app events (the Wails shell); without it the page reads /events. */
+      onEvent?(cb: (event: unknown) => void): () => void;
+      /** Save an export through a native dialog (the Wails shell: its web view cannot download). */
+      saveDownload?(path: string, filename: string): Promise<{ saved: boolean; path?: string }>;
     };
   }
 }
 
-/** The Electron preload bridge provides the API address and per-launch token; dev uses a proxy. */
+/** The desktop app's bridge provides the API address and per-launch token; dev uses a proxy. */
 export function apiConfig(): ApiConfig {
   if (typeof window !== 'undefined' && window.classpad?.api) return window.classpad.api;
   return { baseUrl: '', token: String(import.meta.env.VITE_API_TOKEN ?? '') };
@@ -100,6 +104,10 @@ export async function postBinary<T>(path: string, data: Blob): Promise<T> {
 
 /** Download a file served by the API (exports) and hand it to the browser. */
 export async function download(path: string, filename: string): Promise<void> {
+  if (window.classpad?.saveDownload) {
+    await window.classpad.saveDownload(path, filename);
+    return;
+  }
   const res = await request('GET', path);
   const url = URL.createObjectURL(await res.blob());
   const a = document.createElement('a');

@@ -13,37 +13,10 @@ import (
 	"io"
 	"os"
 	"os/signal"
-	"path/filepath"
-	"runtime"
 	"syscall"
 
 	"github.com/reeper316099/classpad/internal/server"
 )
-
-// defaultDataDir is the per-OS data directory; CLASSPAD_DATA_DIR overrides it.
-func defaultDataDir() string {
-	if d := os.Getenv("CLASSPAD_DATA_DIR"); d != "" {
-		abs, err := filepath.Abs(d)
-		if err == nil {
-			return abs
-		}
-		return d
-	}
-	home, _ := os.UserHomeDir()
-	switch runtime.GOOS {
-	case "windows":
-		if a := os.Getenv("APPDATA"); a != "" {
-			return filepath.Join(a, server.AppName)
-		}
-		return filepath.Join(home, "AppData", "Roaming", server.AppName)
-	case "darwin":
-		return filepath.Join(home, "Library", "Application Support", server.AppName)
-	}
-	if x := os.Getenv("XDG_CONFIG_HOME"); x != "" {
-		return filepath.Join(x, server.AppName)
-	}
-	return filepath.Join(home, ".config", server.AppName)
-}
 
 func main() {
 	dataDir := flag.String("data-dir", "", "data directory (default: the per-OS Classpad folder)")
@@ -57,7 +30,7 @@ func main() {
 
 	dir := *dataDir
 	if dir == "" {
-		dir = defaultDataDir()
+		dir = server.DefaultDataDir()
 	}
 	token := os.Getenv("CLASSPAD_TOKEN")
 	opts := server.AppOptions{DataDir: dir, Token: token, Dev: *dev, Watch: *watch, StaticDir: *static,

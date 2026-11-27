@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"mime"
 	"net"
 	"net/http"
@@ -38,6 +39,11 @@ type AppOptions struct {
 	Watch   bool
 	// StaticDir holds the built web UI; when set, the server serves it too (same origin as the API).
 	StaticDir string
+	// StaticFS is the web UI as an embedded file system (used instead of StaticDir when set).
+	StaticFS fs.FS
+	// InProcess: the handler is called directly by the desktop shell's web view and never listens on a
+	// network port, so there is no Host header to guard (the token is still required).
+	InProcess bool
 	// AllowedHosts are the accepted Host header values (DNS-rebinding guard). Default: loopback names on
 	// the listening port.
 	AllowedHosts []string
@@ -282,30 +288,11 @@ var reBearer = regexp.MustCompile(`(?i)^Bearer\s+`)
 // guard is the onRequest hook: host check, bearer token, lock.
 func (a *App) guard(q *request, path string) error {
 	r := q.r
-	host := r.Host
-	hostName := rePortSuffix.ReplaceAllString(host, "")
-	loopback := hostName == "127.0.0.1" || hostName == "localhost" || hostName == "[::1]"
-	portOK := a.opts.Dev || a.port == 0 || strings.HasSuffix(host, ":"+strconv.Itoa(a.port))
-	allowed := a.opts.AllowedHosts
-	if allowed == nil {
-		switch {
-		case loopback && portOK:
-			allowed = []string{host}
-		case a.port != 0:
-			allowed = []string{}
-		}
-	}
-	if allowed != nil {
-		ok := false
-		for _, h := range allowed {
-			ok = ok || h == host
-		}
-		if !ok {
-			return apiErr(403, "BAD_HOST", "unexpected Host header")
-		}
+	if !a.opts.InProcess && !a.hostOK(r.Host) {
+		return apiErr(403, "BAD_HOST", "unexpected Host header")
 	}
 	// the UI bundle itself is public (it holds no data); everything under /api needs the token
-	if a.opts.StaticDir != "" && !strings.HasPrefix(path, apiPrefix+"/") && (r.Method == http.MethodGet || r.Method == http.MethodHead) {
+	if a.serveStatic() && !strings.HasPrefix(path, apiPrefix+"/") && (r.Method == http.MethodGet || r.Method == http.MethodHead) {
 		return nil
 	}
 	given := reBearer.ReplaceAllString(r.Header.Get("Authorization"), "")
@@ -323,6 +310,30 @@ func (a *App) guard(q *request, path string) error {
 		return apiErr(423, "LOCKED", "Classpad is locked")
 	}
 	return nil
+}
+
+// hostOK is the DNS-rebinding guard: loopback names only, on our port (any port in dev mode).
+func (a *App) hostOK(host string) bool {
+	hostName := rePortSuffix.ReplaceAllString(host, "")
+	loopback := hostName == "127.0.0.1" || hostName == "localhost" || hostName == "[::1]"
+	portOK := a.opts.Dev || a.port == 0 || strings.HasSuffix(host, ":"+strconv.Itoa(a.port))
+	allowed := a.opts.AllowedHosts
+	if allowed == nil {
+		switch {
+		case loopback && portOK:
+			return true
+		case a.port != 0:
+			return false
+		default:
+			return true // not listening (tests call the handler directly)
+		}
+	}
+	for _, h := range allowed {
+		if h == host {
+			return true
+		}
+	}
+	return false
 }
 
 // parseQuery reads the query string like fastify: repeated keys become arrays.
@@ -483,8 +494,14 @@ func (a *App) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) notFound(w http.ResponseWriter, q *request, path string) {
 	r := q.r
-	if a.opts.StaticDir != "" && (r.Method == http.MethodGet || r.Method == http.MethodHead) && !strings.HasPrefix(path, apiPrefix+"/") {
-		if f := ReadStatic(a.opts.StaticDir, path); f != nil {
+	if a.serveStatic() && (r.Method == http.MethodGet || r.Method == http.MethodHead) && !strings.HasPrefix(path, apiPrefix+"/") {
+		var f *StaticFile
+		if a.opts.StaticFS != nil {
+			f = ReadStaticFS(a.opts.StaticFS, path)
+		} else {
+			f = ReadStatic(a.opts.StaticDir, path)
+		}
+		if f != nil {
 			h := w.Header()
 			h.Set("Content-Type", f.Type)
 			if f.Immutable {
@@ -508,6 +525,8 @@ func (a *App) notFound(w http.ResponseWriter, q *request, path string) {
 	}
 	a.sendError(w, q.id, 404, "NOT_FOUND", "route not found", nil)
 }
+
+func (a *App) serveStatic() bool { return a.opts.StaticDir != "" || a.opts.StaticFS != nil }
 
 // download sends a file to save.
 func download(q *request, contentType, name string, body []byte) (any, error) {
