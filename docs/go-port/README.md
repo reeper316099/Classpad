@@ -78,12 +78,13 @@ size is the one installed on the test machine; official builds differ by platfor
 
 ### The app download
 
-|                        | Electron (v1.3.1, today) | Wails + Go         |
-| ---------------------- | ------------------------ | ------------------ |
-| macOS installer (.dmg) | 231.7 MB (universal)     | measured at step 6 |
+|                        | Electron (v1.3.1) | Electron + the Go server (step 5) | Wails + Go         |
+| ---------------------- | ----------------- | --------------------------------- | ------------------ |
+| macOS installer (.dmg) | 231.7 MB          | 240.8 MB                          | measured at step 6 |
 
-Electron ships a full copy of Chromium and Node.js in every app. Wails uses the web view the operating system
-already has, which is where most of the difference will come from.
+All universal (arm64 + x64). Step 5 adds the Go server to an app that still carries Electron, so the download
+grows by 9 MB for now. Electron ships a full copy of Chromium and Node.js in every app; Wails uses the web view
+the operating system already has, which is where most of the difference will come from.
 
 ### Note editor core (Go → WebAssembly)
 
