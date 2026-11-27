@@ -7,3 +7,6 @@ fixtures/synthetic/notion-export
 fixtures/synthetic/notion-export.expected.json
 apps/web/public/editor
 internal/*/testdata/
+cmd/classpad/web
+build
+release

@@ -49,7 +49,7 @@ func Migrate(doc Versioned, target int, migrations Migrations) (Versioned, error
 // desktop shell's own folder, so Chromium's single-instance lock files are skipped too: they hold no
 // data, and on Windows "lockfile" is open with delete-on-close, which Go's os.Open cannot share.
 var backupExclude = map[string]bool{
-	"electron": true, "backups": true, "quarantine": true, "logs": true,
+	"electron": true, "shell": true, "backups": true, "quarantine": true, "logs": true,
 	"attachments": true, "imports": true, "exports": true, ".lock": true,
 	"lockfile": true, "SingletonLock": true, "SingletonSocket": true, "SingletonCookie": true,
 }

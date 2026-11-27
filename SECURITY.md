@@ -14,12 +14,14 @@ It does **not** defend against malware running as your user, or someone with you
 
 ## What we do
 
-- **No network.** No telemetry, accounts, updates checks or AI calls. The Electron session cancels any
-  request that is not the local server.
-- **Local API hardened.** Loopback only, random per-launch bearer token, `Host` header allow-list, strict
-  Content-Security-Policy, request size limits, schema validation on every write.
-- **Renderer isolation.** Sandbox, context isolation, no Node integration, no popups or webviews,
-  navigation locked, only a narrow preload bridge.
+- **No network.** No telemetry, accounts, updates checks or AI calls. The page's Content-Security-Policy
+  allows nothing but the app itself; links open in your browser, never in the app window.
+- **Local API hardened.** In the desktop app the API runs in the same process and has no network port at
+  all. A random per-launch bearer token is still required, with a strict Content-Security-Policy, request
+  size limits and schema validation on every write. (Run on its own, `classpad-server` listens on loopback
+  only and checks the `Host` header against DNS rebinding.)
+- **Page isolation.** The interface runs in the system web view with no access to your files or programs;
+  a narrow bridge offers only what it needs (menu, dialogs you confirm, the clipboard on Paste).
 - **Untrusted content.** Raw HTML in Markdown is never rendered; imports are previewed before anything is written; file
   paths are confined to the data folder.
 - **No secrets in logs.** Logs never include note, journal or grade content.

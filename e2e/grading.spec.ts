@@ -1,28 +1,11 @@
-import {
-  _electron as electron,
-  expect,
-  test,
-  type ElectronApplication,
-  type Page,
-} from '@playwright/test';
-import { mkdtempSync, rmSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { cleanup, launch, type App } from './harness';
+import { mkdtempSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
-function cleanup(dir: string) {
-  try {
-    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
-  } catch {
-    /* best effort */
-  }
-}
-
-const here = path.dirname(fileURLToPath(import.meta.url));
-const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-grading-'));
-let app: ElectronApplication;
+let app: App;
 let page: Page;
 const api = (p: string, method = 'GET', body?: unknown) =>
   page.evaluate(
@@ -46,13 +29,7 @@ test.afterAll(async () => {
 });
 
 test('set your own category weights for a class, then sort assignments into them', async () => {
-  app = await electron.launch({
-    args: [main],
-    env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
-  });
-  page = await app.firstWindow();
-  await page.setViewportSize({ width: 1280, height: 900 });
-  await page.waitForLoadState('domcontentloaded');
+  ({ app, page } = await launch(dataDir));
   const sem = await api('/semesters', 'POST', { name: 'Cat Term' });
   const cls = await api('/classes', 'POST', { name: 'Cat Class', semesterId: sem.id });
   for (const [title, type, score] of [

@@ -411,7 +411,7 @@ export class JsonStore extends EventEmitter {
   async watch(): Promise<void> {
     if (this.watcher) return;
     const ignored = (p: string) =>
-      /(^|[\\/])(backups|quarantine|logs|attachments|exports|imports|electron)([\\/]|$)|(^|[\\/])Singleton(Lock|Socket|Cookie)$|\.tmp$|\.lock$/.test(
+      /(^|[\\/])(backups|quarantine|logs|attachments|exports|imports|electron|shell)([\\/]|$)|(^|[\\/])Singleton(Lock|Socket|Cookie)$|\.tmp$|\.lock$/.test(
         path.relative(this.root, p),
       );
     this.watcher = chokidarWatch(this.root, {

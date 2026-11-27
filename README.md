@@ -25,8 +25,8 @@ More: [architecture](docs/ARCHITECTURE.md) · [data format](docs/DATA_FORMAT.md)
 
 ## Develop
 
-Needs Node 22+ and Go 1.26+ (the local API is Go, the note editor's core is Go compiled to WebAssembly, and the
-rest of the app is [moving to Go](docs/go-port/README.md)).
+Needs Node 22+ and Go 1.26+. The app is Go ([how it got there](docs/go-port/README.md)); Node.js builds the
+interface. On Linux the desktop app also needs GTK 4 and WebKitGTK 6.0 (`libgtk-4-dev libwebkitgtk-6.0-dev`).
 
 ```bash
 npm install
@@ -41,8 +41,8 @@ go test ./cmd/... ./internal/...
 ```bash
 npm run dev       # API + web UI in your browser (http://127.0.0.1:5173)
 npm run dev:stop  # stop leftover dev servers if a port is busy
-npm run desktop   # the Electron desktop app
-npm run e2e       # end-to-end tests on the built app
+npm run desktop   # build and open the desktop app
+npm run e2e       # end-to-end tests (WebKit and Chromium)
 ```
 
 See `docs/PACKAGING.md` for installers and releases.
@@ -54,7 +54,7 @@ See `docs/PACKAGING.md` for installers and releases.
 - `packages/shared` – Zod schemas and shared types
 - `internal/server`, `cmd/classpad-server` – the local API (Go); `packages/server` is the TypeScript original
 - `packages/importers` – Notion/CSV/ICS/Markdown importers
-- `apps/web` – React UI · `apps/desktop` – Electron shell
+- `apps/web` – React UI · `cmd/classpad` – the desktop app (Wails)
 - `fixtures/synthetic` – generated fake data (public)
 
 Your own data never belongs in this repo: `private-fixtures/` is gitignored and a guard

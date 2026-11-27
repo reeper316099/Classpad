@@ -69,7 +69,7 @@ jobs:
           node scripts/api-parity.mjs --go "$RUNNER_TEMP/classpad-server"
       - run: npm test
       - run: npm run test:perf
-      # only what ships: build-time tooling (electron-builder) is not part of the app
+      # only what ships: build-time tooling is not part of the app
       - run: npm audit --omit=dev --audit-level=moderate
         if: matrix.os == 'ubuntu-latest'
 
@@ -91,21 +91,27 @@ jobs:
       - name: Linux libraries for the desktop app (GTK 4, WebKitGTK 6.0)
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev
-      - name: Build the desktop bundle
-        run: npm run bundle -w @classpad/desktop
-      # the Wails app checks itself in a hidden window: bridge, in-process API, live updates, interface
-      - name: Wails desktop app self-test
+      - name: Build the interface
+        run: npm run build -w @classpad/web
+      # the desktop app checks itself in a hidden window: bridge, in-process API, live updates, interface
+      - name: Desktop app self-test
         shell: bash
         run: |
           node scripts/build-desktop.mjs --skip-web --out "$RUNNER_TEMP/classpad-app"
           export CLASSPAD_SELFTEST=1 CLASSPAD_DATA_DIR="$RUNNER_TEMP/selftest-data"
           if [ "$RUNNER_OS" = Linux ]; then xvfb-run -a "$RUNNER_TEMP/classpad-app"; else "$RUNNER_TEMP/classpad-app"; fi
-      - name: End-to-end tests (Linux needs a virtual display)
-        if: runner.os == 'Linux'
-        run: xvfb-run -a npx playwright test -c e2e/playwright.config.ts
-      - name: End-to-end tests
-        if: runner.os != 'Linux'
-        run: npx playwright test -c e2e/playwright.config.ts
+      # the interface against the Go server in the engines the desktop app uses: WebKit on macOS and
+      # Linux, Chromium (WebView2) on Windows
+      - name: End-to-end tests (WebKit and Chromium)
+        if: runner.os != 'Windows'
+        run: |
+          npx playwright install --with-deps chromium webkit
+          npx playwright test -c e2e/playwright.config.ts
+      - name: End-to-end tests (Chromium, as WebView2)
+        if: runner.os == 'Windows'
+        run: |
+          npx playwright install chromium
+          npx playwright test -c e2e/playwright.config.ts --project=chromium
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

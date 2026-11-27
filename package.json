@@ -14,7 +14,7 @@
   "scripts": {
     "lint": "eslint . && prettier --check .",
     "format": "prettier --write .",
-    "typecheck": "tsc -b && tsc -p apps/web --noEmit && tsc -p apps/desktop --noEmit",
+    "typecheck": "tsc -b && tsc -p apps/web --noEmit",
     "test": "vitest run",
     "test:perf": "vitest run -c vitest.perf.config.ts",
     "test:watch": "vitest",
@@ -25,16 +25,16 @@
     "fixtures:check-leak": "node scripts/check-fixture-leak.mjs",
     "dev": "node scripts/dev.mjs",
     "build:web": "npm run build -w @classpad/web",
-    "desktop": "npm run start -w @classpad/desktop",
-    "desktop:pack": "npm run pack -w @classpad/desktop",
-    "desktop:dist": "npm run dist -w @classpad/desktop",
-    "e2e": "npm run bundle -w @classpad/desktop && playwright test -c e2e/playwright.config.ts",
+    "desktop": "node scripts/build-desktop.mjs --run",
+    "desktop:dist": "node scripts/package-desktop.mjs",
+    "e2e": "npm run build -w @classpad/web && playwright test -c e2e/playwright.config.ts",
     "dev:stop": "node scripts/dev.mjs --stop"
   },
   "simple-git-hooks": {
     "pre-commit": "node scripts/guard-private.mjs"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@types/node": "^26.6.5",
     "@vitest/coverage-v8": "^5.0.5",
     "axe-core": "^4.10.2",

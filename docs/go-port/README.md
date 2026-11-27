@@ -1,18 +1,18 @@
 # Porting Classpad to Go
 
-Classpad is moving from Electron + Node.js to Go. The goal is one Go program with no Electron and no Node.js at
-run time. The interface stays HTML/TypeScript, shown in the operating system's own web view through
+Classpad moved from Electron + Node.js to Go: it is now one Go program, with no Electron and no Node.js at run
+time. The interface stays HTML/TypeScript, shown in the operating system's own web view through
 [Wails](https://wails.io) (WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux).
 
-| Piece                 | Today                                  | After the port                                |
-| --------------------- | -------------------------------------- | --------------------------------------------- |
-| Desktop shell         | Electron (bundles Chromium + Node.js)  | Wails (Go + the system web view)              |
-| Local API             | **Go** (done)                          | Go (`net/http`) in the same process           |
-| Storage (data folder) | **Go** (done)                          | Go, `internal/jsonstore`                      |
-| Grade engine          | **Go** (done)                          | Go, `internal/grades`                         |
-| Importers             | **Go** (done)                          | Go, `internal/importers`                      |
-| Note editor core      | **Go, compiled to WebAssembly** (done) | the same                                      |
-| Interface             | React + TypeScript                     | the same (Node.js is needed only to build it) |
+| Piece                 | Before                                | Now                                           |
+| --------------------- | ------------------------------------- | --------------------------------------------- |
+| Desktop shell         | Electron (bundles Chromium + Node.js) | **Wails** (Go + the system web view)          |
+| Local API             | Fastify on Node.js                    | **Go** (`net/http`) in the same process       |
+| Storage (data folder) | TypeScript                            | **Go**, `internal/jsonstore`                  |
+| Grade engine          | TypeScript                            | **Go**, `internal/grades`                     |
+| Importers             | TypeScript                            | **Go**, `internal/importers`                  |
+| Note editor core      | TypeScript                            | **Go, compiled to WebAssembly**               |
+| Interface             | React + TypeScript                    | the same (Node.js is needed only to build it) |
 
 ## Order
 
@@ -49,21 +49,21 @@ run time. The interface stays HTML/TypeScript, shown in the operating system's o
    Matching JavaScript took a few deliberate details: Go must not fuse a multiply and an add into one step
    where JavaScript rounds twice (search scores differed in the last digit on Apple Silicon), and absent
    fields must stay absent rather than become `null`. Not ported: the development-only `/openapi.json`.
-   The desktop app now starts the Go server as a child process (`apps/desktop/src/server.ts`), so every
-   end-to-end test runs against it, and `npm run dev` uses it too. The Electron main bundle shrank from 1.92 MB to
-   0.61 MB without Fastify and the rest of the TypeScript server; the Go server adds 9.1 MB per platform (19 MB
-   as a universal macOS binary) until step 6 removes Electron.
-6. **Shell** (in progress): Electron → Wails 3. `cmd/classpad` is the Wails app. The API runs in the same
-   process and the web view calls its handler directly, so it no longer listens on a network port at all. A
-   bridge script (`cmd/classpad/bridge.js`) gives the page the same `window.classpad` the Electron preload did:
-   native menu, folder picker, paste, the report window (printing replaces "save as PDF": the system print
-   dialog saves PDFs), exports through a native Save dialog, live updates as app events, and external links
-   opened in the browser. `CLASSPAD_SELFTEST=1` starts it hidden and checks itself (bridge, in-process API and
-   token, live updates, the interface, the editor core, the report); CI runs that on all three systems. Electron
-   stays the shipped app until packaging and the end-to-end tests move over, then it and Node.js leave the
-   download.
+   For a while the Electron app started the Go server as a child process; its main bundle shrank from 1.92 MB
+   to 0.61 MB without Fastify and the rest of the TypeScript server. `npm run dev` uses the Go server too.
+6. **Shell** (done): Electron → Wails 3. `cmd/classpad` is the desktop app. The API runs in the same process
+   and the web view calls its handler directly, so it no longer listens on a network port at all. A bridge
+   script (`cmd/classpad/bridge.js`) gives the page the same `window.classpad` the Electron preload did: native
+   menu, folder picker, paste, the report window (printing replaces "save as PDF": the system print dialog
+   saves PDFs), exports through a native Save dialog, live updates as app events, and external links opened in
+   the browser. `scripts/package-desktop.mjs` builds the installers (`packaging/`). Tests: the end-to-end suite
+   now runs the interface against the Go server in WebKit and Chromium, the engines of the desktop app's web
+   views (70 runs, all passing), and `CLASSPAD_SELFTEST=1` starts the real app hidden and checks it (bridge,
+   in-process API and token, live updates, interface, editor core, report) on all three systems in CI.
+   `apps/desktop` (Electron) is gone. The TypeScript packages stay as the reference the Go code is checked
+   against.
 
-Each step ships on its own. Until step 6 the app keeps running on Electron with the parts that are already Go.
+Each step shipped on its own.
 
 ## Measurements
 
@@ -86,13 +86,14 @@ size is the one installed on the test machine; official builds differ by platfor
 
 ### The app download
 
-|                        | Electron (v1.3.1) | Electron + the Go server (step 5) | Wails + Go         |
-| ---------------------- | ----------------- | --------------------------------- | ------------------ |
-| macOS installer (.dmg) | 231.7 MB          | 240.8 MB                          | measured at step 6 |
+|                        | Electron (v1.3.1) | Electron + the Go server (step 5) | Wails + Go (step 6) |
+| ---------------------- | ----------------- | --------------------------------- | ------------------- |
+| macOS installer (.dmg) | 231.7 MB          | 240.8 MB                          | 23.7 MB             |
 
-All universal (arm64 + x64). Step 5 adds the Go server to an app that still carries Electron, so the download
-grows by 9 MB for now. Electron ships a full copy of Chromium and Node.js in every app; Wails uses the web view
-the operating system already has, which is where most of the difference will come from.
+All universal (arm64 + x64), so about 9.8× smaller than Electron. Electron ships a full copy of Chromium and
+Node.js in every app; Wails uses the web view the operating system already has. Unpacked, the universal app is
+one 52.4 MB binary (25.6 MB for arm64, 26.8 MB for x64), each half carrying the embedded interface (13 MB, of
+which 5.9 MB is the editor core's WebAssembly). Release builds leave the interface's source maps out (12 MB).
 
 ### Note editor core (Go → WebAssembly)
 

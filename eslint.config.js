@@ -5,6 +5,9 @@ export default tseslint.config(
   {
     ignores: [
       'apps/web/public/editor/**',
+      'cmd/classpad/web/**',
+      'build/**',
+      'release/**',
       '**/dist/**',
       '**/coverage/**',
       'private-fixtures/**',

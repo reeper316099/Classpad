@@ -1,16 +1,16 @@
 # Architecture
 
-Classpad is an Electron app that talks to a small local web server, a Go program it starts as a child process.
-There is no cloud component.
+Classpad is one Go program: a desktop shell (Wails) that shows the web interface in the operating system's own
+web view, with the local API in the same process. There is no cloud component.
 
 ```
-┌─────────── Electron main ───────────┐      ┌────────── Renderer (sandboxed) ─────────┐
-│ window, menu, single-instance lock  │      │ React UI (apps/web)                      │
-│ starts the API on 127.0.0.1:<port>  │◀────▶│ fetch → http://127.0.0.1:<port>/api/v1    │
-│ per-launch bearer token             │ IPC  │ preload bridge: token, port, native menu │
-│ blocks every non-local request      │      │ no Node, contextIsolation, sandbox       │
+┌──────── cmd/classpad (Wails) ───────┐      ┌──────────── System web view ────────────┐
+│ window, menu, dialogs, single       │      │ React UI (apps/web), embedded in the app │
+│ instance, window position           │◀────▶│ fetch → /api/v1 (same origin, no port)   │
+│ serves the web view's requests      │ calls│ bridge.js: token, menu, live updates,    │
+│ per-launch bearer token             │      │ dialogs; strict CSP, no remote requests  │
 └──────────────┬──────────────────────┘      └─────────────────────────────────────────┘
-               │ child process (token in its environment; it exits when the app goes away)
+               │ in process: the web view's requests go to the API's handler
        ┌───────▼─────────┐   ┌────────────┐   ┌───────────┐   ┌────────────┐
        │ internal/server │──▶│ jsonstore  │   │  grades   │   │ importers  │
        │ Go, net/http    │   │ files, I/O │   │ pure math │   │ pure parse │
@@ -28,7 +28,7 @@ There is no cloud component.
 | `packages/importers`      | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                    | shared                             |
 | `packages/server`         | The TypeScript API the Go server was ported from; kept, with the other TypeScript packages, as the reference the Go code is checked against (`scripts/api-parity.mjs`).                                                                                     | all of the above                   |
 | `apps/web`                | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                             | —                                  |
-| `apps/desktop`            | Electron main + preload, packaging; starts the Go server (`apps/desktop/src/server.ts`).                                                                                                                                                                    | server, web                        |
+| `cmd/classpad` (Go)       | The desktop app (Wails 3): window, menu, dialogs and the page bridge; runs the API in process. See [PACKAGING.md](PACKAGING.md).                                                                                                                            | server, web                        |
 | `internal/editor` (Go)    | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md). | Go standard library                |
 | `internal/grades` (Go)    | The grade and GPA engine ported from `packages/grades`, digit for digit (exact decimals, same steps and warnings). Checked against the TypeScript engine on generated cases (`scripts/grades-parity.mjs`). Used by the Go API.                              | Go standard library                |
 | `internal/jsonstore` (Go) | The data folder store ported from `packages/jsonstore`: same files byte for byte, same encryption and backups, both ways compatible (checked by `scripts/jsonstore-compat.mjs`). Used by the Go API.                                                        | x/crypto, x/text, fsnotify         |
@@ -47,7 +47,8 @@ There is no cloud component.
 - **Imports are drafts first.** Importers return previews with an `importRef` per item; committing
   writes a manifest so the whole import can be undone, after a pre-import backup.
 - **Explainable numbers.** The grade engine returns steps as data; the UI renders them.
-- **No network by design.** The Electron session cancels any request that is not the local server.
+- **No network by design.** The page's Content-Security-Policy allows only the app itself, and the API has no
+  network port in the desktop app.
 
 ## Extension boundary
 
@@ -71,7 +72,7 @@ Anything that needs network access, accounts or sync is out of scope for v1.
 flowchart TD
 
 subgraph group_clients["User interfaces"]
-  node_desktop["Desktop shell<br/>[main.ts]"]
+  node_desktop["Desktop shell<br/>[main.go]"]
   node_web["Web workspace<br/>[App.tsx]"]
   node_ui_state["UI preferences<br/>[store.ts]"]
   node_api_client["API client<br/>[api.ts]"]
@@ -138,7 +139,7 @@ node_folder_sync -->|"writes folder"| node_filesystem
 node_api_server -->|"creates service"| node_attachments
 node_attachments -.->|"uses storage"| node_json_store
 
-click node_desktop "https://github.com/reeper316099/classpad/blob/main/apps/desktop/src/main.ts"
+click node_desktop "https://github.com/reeper316099/classpad/blob/main/cmd/classpad/main.go"
 click node_web "https://github.com/reeper316099/classpad/blob/main/apps/web/src/App.tsx"
 click node_ui_state "https://github.com/reeper316099/classpad/blob/main/apps/web/src/lib/store.ts"
 click node_api_client "https://github.com/reeper316099/classpad/blob/main/apps/web/src/lib/api.ts"

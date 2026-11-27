@@ -6,6 +6,7 @@ import path from 'node:path';
 // data (and on Windows the Go store cannot open "lockfile", which is kept open with delete-on-close).
 export const BACKUP_EXCLUDE = new Set([
   'electron',
+  'shell',
   'backups',
   'quarantine',
   'logs',

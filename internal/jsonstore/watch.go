@@ -17,7 +17,7 @@ import (
 // validated). The TypeScript store waits 60 ms for the size to stop changing.
 const settle = 80 * time.Millisecond
 
-var ignoredPath = regexp.MustCompile(`(^|[\\/])(backups|quarantine|logs|attachments|exports|imports|electron)([\\/]|$)|(^|[\\/])Singleton(Lock|Socket|Cookie)$|\.tmp$|\.lock$`)
+var ignoredPath = regexp.MustCompile(`(^|[\\/])(backups|quarantine|logs|attachments|exports|imports|electron|shell)([\\/]|$)|(^|[\\/])Singleton(Lock|Socket|Cookie)$|\.tmp$|\.lock$`)
 
 type watcher struct {
 	fs     *fsnotify.Watcher

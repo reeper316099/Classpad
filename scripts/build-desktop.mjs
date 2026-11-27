@@ -2,7 +2,8 @@
 // Builds the Wails desktop app (cmd/classpad): the web interface, copied into cmd/classpad/web so the
 // binary embeds it, then the Go program.
 //
-//   node scripts/build-desktop.mjs [--out build/classpad] [--skip-web] [--version 1.2.3]
+//   node scripts/build-desktop.mjs [--out build/classpad] [--skip-web] [--version 1.2.3] [--run]
+// --run opens the app afterwards (on your usual data folder, or CLASSPAD_DATA_DIR).
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs';
 import path from 'node:path';
@@ -40,7 +41,11 @@ const web = path.join(root, 'cmd/classpad/web');
 mkdirSync(web, { recursive: true });
 for (const f of readdirSync(web))
   if (f !== 'README.txt') rmSync(path.join(web, f), { recursive: true, force: true });
-cpSync(dist, web, { recursive: true });
+// release builds leave out source maps (12 MB); dev builds keep them for the web inspector
+cpSync(dist, web, {
+  recursive: true,
+  filter: (src) => version === 'dev' || !src.endsWith('.map'),
+});
 
 const ldflags = `-X main.version=${version}${version === 'dev' ? '' : ' -s -w'}`;
 // Windows: a GUI program (no console window) once it is a release
@@ -58,3 +63,4 @@ run('go', ['build', '-trimpath', `-ldflags=${ldflags}${flags}`, '-o', out, './cm
   env,
 });
 console.log('Built', out);
+if (process.argv.includes('--run')) run(out, [], { shell: false });

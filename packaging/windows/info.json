@@ -1,0 +1,14 @@
+{
+  "fixed": { "file_version": "{{VERSION4}}", "product_version": "{{VERSION4}}" },
+  "info": {
+    "0409": {
+      "FileVersion": "{{VERSION}}",
+      "ProductVersion": "{{VERSION}}",
+      "CompanyName": "Classpad contributors",
+      "FileDescription": "Classpad",
+      "LegalCopyright": "Copyright © 2026 Classpad contributors",
+      "ProductName": "Classpad",
+      "Comments": "A local-first student workspace"
+    }
+  }
+}

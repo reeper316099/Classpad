@@ -1,29 +1,12 @@
-import {
-  _electron as electron,
-  expect,
-  test,
-  type ElectronApplication,
-  type Page,
-} from '@playwright/test';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { cleanup, launch, type App } from './harness';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
-function cleanup(dir: string) {
-  try {
-    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
-  } catch {
-    /* best effort */
-  }
-}
-
-const here = path.dirname(fileURLToPath(import.meta.url));
-const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-m9-'));
 const outDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-m9-out-'));
-let app: ElectronApplication;
+let app: App;
 let page: Page;
 const api = (p: string, method = 'GET', body?: unknown) =>
   page.evaluate(
@@ -59,13 +42,7 @@ test('import a gradebook with a user plugin, then export to a folder', async () 
       columns: { title: 'Task', score: 'Mark', pointsPossible: 'Out of' },
     }),
   );
-  app = await electron.launch({
-    args: [main],
-    env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
-  });
-  page = await app.firstWindow();
-  await page.setViewportSize({ width: 1280, height: 860 });
-  await page.waitForLoadState('domcontentloaded');
+  ({ app, page } = await launch(dataDir));
   const sem = await api('/semesters', 'POST', { name: 'M9 Term' });
   await api('/classes', 'POST', { name: 'Lorem 101', semesterId: sem.id });
 

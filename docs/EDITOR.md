@@ -93,4 +93,4 @@ build run it). The page side is `apps/web/src/blockeditor/`: `core.ts` (loading 
 and `items.ts` (the block menu). The Source mode editor is the CodeMirror one in `apps/web/src/editor/`.
 
 Tests: `go test ./cmd/... ./internal/...` for the core, `npx vitest run apps/web/src/blockeditor` for the DOM mapping, and
-`e2e/editor.spec.ts` for the real thing in Electron.
+`e2e/editor.spec.ts` for the real thing in a browser (WebKit and Chromium, the desktop app's engines).

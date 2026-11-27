@@ -1,44 +1,20 @@
-import {
-  _electron as electron,
-  expect,
-  test,
-  type ElectronApplication,
-  type Page,
-} from '@playwright/test';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { cleanup, launch, type App } from './harness';
+import { mkdtempSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 
-/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
-function cleanup(dir: string) {
-  try {
-    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
-  } catch {
-    /* best effort */
-  }
-}
-
-const here = path.dirname(fileURLToPath(import.meta.url));
-const main = path.join(here, '../apps/desktop/dist/main.cjs');
 const axeSource = readFileSync(
   createRequire(import.meta.url).resolve('axe-core/axe.min.js'),
   'utf8',
 );
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-mod-'));
 
-let app: ElectronApplication;
+let app: App;
 let page: Page;
-async function launch() {
-  const noSandbox = process.env.CI && process.platform === 'linux' ? ['--no-sandbox'] : [];
-  app = await electron.launch({
-    args: [main, ...noSandbox],
-    env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
-  });
-  page = await app.firstWindow();
-  await page.setViewportSize({ width: 1280, height: 860 });
-  await page.waitForLoadState('domcontentloaded');
+async function start() {
+  ({ app, page } = await launch(dataDir));
 }
 const call = (method: string, p: string, body?: unknown) =>
   page.evaluate(
@@ -63,7 +39,7 @@ test.afterAll(async () => {
 });
 
 test('modules: turn on, add data, journal is private by default', async () => {
-  await launch();
+  await start();
   await page.getByRole('heading', { name: 'Open demo data' }).click();
   await expect(page.getByRole('heading', { name: 'Demo Term' })).toBeVisible();
   await page.locator('aside.sidebar').getByRole('link', { name: 'Settings', exact: true }).click();
@@ -106,7 +82,7 @@ test('modules: the choices are still there after restarting the app', async () =
   const before = new URL(page.url()).port;
   await page.waitForTimeout(800); // let the debounced save reach the data folder
   await app.close();
-  await launch();
+  await start();
   expect(new URL(page.url()).port).not.toBe(before);
   const sidebar = page.locator('aside.sidebar');
   for (const label of ['Journal', 'Flashcards', 'Budget'])

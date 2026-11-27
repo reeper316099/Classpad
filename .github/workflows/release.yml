@@ -29,19 +29,31 @@ jobs:
         with: { node-version: 22, cache: npm }
       - uses: actions/setup-go@v5
         with: { go-version-file: go.mod, cache: false }
-      - name: Linux packaging tools (rpm, deb)
+      - name: Linux libraries for the desktop app (GTK 4, WebKitGTK 6.0)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y rpm fakeroot dpkg
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libwebkitgtk-6.0-dev
+      - name: Windows installer tool (NSIS)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: command -v makensis || choco install nsis -y --no-progress
+      - name: Wails CLI (icons, Windows resources, Linux packages)
+        run: go install github.com/wailsapp/wails/v3/cmd/wails3@v3.1.0
       - run: npm ci
       - run: npm run guard -- --all
       # workspace packages resolve to their built output, so build before the tests
       - run: npm run build
+      - run: npm run build -w @classpad/web
       - run: npm test
       - run: go test ./cmd/... ./internal/...
       - name: Build installers (unsigned)
-        run: npm run desktop:dist
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+        shell: bash
+        run: |
+          TAG="${{ inputs.tag || github.ref_name }}"
+          VERSION="${TAG#v}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || VERSION=0.0.0
+          # NSIS from Chocolatey is not on the PATH of later steps by default
+          if [ "$RUNNER_OS" = Windows ]; then export PATH="$PATH:/c/Program Files (x86)/NSIS"; fi
+          node scripts/package-desktop.mjs --version "$VERSION" --skip-web
       - uses: actions/upload-artifact@v4
         with:
           name: installers-${{ matrix.os }}
@@ -49,9 +61,9 @@ jobs:
           path: |
             release/*.dmg
             release/*.exe
-            release/*.AppImage
             release/*.deb
             release/*.rpm
+            release/*.tar.gz
 
   publish:
     needs: build
@@ -74,6 +86,7 @@ jobs:
             These builds are **unsigned**, so your OS will warn you the first time:
             - **macOS:** right-click the app → Open (or System Settings → Privacy & Security → Open Anyway).
             - **Windows:** SmartScreen → More info → Run anyway.
-            - **Linux:** `chmod +x` the AppImage, or install the `.deb` / `.rpm`.
+            - **Windows:** the installer adds the WebView2 runtime if Windows 10 does not have it yet; the portable `.exe` needs it already (Windows 11 has it).
+            - **Linux:** install the `.deb` / `.rpm`, or unpack the `.tar.gz` (needs GTK 4 and WebKitGTK 6.0).
 
             Everything stays on your computer. There is no telemetry and no network access.

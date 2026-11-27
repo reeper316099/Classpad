@@ -6,7 +6,7 @@ import { deflateSync } from 'node:zlib';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'apps', 'desktop', 'build');
+const out = join(dirname(fileURLToPath(import.meta.url)), '..', 'packaging', 'icons');
 mkdirSync(out, { recursive: true });
 
 const crcTable = Array.from({ length: 256 }, (_, n) => {
@@ -88,6 +88,6 @@ const pixel = (u, v) => {
   );
 };
 
-writeFileSync(join(out, 'icon.png'), png(1024, pixel)); // electron-builder derives .icns/.ico from this
+writeFileSync(join(out, 'icon.png'), png(1024, pixel)); // scripts/package-desktop.mjs derives .icns/.ico from this
 writeFileSync(join(out, 'icon-256.png'), png(256, pixel));
 console.log('icons written to', out);

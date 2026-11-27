@@ -1,46 +1,19 @@
 import AdmZip from 'adm-zip';
-import {
-  _electron as electron,
-  expect,
-  test,
-  type ElectronApplication,
-  type Page,
-} from '@playwright/test';
-import { mkdtempSync, rmSync, writeFileSync, readdirSync, statSync, readFileSync } from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { cleanup, launch, type App } from './harness';
+import { mkdtempSync, writeFileSync, readdirSync, statSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-/** Remove a temp folder; Windows keeps Electron's cache files locked for a moment, and that must not fail a test. */
-function cleanup(dir: string) {
-  try {
-    rmSync(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 300 });
-  } catch {
-    /* best effort */
-  }
-}
-
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, '..');
-const main = path.join(root, 'apps/desktop/dist/main.cjs');
 const fixtures = path.join(root, 'fixtures/synthetic/notion-export');
 
 const dataDir = mkdtempSync(path.join(tmpdir(), 'classpad-e2e-'));
 test.afterAll(() => cleanup(dataDir));
 
-async function launch(): Promise<{ app: ElectronApplication; page: Page }> {
-  // E2E_EXECUTABLE=/path/to/Classpad(.exe/.app binary) runs the same tests against a packaged build
-  const exe = process.env.E2E_EXECUTABLE;
-  const noSandbox = process.env.CI && process.platform === 'linux' ? ['--no-sandbox'] : [];
-  const app = await electron.launch({
-    ...(exe ? { executablePath: exe, args: noSandbox } : { args: [main, ...noSandbox] }),
-    env: { ...process.env, CLASSPAD_DATA_DIR: dataDir, ELECTRON_DISABLE_SECURITY_WARNINGS: '1' },
-  });
-  const page = await app.firstWindow();
-  await page.setViewportSize({ width: 1280, height: 860 });
-  await page.waitForLoadState('domcontentloaded');
-  return { app, page };
-}
+const start = () => launch(dataDir);
 const api = (page: Page, p: string) =>
   page.evaluate(
     async (u) =>
@@ -55,14 +28,14 @@ const nav = (page: Page, name: string) =>
   page.locator('aside.sidebar').getByRole('link', { name, exact: true }).click();
 
 test.describe.configure({ mode: 'serial' });
-let app: ElectronApplication;
+let app: App;
 let page: Page;
 
 test('first run: secure shell, no network, demo data', async () => {
-  ({ app, page } = await launch());
+  ({ app, page } = await start());
   await expect(page).toHaveTitle(/Classpad/);
 
-  // the bridge exists, with a per-launch token, and the page is served from our own loopback server
+  // the page has its per-launch token and is served by the local API server
   const info = await page.evaluate(() => ({
     url: location.origin,
     hasToken: (window.classpad?.api.token.length ?? 0) >= 32,
@@ -71,10 +44,11 @@ test('first run: secure shell, no network, demo data', async () => {
   }));
   expect(info.url).toMatch(/^http:\/\/127\.0\.0\.1:\d+$/);
   expect(info.hasToken).toBe(true);
-  expect(info.node).toBe('undefined'); // no Node in the renderer
+  expect(info.node).toBe('undefined'); // no Node in the page
   expect(info.process).toBe('undefined');
 
-  // "no network" is enforced: remote requests are blocked, and the API refuses requests without the token
+  // "no network": the page's Content-Security-Policy blocks remote requests, and the API refuses
+  // requests without the token
   const remote = await page.evaluate(async () => {
     try {
       await fetch('https://example.com/', { mode: 'no-cors' });
@@ -198,8 +172,8 @@ test('import the synthetic export, then open the printable report', async () => 
   await expect(page.getByRole('heading', { name: 'Imported' })).toBeVisible();
   expect(((await api(page, '/assignments?limit=1000')) as { total: number }).total).toBe(before);
 
-  // the printable grade report opens in its own script-free window
-  const popup = app.waitForEvent('window');
+  // the printable grade report opens in its own script-free window (here, a pop-up)
+  const popup = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Printable grade report' }).click();
   const report = await popup;
   await report.waitForLoadState();
@@ -210,7 +184,7 @@ test('import the synthetic export, then open the printable report', async () => 
 
 test('restart: everything persisted, and the window comes back', async () => {
   await app.close();
-  ({ app, page } = await launch());
+  ({ app, page } = await start());
   await expect(page.getByRole('heading', { name: 'Demo Term' })).toBeVisible(); // no welcome screen the second time
 
   const asg = (await api(page, '/assignments?limit=1000')) as {
