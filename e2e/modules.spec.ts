@@ -101,6 +101,24 @@ test('modules: turn on, add data, journal is private by default', async () => {
   await page.keyboard.press('Escape');
 });
 
+test('modules: the choices are still there after restarting the app', async () => {
+  // Each launch serves the page from a new port; preferences must not live in that origin's storage.
+  const before = new URL(page.url()).port;
+  await page.waitForTimeout(800); // let the debounced save reach the data folder
+  await app.close();
+  await launch();
+  expect(new URL(page.url()).port).not.toBe(before);
+  const sidebar = page.locator('aside.sidebar');
+  for (const label of ['Journal', 'Flashcards', 'Budget'])
+    await expect(sidebar.getByRole('link', { name: label, exact: true })).toBeVisible();
+  const saved = JSON.parse(readFileSync(path.join(dataDir, 'config', 'settings.json'), 'utf8'));
+  expect(JSON.parse(saved.prefs['classpad-ui']).state.modules).toMatchObject({
+    journal: true,
+    flashcards: true,
+    budget: true,
+  });
+});
+
 test('flashcards: review a cloze card with the keyboard', async () => {
   await call('POST', '/flashcards', { front: 'Lorem ___', back: 'ipsum' });
   await page

@@ -1,3 +1,4 @@
+import { getPref, setPref } from '../lib/prefs.js';
 import { useEffect, useRef } from 'react';
 import { announce } from '../lib/usePomodoro.js';
 import { useTasks } from '../lib/hooks.js';
@@ -8,7 +9,7 @@ import { useUi } from '../lib/store.js';
 const KEY = 'classpad-notified';
 const readFired = (): Record<string, number> => {
   try {
-    return JSON.parse(localStorage.getItem(KEY) ?? '{}');
+    return JSON.parse(getPref(KEY) ?? '{}');
   } catch {
     return {};
   }
@@ -42,7 +43,7 @@ export function Notifier() {
       }
       for (const [k, t] of Object.entries(fired)) if (now - t > 3 * 86_400_000) delete fired[k]; // forget old reminders
       try {
-        localStorage.setItem(KEY, JSON.stringify(fired));
+        setPref(KEY, JSON.stringify(fired));
       } catch {
         /* optional */
       }

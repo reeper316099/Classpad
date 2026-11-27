@@ -8,11 +8,20 @@ import './styles/components.css';
 import './styles/markdown.css';
 import './styles/editor.css';
 import './styles/blockeditor.css';
+import { loadPrefs, onPrefsLoaded } from './lib/prefs.js';
 import { applyAppearance, useUi } from './lib/store.js';
 
-applyAppearance(useUi.getState());
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
-);
+// Preferences live in the data folder. Load them before the first render so the app opens the
+// way it was left. While locked this fails; LockGate loads them again after unlocking.
+onPrefsLoaded(() => {
+  void useUi.persist.rehydrate();
+});
+void loadPrefs().then((ok) => {
+  if (!ok) void useUi.persist.rehydrate(); // locked or offline: fall back to this browser's copy
+  applyAppearance(useUi.getState());
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <App />
+    </StrictMode>,
+  );
+});

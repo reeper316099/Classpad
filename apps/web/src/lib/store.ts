@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
+import { prefStorage } from './prefs.js';
 import { setHour12Default } from './format.js';
 import { DEFAULT_POMODORO, type PomodoroConfig } from './pomodoro.js';
 
@@ -92,6 +93,9 @@ export const useUi = create<UiState>()(
     }),
     {
       name: 'classpad-ui',
+      // Kept in the data folder (see prefs.ts); hydrated once preferences are loaded.
+      storage: createJSONStorage(() => prefStorage),
+      skipHydration: true,
       partialize: (s) => ({
         theme: s.theme,
         accent: s.accent,

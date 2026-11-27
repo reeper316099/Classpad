@@ -24,6 +24,19 @@ const dataDir = defaultDataDir();
 app.setPath('userData', dataDir);
 app.setPath('sessionData', path.join(dataDir, 'electron'));
 
+/**
+ * End-to-end tests set CLASSPAD_E2E_BACKGROUND=1: windows open without taking focus, invisible and
+ * without a Dock icon, so a test run never pulls the person away from what they're doing. Pages
+ * still render normally (no background throttling), so the tests see the real app.
+ */
+const background = process.env.CLASSPAD_E2E_BACKGROUND === '1';
+if (background) app.dock?.hide();
+const reveal = (w: BrowserWindow) => {
+  if (!background) return w.show();
+  w.setOpacity(0);
+  w.showInactive();
+};
+
 type Server = Awaited<ReturnType<typeof startServer>>;
 let server: Server | null = null;
 let win: BrowserWindow | null = null;
@@ -65,11 +78,12 @@ async function createWindow(): Promise<void> {
       allowRunningInsecureContent: false,
       spellcheck: true,
       devTools: !app.isPackaged,
+      backgroundThrottling: !background,
     },
   });
   state.track(win);
   if (b.maximized) win.maximize();
-  win.once('ready-to-show', () => win?.show());
+  win.once('ready-to-show', () => win && reveal(win));
   win.on('closed', () => {
     win = null;
   });
@@ -98,6 +112,7 @@ async function openReportWindow(hide = false): Promise<void> {
     title: `${APP_NAME} grade report`,
     backgroundColor: '#ffffff',
     parent: win ?? undefined,
+    show: false,
     webPreferences: {
       sandbox: true,
       contextIsolation: true,
@@ -107,6 +122,7 @@ async function openReportWindow(hide = false): Promise<void> {
     },
   });
   w.setMenuBarVisibility(false);
+  w.once('ready-to-show', () => reveal(w));
   w.on('closed', () => {
     revokeFile(tmp);
     void fs.rm(tmp, { force: true });

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Fixes
+
+- Settings now stick between launches: which modules are switched on, theme and accent, the chosen semester, week start, reminders, Pomodoro lengths, the export folder and Source mode. They were kept in the window's browser storage, which the desktop app lost on every launch (it opens on a new local port each time, and browser storage belongs to one address). They are now saved in the data folder (`config/settings.json`), so they are also in backups. Settings from before this fix are moved over the first time the app opens.
+
 ### Security
 
 - Updated zod (data validation) to 4.6.7 for GHSA-mrhx-c7xc-m3w5, where a very large list could exhaust memory during validation. Plugin files without a `wide` section still get its defaults.

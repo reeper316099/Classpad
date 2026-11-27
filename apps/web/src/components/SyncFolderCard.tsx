@@ -1,3 +1,4 @@
+import { getPref, setPref } from '../lib/prefs.js';
 import { useState } from 'react';
 import { ApiError, post } from '../lib/api.js';
 import { useUi } from '../lib/store.js';
@@ -5,7 +6,7 @@ import { useUi } from '../lib/store.js';
 const KEY = 'classpad.syncDir';
 const read = () => {
   try {
-    return localStorage.getItem(KEY) ?? '';
+    return getPref(KEY) ?? '';
   } catch {
     return '';
   }
@@ -29,7 +30,7 @@ export function SyncFolderCard() {
   const save = (v: string) => {
     setDir(v);
     try {
-      localStorage.setItem(KEY, v);
+      setPref(KEY, v);
     } catch {
       /* private mode: just don't remember it */
     }

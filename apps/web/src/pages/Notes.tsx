@@ -1,3 +1,4 @@
+import { getPref, setPref } from '../lib/prefs.js';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type Ref } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
@@ -27,7 +28,7 @@ const PdfViewer = lazy(() =>
 );
 const readSource = () => {
   try {
-    return localStorage.getItem('classpad-notes-source') === '1';
+    return getPref('classpad-notes-source') === '1';
   } catch {
     return false;
   }
@@ -323,7 +324,7 @@ function NoteEditor({
   const setSource = (v: boolean) => {
     setSourceState(v);
     try {
-      localStorage.setItem('classpad-notes-source', v ? '1' : '0');
+      setPref('classpad-notes-source', v ? '1' : '0');
     } catch {
       /* optional */
     }

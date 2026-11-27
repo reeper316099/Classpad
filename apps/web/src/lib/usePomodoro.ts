@@ -1,3 +1,4 @@
+import { getPref, setPref } from './prefs.js';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { get, post } from './api.js';
@@ -32,7 +33,7 @@ const load = (): Saved => {
       timer: null,
       link: {},
       serverOn: false,
-      ...(JSON.parse(localStorage.getItem(KEY) ?? '{}') as Partial<Saved>),
+      ...(JSON.parse(getPref(KEY) ?? '{}') as Partial<Saved>),
     };
   } catch {
     return { timer: null, link: {}, serverOn: false };
@@ -42,8 +43,8 @@ const load = (): Saved => {
 /** The "server timer is running" flag is saved the moment it changes (not only when React state changes). */
 const saveServerOn = (on: boolean) => {
   try {
-    const cur = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Partial<Saved>;
-    localStorage.setItem(KEY, JSON.stringify({ ...cur, serverOn: on }));
+    const cur = JSON.parse(getPref(KEY) ?? '{}') as Partial<Saved>;
+    setPref(KEY, JSON.stringify({ ...cur, serverOn: on }));
   } catch {
     /* optional */
   }
@@ -94,7 +95,7 @@ export function usePomodoro() {
 
   useEffect(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ timer, link, serverOn: serverOn.current }));
+      setPref(KEY, JSON.stringify({ timer, link, serverOn: serverOn.current }));
     } catch {
       /* optional */
     }

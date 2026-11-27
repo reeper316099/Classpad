@@ -1,6 +1,7 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ApiError, get, post } from '../lib/api.js';
+import { loadPrefs } from '../lib/prefs.js';
 import { Icon } from './Icon.js';
 
 export interface LockStatus {
@@ -75,6 +76,7 @@ function LockScreen({ retryAfterMs }: { retryAfterMs: number }) {
       const n = await post<LockStatus>('/lock/unlock', { passphrase: pass });
       setPass('');
       qc.setQueryData(lockKey, n);
+      await loadPrefs(); // preferences can't be read while locked
       await qc.invalidateQueries();
     } catch (x) {
       const a = x as ApiError;
