@@ -2,7 +2,26 @@
 
 ## Unreleased
 
+### Classpad is now one Go program
+
+- The desktop app no longer bundles Electron (a copy of Chromium and Node.js). It is a single Go program that shows the interface in your system's own web view: WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux.
+- **Smaller and faster:** the macOS download is 23.7 MB instead of 231.7 MB. The app's server starts in about 35 ms instead of about 350 ms and uses about 22 MB of memory instead of about 143 MB, and it answers about as fast or faster on every page measured.
+- **Safer:** the server now runs inside the app and no longer listens on a network port at all, so no other program on your computer can reach it. The rule that the app never contacts the internet still holds (the page's security policy blocks anything outside the app); links open in your browser.
+- **Your data folder doesn't change.** Notes stay Markdown files and everything else stays where it was; the new app reads the folder as it is. The old Electron app's own files (the `electron` folder inside your data folder) are no longer used and can be deleted.
+- **Save Grade Report as PDF** is now **Print Grade Report…**: the system print dialog can save it as a PDF on all three systems.
+- **Installers:** a universal `.dmg` for macOS; for Windows an installer that needs no administrator rights (it adds Microsoft's WebView2 if Windows 10 lacks it) and a portable `.exe`; for Linux `.deb`, `.rpm` and a `.tar.gz` (they need GTK 4 and WebKitGTK 6.0). There is no AppImage any more: putting WebKitGTK inside one is not reliable.
+- Exports (CSV, calendars, backups, notes) are saved through a normal Save dialog.
+
 ### Fixes
+
+- Typing right after opening a note could be lost: the note showed a moment before it could be edited. A click made while the editor is still opening now puts the cursor in once it is ready, and if the editor's core cannot start, it says so instead of loading forever.
+- Menus no longer pick the row under a mouse that merely rests where they open (for example the `/` menu: Enter now takes the first match). The mouse moves the highlight only when it actually moves.
+- The note's save label said "Saved" for a moment after you typed, before your words had been handed over for saving. It now says "Unsaved changes" straight away.
+- A link to a note made a moment ago elsewhere (an import, another window) could show "Pick a note" instead of the note.
+- Dialogs reset their fields before they appear, so typing as soon as one opens is never cleared.
+- A key pressed as a flashcard review opens is no longer missed.
+- Items created together (an import, the demo data) now keep the order they were made in lists sorted by creation.
+- Windows: backups failed in the new desktop app because of a lock file the system browser engine keeps in the data folder; such lock files are now left out of backups.
 
 - Settings now stick between launches: which modules are switched on, theme and accent, the chosen semester, week start, reminders, Pomodoro lengths, the export folder and Source mode. They were kept in the window's browser storage, which the desktop app lost on every launch (it opens on a new local port each time, and browser storage belongs to one address). They are now saved in the data folder (`config/settings.json`), so they are also in backups. Settings from before this fix are moved over the first time the app opens.
 
@@ -21,7 +40,7 @@
 ### Go port, step 2: the grade engine
 
 - The grade and GPA engine is now also written in Go (`internal/grades`): current grade with its step-by-step breakdown, what-if, the score needed for a target, sensitivity, projection, GPA, retakes and the GPA planner. It gives the same answers as the TypeScript engine digit for digit, checked on 45,000 generated cases, and CI checks the two still agree on every change.
-- Nothing changes in the app yet: the Go engine takes over when the local API moves to Go (step 4). See [docs/go-port](docs/go-port/README.md).
+- The app uses it since the server moved to Go (see above). See [docs/go-port](docs/go-port/README.md).
 
 ### Go port, step 3: storage
 
@@ -33,7 +52,7 @@
 
 - The importers are now also written in Go (`internal/importers`): Notion exports (zipped, nested or as a folder), CSV files, gradebook mappings, calendars (.ics in and out), Markdown folders and Classpad backups.
 - They give the same preview as today's importers for the same file, down to how odd CSVs are split and how calendar times are read. This was checked on about 110,000 generated cases and on a real Notion export. CI checks the two still agree on every change.
-- The importers moved ahead of the API in the port plan, since the API uses them. Nothing changes in the app until the API is Go (step 5).
+- The importers moved ahead of the API in the port plan, since the API uses them; the app uses them since the server moved to Go.
 
 ### Grading
 
