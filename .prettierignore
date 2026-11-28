@@ -10,3 +10,8 @@ internal/*/testdata/
 cmd/classpad/web
 build
 release
+# frozen TypeScript reference
+packages/grades
+packages/jsonstore
+packages/importers
+packages/server

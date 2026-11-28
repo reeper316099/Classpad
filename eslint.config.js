@@ -6,6 +6,11 @@ export default tseslint.config(
     ignores: [
       'apps/web/public/editor/**',
       'cmd/classpad/web/**',
+      // frozen TypeScript reference (see vitest.config.ts)
+      'packages/grades/**',
+      'packages/jsonstore/**',
+      'packages/importers/**',
+      'packages/server/**',
       'build/**',
       'release/**',
       '**/dist/**',

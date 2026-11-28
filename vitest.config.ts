@@ -1,17 +1,14 @@
-import { defineConfig } from 'vitest/config';
+import { configDefaults, defineConfig } from 'vitest/config';
+
+// The TypeScript grades, storage, importers and server packages are frozen: they are the reference
+// the Go code was ported from and checked against, and the Go code is now the source of truth
+// (docs/go-port/README.md). Their tests no longer run.
+const FROZEN = ['packages/grades', 'packages/jsonstore', 'packages/importers', 'packages/server'];
+
 export default defineConfig({
   test: {
-    include: [
-      'packages/*/src/**/*.test.ts',
-      'scripts/**/*.test.mjs',
-      'apps/web/src/**/*.test.{ts,tsx}',
-    ],
-    // wall-clock budgets run alone (`npm run test:perf`) so they measure the app, not CPU contention
-    exclude: ['**/node_modules/**', '**/*.perf.test.ts'],
-    // Windows runners are slow at file-heavy tests; the default 5 s is too tight there
-    testTimeout: 30_000,
-    hookTimeout: 30_000,
-    environment: 'node',
-    environmentMatchGlobs: [['apps/web/src/**/*.test.tsx', 'jsdom']],
+    // unit tests only: e2e/*.spec.ts are Playwright's
+    include: ['**/*.test.{ts,tsx}'],
+    exclude: [...configDefaults.exclude, 'e2e/**', ...FROZEN.map((p) => `${p}/**`)],
   },
 });

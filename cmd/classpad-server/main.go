@@ -4,6 +4,9 @@
 // read it); without one a random token is made and printed. When the server is ready it prints one
 // JSON line, {"ready":true,"url":...,"port":...}, so a parent process (the desktop app) can find it.
 // It stops on SIGINT or SIGTERM, or when stdin closes if --exit-with-stdin is set.
+//
+// CLASSPAD_TEST_CLOCK (an RFC 3339 time) starts the server's clock at that moment, running forward
+// from there: the recorded API answers (scripts/api-parity.mjs) depend on "today".
 package main
 
 import (
@@ -14,6 +17,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/reeper316099/classpad/internal/server"
 )
@@ -31,6 +35,15 @@ func main() {
 	dir := *dataDir
 	if dir == "" {
 		dir = server.DefaultDataDir()
+	}
+	if c := os.Getenv("CLASSPAD_TEST_CLOCK"); c != "" {
+		base, err := time.Parse(time.RFC3339, c)
+		if err != nil {
+			fmt.Fprintln(os.Stderr, "classpad-server: CLASSPAD_TEST_CLOCK:", err)
+			os.Exit(2)
+		}
+		started := time.Now()
+		server.Now = func() time.Time { return base.Add(time.Since(started)) }
 	}
 	token := os.Getenv("CLASSPAD_TOKEN")
 	opts := server.AppOptions{DataDir: dir, Token: token, Dev: *dev, Watch: *watch, StaticDir: *static,

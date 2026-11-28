@@ -22,11 +22,11 @@ web view, with the local API in the same process. There is no cloud component.
 
 | Package                   | Responsibility                                                                                                                                                                                                                                              | Depends on                         |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- |
-| `packages/grades`         | Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                                                                                            | decimal.js                         |
-| `packages/jsonstore`      | Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                                                                                          | adm-zip, chokidar                  |
+| `packages/grades`         | **Frozen** TypeScript original of the Go package (see `FROZEN.md`). Exact-decimal grade and GPA engine with step breakdowns. No I/O.                                                                                                                        | decimal.js                         |
+| `packages/jsonstore`      | **Frozen** TypeScript original of the Go package (see `FROZEN.md`). Atomic JSON/text files, validation, migrations, backups, quarantine, watcher, encryption. Knows nothing about Classpad's entities.                                                      | adm-zip, chokidar                  |
 | `packages/shared`         | Entity schemas (Zod), enums, ULIDs, SM-2 scheduling, cloze extraction.                                                                                                                                                                                      | zod                                |
-| `packages/importers`      | Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                                                                                    | shared                             |
-| `packages/server`         | The TypeScript API the Go server was ported from; kept, with the other TypeScript packages, as the reference the Go code is checked against (`scripts/api-parity.mjs`).                                                                                     | all of the above                   |
+| `packages/importers`      | **Frozen** TypeScript original of the Go package (see `FROZEN.md`). Pure functions: Notion/CSV/ICS/Markdown/JSON in → `ImportPreview` drafts out. No file or network access.                                                                                | shared                             |
+| `packages/server`         | **Frozen** TypeScript original of `internal/server` (see `FROZEN.md`), kept as the reference the Go server was checked against.                                                                                                                             | all of the above                   |
 | `apps/web`                | React 18 + Vite UI, TanStack Query, Zustand for UI preferences.                                                                                                                                                                                             | —                                  |
 | `cmd/classpad` (Go)       | The desktop app (Wails 3): window, menu, dialogs and the page bridge; runs the API in process. See [PACKAGING.md](PACKAGING.md).                                                                                                                            | server, web                        |
 | `internal/editor` (Go)    | The note editor's core, ported from AppFlowy Editor: block document, Markdown ⇄ blocks, commands, undo. Built to WebAssembly by `cmd/editorwasm` and loaded by `apps/web/src/blockeditor`. See [EDITOR.md](EDITOR.md) and the [Go port](go-port/README.md). | Go standard library                |
@@ -55,13 +55,13 @@ web view, with the local API in the same process. There is no cloud component.
 Classpad has no plugin system in v1. The supported seams for contributors are:
 
 1. **A CSV format**: write a JSON mapping plugin (no code, see [PLUGINS.md](PLUGINS.md)). This is the supported way for users to extend importing.
-2. **An optional module**: add a Zod schema in `packages/shared/src/modules.ts`, a repository line in
-   `packages/server/src/context.ts` and routes in `app.ts`, then a definition in
-   `apps/web/src/lib/modules.ts`. The generic table page handles the rest.
-3. **An importer**: add a pure parser in `packages/importers` that returns `ImportPreview` drafts, and the same
-   in `internal/importers` (Go) until the port is finished. CI checks that the two agree.
-4. **A grading mode or GPA scale**: `packages/grades` (schemes and presets) with golden tests, and the same change in
-   `internal/grades` (Go) until the port is finished. CI checks that the two engines agree.
+2. **An optional module**: add its schema in `internal/schema/entities.go` (what the server checks) and its type in
+   `packages/shared/src/modules.ts` (for the interface; `scripts/schema-parity.mjs` checks the two agree), a
+   repository line in `internal/server/context.go` and a `crud` line in `internal/server/routes.go`, then a
+   definition in `apps/web/src/lib/modules.ts`. The generic table page handles the rest.
+3. **An importer**: add a pure parser in `internal/importers` that returns `ImportPreview` drafts, with tests.
+4. **A grading mode or GPA scale**: `internal/grades` (schemes and presets) with tests; recorded answers in its
+   `testdata` change only on purpose.
 
 Anything that needs network access, accounts or sync is out of scope for v1.
 

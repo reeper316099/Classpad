@@ -49,12 +49,12 @@ See `docs/PACKAGING.md` for installers and releases.
 
 ## Layout
 
-- `packages/grades` – pure, exact-decimal grade and GPA engine
-- `packages/jsonstore` – standalone atomic JSON/Markdown storage engine
-- `packages/shared` – Zod schemas and shared types
-- `internal/server`, `cmd/classpad-server` – the local API (Go); `packages/server` is the TypeScript original
-- `packages/importers` – Notion/CSV/ICS/Markdown importers
-- `apps/web` – React UI · `cmd/classpad` – the desktop app (Wails)
+- `cmd/classpad` – the desktop app (Wails) · `apps/web` – the interface (React)
+- `internal/server`, `cmd/classpad-server` – the local API
+- `internal/grades` – exact-decimal grade and GPA engine · `internal/jsonstore` – the data folder store
+- `internal/importers` – Notion/CSV/ICS/Markdown importers · `internal/editor` – the note editor's core
+- `packages/shared` – entity types for the interface
+- `packages/grades`, `jsonstore`, `importers`, `server` – the frozen TypeScript originals (see `FROZEN.md`)
 - `fixtures/synthetic` – generated fake data (public)
 
 Your own data never belongs in this repo: `private-fixtures/` is gitignored and a guard

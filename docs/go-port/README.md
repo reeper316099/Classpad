@@ -60,8 +60,8 @@ time. The interface stays HTML/TypeScript, shown in the operating system's own w
    now runs the interface against the Go server in WebKit and Chromium, the engines of the desktop app's web
    views (70 runs, all passing), and `CLASSPAD_SELFTEST=1` starts the real app hidden and checks it (bridge,
    in-process API and token, live updates, interface, editor core, report) on all three systems in CI.
-   `apps/desktop` (Electron) is gone. The TypeScript packages stay as the reference the Go code is checked
-   against.
+   `apps/desktop` (Electron) is gone. The TypeScript grades, storage, importers and server packages are frozen
+   (see Building): their answers are recorded in the Go tests, and only the Go code changes.
 
 Each step shipped on its own.
 
@@ -204,15 +204,18 @@ scheme was cached, and the report graded each class once instead of twice.
 
 - Go 1.26 or newer (the toolchain in CI comes from `go.mod`).
 - `go test ./cmd/... ./internal/...` runs the Go tests; `node scripts/build-editor-wasm.mjs` builds the editor core for the app.
-- After changing the grade engine: `npx tsc -b packages/grades && node scripts/grades-parity.mjs` regenerates the
-  TypeScript answers, then `go test ./internal/grades` checks the Go engine against them.
-- After changing the store: `npx tsc -b packages/jsonstore && node scripts/jsonstore-compat.mjs`, then
-  `go test ./internal/jsonstore`.
-- After changing the API: `npx tsc -b packages/server`, `go build -o /tmp/classpad-server ./cmd/classpad-server`,
-  then `node scripts/api-parity.mjs --go /tmp/classpad-server` (add `--keep` to look at both transcripts).
-- After changing an importer: `npx tsc -b packages/importers && node scripts/importers-parity.mjs`, then
-  `go test ./internal/importers`. `node scripts/gen-unicode-tables.mjs` regenerates the emoji table
-  (`\p{Extended_Pictographic}`, which Go's regexp lacks) from Node's Unicode data.
+- The TypeScript grades, storage, importers and server packages are **frozen**: the Go code is the source of
+  truth and the only one that changes. What they answered lives on as recorded answers in the Go tests'
+  `testdata` (grades, importers, storage, search, front matter, and `internal/server/testdata/api-golden.json.gz`
+  for the API), so `go test` and CI need no TypeScript. A deliberate change that alters an answer must update the
+  recorded one in the same commit. For the API that is `node scripts/api-parity.mjs --go <binary> --update` (then
+  review the diff); the other tests compare against their files directly. The parity scripts
+  (`scripts/*-parity.mjs`, `scripts/jsonstore-compat.mjs`) still run against the frozen packages
+  (`npx tsc -b packages/<name>` first) for anyone who wants to look again.
+- `packages/shared` is not frozen: the interface takes its entity types from it, so a change to an entity changes
+  `internal/schema` (what the server checks) and `packages/shared` (the types), and
+  `node scripts/schema-parity.mjs` checks they still agree. `node scripts/gen-unicode-tables.mjs` regenerates
+  the emoji table (`\p{Extended_Pictographic}`, which Go's regexp lacks) from Node's Unicode data.
 - The desktop app: `node scripts/build-desktop.mjs` (builds the web interface, embeds it, and builds
   `cmd/classpad` into `build/`). On Linux it needs GTK 4 and WebKitGTK 6.0 (`libgtk-4-dev libwebkitgtk-6.0-dev`
   on Debian and Ubuntu); macOS and Windows need nothing extra.

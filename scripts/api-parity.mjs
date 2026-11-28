@@ -1,19 +1,28 @@
 #!/usr/bin/env node
-// Runs the same scripted session against the TypeScript API (packages/server) and the Go API
-// (cmd/classpad-server), each on its own empty data folder, and compares every response: status,
-// content type and body. Ids, timestamps and request ids differ between runs, so they are replaced by
-// placeholders (ids by order of first appearance) before comparing. All data is invented.
+// Runs a scripted session against the Go API (cmd/classpad-server) on an empty data folder and
+// compares every response (status, content type, body) with the recorded answers in
+// internal/server/testdata/api-golden.json.gz. Ids, timestamps and request ids are replaced by
+// placeholders (ids by order of first appearance), and the server's clock starts at a fixed moment
+// (CLASSPAD_TEST_CLOCK), since many answers depend on "today". All data is invented.
 //
-//   npx tsc -b packages/server && go build -o /tmp/classpad-server ./cmd/classpad-server
-//   node scripts/api-parity.mjs --go /tmp/classpad-server [--keep]
+// The recorded answers came from the Go server after it matched the TypeScript server it was ported
+// from, response for response; the TypeScript packages are now frozen. After a deliberate change in
+// what the API answers, record the new answers with --update and review the diff.
+//
+//   go build -o /tmp/classpad-server ./cmd/classpad-server
+//   node scripts/api-parity.mjs --go /tmp/classpad-server [--update] [--keep]
+//   node scripts/api-parity.mjs --go /tmp/classpad-server --ts   # live, against the frozen TS server
+//                                                                 # (npx tsc -b packages/server first)
 import { spawn } from 'node:child_process';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { request } from 'node:http';
 import { createInterface } from 'node:readline';
+import { fileURLToPath } from 'node:url';
+import { gunzipSync, gzipSync } from 'node:zlib';
 
-process.env.TZ = 'America/New_York'; // both servers read local dates; pin the zone
+process.env.TZ = 'America/New_York'; // the servers read local dates; pin the zone
 const arg = (name, def) => {
   const i = process.argv.indexOf(`--${name}`);
   return i > 0 ? process.argv[i + 1] : def;
@@ -21,12 +30,18 @@ const arg = (name, def) => {
 const GO = arg('go');
 if (!GO) throw new Error('--go <path to classpad-server> is required');
 const keep = process.argv.includes('--keep');
-const { startServer } = await import('../packages/server/dist/index.js');
+const live = process.argv.includes('--ts');
+const update = process.argv.includes('--update');
+const GOLDEN = fileURLToPath(
+  new URL('../internal/server/testdata/api-golden.json.gz', import.meta.url),
+);
+const CLOCK = '2026-11-27T17:00:00Z'; // a Friday, noon in New York
 
 const TOKEN = 'parity-token';
 const root = mkdtempSync(path.join(tmpdir(), 'classpad-api-parity-'));
 
 async function startTs() {
+  const { startServer } = await import('../packages/server/dist/index.js');
   const dataDir = path.join(root, 'ts');
   const s = await startServer({ dataDir, token: TOKEN, watch: false, port: 0 });
   return { url: s.url, dataDir, close: () => s.close() };
@@ -34,8 +49,10 @@ async function startTs() {
 
 async function startGo() {
   const dataDir = path.join(root, 'go');
+  // against the recorded answers the clock is fixed; live against TypeScript both use real time
+  const clock = live ? {} : { CLASSPAD_TEST_CLOCK: CLOCK };
   const child = spawn(GO, ['--data-dir', dataDir, '--watch=false', '--exit-with-stdin'], {
-    env: { ...process.env, CLASSPAD_TOKEN: TOKEN },
+    env: { ...process.env, CLASSPAD_TOKEN: TOKEN, ...clock },
     stdio: ['pipe', 'pipe', 'inherit'],
   });
   const line = await new Promise((resolve, reject) => {
@@ -466,59 +483,73 @@ function normalizer() {
       })
       .replace(ISO_TS, '<ts>')
       .replace(STAMP, '<stamp>')
-      .replace(/classpad-api-parity-[^/\\"]+[/\\](ts|go)\b/g, '<dir>')
+      .replaceAll(root, '<root>')
+      .replace(/<root>\/(ts|go)\b/g, '<root>/<side>')
       .replace(/"(requestId|retryAfterMs)":("[^"]*"|\d+)/g, '"$1":"<x>"');
   return (entry) => JSON.parse(fix(JSON.stringify(entry)));
 }
 
-const ts = await startTs();
-const go = await startGo();
-const tsRec = recorder(ts.url, new URL(ts.url).port);
-const goRec = recorder(go.url, new URL(go.url).port);
-mkdirSync(path.join(root, 'ts-scratch'), { recursive: true });
-mkdirSync(path.join(root, 'go-scratch'), { recursive: true });
+const goServer = await startGo();
+const goRec = recorder(goServer.url, new URL(goServer.url).port);
+const tsServer = live ? await startTs() : null;
+const tsRec = tsServer ? recorder(tsServer.url, new URL(tsServer.url).port) : null;
 let failed = false;
 try {
-  await session(tsRec.api, path.join(root, 'ts-scratch'));
+  if (tsRec) {
+    mkdirSync(path.join(root, 'ts-scratch'), { recursive: true });
+    await session(tsRec.api, path.join(root, 'ts-scratch'));
+  }
+  mkdirSync(path.join(root, 'go-scratch'), { recursive: true });
   await session(goRec.api, path.join(root, 'go-scratch'));
 } catch (e) {
   console.error('session failed:', e);
   failed = true;
 } finally {
-  await ts.close();
-  await go.close();
+  await tsServer?.close();
+  await goServer.close();
 }
 
-const nt = normalizer();
 const ng = normalizer();
+const got = goRec.log.map(ng);
+if (update && !failed) {
+  writeFileSync(GOLDEN, gzipSync(JSON.stringify(got, null, 1)));
+  console.log(`Recorded ${got.length} answers in ${path.relative(process.cwd(), GOLDEN)}`);
+  rmSync(root, { recursive: true, force: true });
+  process.exit(0);
+}
+// the other side: the frozen TypeScript server (--ts), or the recorded answers
+const nt = normalizer();
+const want = tsRec ? tsRec.log.map(nt) : JSON.parse(gunzipSync(readFileSync(GOLDEN)).toString());
+const label = tsRec ? 'ts' : 'recorded';
 let diffs = 0;
-const n = Math.max(tsRec.log.length, goRec.log.length);
+const n = Math.max(want.length, got.length);
 const report = [];
 for (let i = 0; i < n; i++) {
-  const a = tsRec.log[i] && nt(tsRec.log[i]);
-  const b = goRec.log[i] && ng(goRec.log[i]);
-  const sa = JSON.stringify(a);
-  const sb = JSON.stringify(b);
+  const sa = JSON.stringify(want[i]);
+  const sb = JSON.stringify(got[i]);
   if (sa !== sb) {
     diffs++;
-    report.push({ i, ts: a, go: b });
+    report.push({ i, [label]: want[i], go: got[i] });
   }
 }
 writeFileSync(path.join(root, 'diff.json'), JSON.stringify(report, null, 2));
-writeFileSync(path.join(root, 'ts.json'), JSON.stringify(tsRec.log.map(nt), null, 2));
-writeFileSync(path.join(root, 'go.json'), JSON.stringify(goRec.log.map(ng), null, 2));
+writeFileSync(path.join(root, 'go.json'), JSON.stringify(got, null, 2));
 console.log(
   `${n} requests, ${n - diffs} identical, ${diffs} different${diffs ? ` (details: ${path.join(root, 'diff.json')})` : ''}`,
 );
 for (const d of report.slice(0, 15)) {
-  console.log(`  #${d.i} ${d.ts?.req ?? d.go?.req}`);
+  console.log(`  #${d.i} ${d[label]?.req ?? d.go?.req}`);
   // where the two answers start to differ, so a CI log is enough to see the problem
-  const a = JSON.stringify(d.ts) ?? '';
+  const a = JSON.stringify(d[label]) ?? '';
   const b = JSON.stringify(d.go) ?? '';
   let k = 0;
   while (k < a.length && a[k] === b[k]) k++;
-  console.log(`    ts: …${a.slice(Math.max(0, k - 120), k + 200)}`);
+  console.log(`    ${label}: …${a.slice(Math.max(0, k - 120), k + 200)}`);
   console.log(`    go: …${b.slice(Math.max(0, k - 120), k + 200)}`);
 }
+if (diffs && !tsRec)
+  console.log(
+    'If the change is deliberate, record the new answers: node scripts/api-parity.mjs --go <binary> --update',
+  );
 if (!keep && !diffs && !failed) rmSync(root, { recursive: true, force: true });
 process.exit(diffs || failed ? 1 : 0);
