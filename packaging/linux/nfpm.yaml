@@ -18,11 +18,16 @@ contents:
     dst: /usr/share/icons/hicolor/256x256/apps/classpad.png
   - src: ./classpad.desktop
     dst: /usr/share/applications/classpad.desktop
+# The glibc minimum is the newest glibc the program needs, read from the binary when it is packaged: on
+# an older system the package manager refuses to install it, instead of installing an app that cannot
+# start
 depends:
+  - libc6 (>= {{GLIBC}})
   - libgtk-4-1
   - libwebkitgtk-6.0-4
 overrides:
   rpm:
     depends:
+      - glibc >= {{GLIBC}}
       - gtk4
       - webkitgtk6.0

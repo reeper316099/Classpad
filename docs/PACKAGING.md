@@ -48,7 +48,10 @@ CLASSPAD_SELFTEST=1 CLASSPAD_DATA_DIR=/tmp/st ./build/classpad   # the desktop a
 - **macOS:** `Classpad-<version>-mac-universal.dmg` with a universal (arm64 + x64) `Classpad.app`.
 - **Windows:** `Classpad-<version>-win-x64-setup.exe` (installs for the current user, no administrator
   rights; adds the WebView2 runtime when Windows 10 lacks it) and `Classpad-<version>-win-x64-portable.exe`.
-- **Linux:** `.deb`, `.rpm` and a `.tar.gz`; they need GTK 4 and WebKitGTK 6.0.
+- **Linux:** `.deb`, `.rpm` and a `.tar.gz`; they need GTK 4, WebKitGTK 6.0 and the glibc the program was
+  built against (2.38 when built on Ubuntu 24.04: Ubuntu 24.04+, Debian 13+, Fedora 39+). The packages declare
+  that glibc version, read from the binary, so older systems refuse them instead of installing an app that cannot
+  start.
 
 Packaging files live in `packaging/` (Info.plist, the Windows manifest and installer script, the Linux
 `.desktop` file and package description). Icons come from `packaging/icons`, made by

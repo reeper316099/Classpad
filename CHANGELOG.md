@@ -9,7 +9,7 @@
 - **Safer:** the server now runs inside the app and no longer listens on a network port at all, so no other program on your computer can reach it. The rule that the app never contacts the internet still holds (the page's security policy blocks anything outside the app); links open in your browser.
 - **Your data folder doesn't change.** Notes stay Markdown files and everything else stays where it was; the new app reads the folder as it is. The old Electron app's own files (the `electron` folder inside your data folder) are no longer used and can be deleted.
 - **Save Grade Report as PDF** is now **Print Grade Report…**: the system print dialog can save it as a PDF on all three systems.
-- **Installers:** a universal `.dmg` for macOS; for Windows an installer that needs no administrator rights (it adds Microsoft's WebView2 if Windows 10 lacks it) and a portable `.exe`; for Linux `.deb`, `.rpm` and a `.tar.gz` (they need GTK 4 and WebKitGTK 6.0). There is no AppImage any more: putting WebKitGTK inside one is not reliable.
+- **Installers:** a universal `.dmg` for macOS; for Windows an installer that needs no administrator rights (it adds Microsoft's WebView2 if Windows 10 lacks it) and a portable `.exe`; for Linux `.deb`, `.rpm` and a `.tar.gz` (they need GTK 4, WebKitGTK 6.0 and glibc 2.38 or newer: Ubuntu 24.04+, Debian 13+, Fedora 39+). There is no AppImage any more: putting WebKitGTK inside one is not reliable.
 - Exports (CSV, calendars, backups, notes) are saved through a normal Save dialog.
 
 ### Fixes

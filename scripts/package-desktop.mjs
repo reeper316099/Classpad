@@ -41,13 +41,25 @@ const run = (cmd, args, opts = {}) => {
     process.exit(r.status ?? 1);
   }
 };
-const fill = (file, out) =>
-  writeFileSync(
-    out,
-    readFileSync(path.join(root, file), 'utf8')
-      .replaceAll('{{VERSION4}}', `${version}.0`)
-      .replaceAll('{{VERSION}}', version),
-  );
+const fill = (file, out, more = {}) => {
+  let text = readFileSync(path.join(root, file), 'utf8')
+    .replaceAll('{{VERSION4}}', `${version}.0`)
+    .replaceAll('{{VERSION}}', version);
+  for (const [k, v] of Object.entries(more)) text = text.replaceAll(`{{${k}}}`, v);
+  writeFileSync(out, text);
+};
+
+/** The newest glibc symbol version a Linux binary needs (for example 2.38). */
+function glibcNeeded(binary) {
+  let best = [2, 17];
+  for (const m of readFileSync(binary)
+    .toString('latin1')
+    .matchAll(/GLIBC_(\d+)\.(\d+)/g)) {
+    const v = [Number(m[1]), Number(m[2])];
+    if (v[0] > best[0] || (v[0] === best[0] && v[1] > best[1])) best = v;
+  }
+  return best.join('.');
+}
 let webBuilt = process.argv.includes('--skip-web');
 const build = (out, env = {}) => {
   run(
@@ -151,7 +163,9 @@ if (process.platform === 'darwin') {
     path.join(root, 'packaging/linux/classpad.desktop'),
     path.join(stage, 'classpad.desktop'),
   );
-  fill('packaging/linux/nfpm.yaml', path.join(stage, 'nfpm.yaml'));
+  const glibc = glibcNeeded(path.join(stage, 'classpad'));
+  console.log(`The program needs glibc ${glibc} or newer`);
+  fill('packaging/linux/nfpm.yaml', path.join(stage, 'nfpm.yaml'), { GLIBC: glibc });
   for (const format of ['deb', 'rpm'])
     run(
       'wails3',
