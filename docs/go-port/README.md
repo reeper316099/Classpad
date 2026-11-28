@@ -181,23 +181,24 @@ first Go version); both are now linear, with the same output. A fuzz test checks
 
 Each server as its own process on a fresh data folder, then loaded with the demo data.
 
-| Measure                                    | TypeScript (Node.js 22) | Go           | Difference           |
-| ------------------------------------------ | ----------------------- | ------------ | -------------------- |
-| Start-up until it answers (median of 10)   | 343–347 ms              | 34–37 ms     | about 10× faster     |
-| Memory, idle                               | 94.9–96.1 MB RSS        | 14.1–14.3 MB | about 6.7× less      |
-| Memory after the demo data and 1,800 calls | 142.8–143.1 MB RSS      | 21.9–22.2 MB | about 6.5× less      |
-| `GET /health`                              | 0.18 ms                 | 0.10 ms      | about 1.7× faster    |
-| `GET /assignments?limit=100&sort=due`      | 0.63 ms                 | 0.34–0.36 ms | about 1.8× faster    |
-| `GET /search?q=lorem`                      | 0.21 ms                 | 0.11–0.12 ms | about 1.8× faster    |
-| `GET /stats/overview`                      | 0.57–0.58 ms            | 0.54–0.55 ms | about the same       |
-| `GET /gpa`                                 | 0.40 ms                 | 0.45 ms      | Go about 1.1× slower |
-| `GET /export/report`                       | 0.38 ms                 | 0.44–0.45 ms | Go about 1.2× slower |
+| Measure                                    | TypeScript (Node.js 22) | Go           | Difference        |
+| ------------------------------------------ | ----------------------- | ------------ | ----------------- |
+| Start-up until it answers (median of 10)   | 348–359 ms              | 33–34 ms     | about 10× faster  |
+| Memory, idle                               | 95.0–96.3 MB RSS        | 14.2 MB      | about 6.7× less   |
+| Memory after the demo data and 1,800 calls | 143.0–144.2 MB RSS      | 21.8–22.5 MB | about 6.5× less   |
+| `GET /health`                              | 0.16 ms                 | 0.11 ms      | about 1.4× faster |
+| `GET /assignments?limit=100&sort=due`      | 0.65–0.67 ms            | 0.36 ms      | about 1.8× faster |
+| `GET /search?q=lorem`                      | 0.20–0.21 ms            | 0.11–0.12 ms | about 1.8× faster |
+| `GET /stats/overview`                      | 0.59–0.60 ms            | 0.55 ms      | about 1.1× faster |
+| `GET /gpa`                                 | 0.41 ms                 | 0.33–0.34 ms | about 1.2× faster |
+| `GET /export/report`                       | 0.36–0.40 ms            | 0.20 ms      | about 1.9× faster |
 
-Method: `node scripts/api-bench.mjs --go <binary>` twice (Go built with `-ldflags="-s -w"`, 9.1 MB); request
-times are the median of 300 calls after 20 warm-up calls, over loopback HTTP. The first Go version sorted lists
-at 1.0 ms: it rebuilt collation keys on every comparison, and now builds one per item. GPA and the report are
-still slower because the Go side turns engine results into JSON through an extra encode-and-parse step; both
-stay under half a millisecond.
+Method: `node scripts/api-bench.mjs --go <binary>` twice (Go built with `-ldflags="-s -w"`); request times are
+the median of 300 calls after 20 warm-up calls, over loopback HTTP. Two Go fixes came from earlier rounds of
+this measurement. The first Go version sorted lists at 1.0 ms because it rebuilt collation keys on every
+comparison; it now builds one per item. GPA (0.45 ms) and the report (0.44 ms) were slower than TypeScript until
+JSON was read in one pass instead of through `encoding/json`'s token reader, the engine's form of each grading
+scheme was cached, and the report graded each class once instead of twice.
 
 ## Building
 
