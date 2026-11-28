@@ -216,7 +216,8 @@ test('undo and redo', async () => {
   const id = await open('start');
   await content().getByText('start').click();
   await lineEnd();
-  await page.keyboard.type(' more');
+  // one input, so the undo step does not depend on typing speed (typing a second apart starts a new step)
+  await page.keyboard.insertText(' more');
   await expect.poll(saved(id)).toBe('start more');
   await page.keyboard.press('ControlOrMeta+z');
   await expect.poll(saved(id)).toBe('start');
@@ -442,4 +443,43 @@ test('a "/" menu that opens under a resting pointer keeps its first match for En
   await page.keyboard.press('Enter');
   await page.keyboard.type('Top');
   await expect.poll(saved(id)).toContain('<summary><h1>Top</h1></summary>');
+});
+
+test('the save label never says "Saved" while typing waits to be saved', async () => {
+  const id = await open('draft');
+  await content().getByText('draft').click();
+  await lineEnd();
+  const label = page.locator('.note-status');
+  await expect(label).toHaveText('Saved');
+  // timed in the page from the keystroke's arrival (a test browser can take a while to deliver it);
+  // the editor holds a keystroke for 350 ms before handing it over, the label must not wait for that
+  await page.evaluate(() => {
+    const w = window as unknown as { typedAt?: number; unsavedAt?: number };
+    const el = document.querySelector('.note-status')!;
+    document.addEventListener('beforeinput', () => (w.typedAt ??= performance.now()), {
+      capture: true,
+      once: true,
+    });
+    new MutationObserver(() => {
+      if (el.textContent === 'Unsaved changes') w.unsavedAt ??= performance.now();
+    }).observe(el, { subtree: true, characterData: true, childList: true });
+  });
+  await page.keyboard.type('!');
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const w = window as unknown as { typedAt?: number; unsavedAt?: number };
+        return w.typedAt !== undefined && w.unsavedAt !== undefined
+          ? w.unsavedAt - w.typedAt
+          : null;
+      }),
+    )
+    .not.toBeNull();
+  const ms = await page.evaluate(() => {
+    const w = window as unknown as { typedAt: number; unsavedAt: number };
+    return w.unsavedAt - w.typedAt;
+  });
+  expect(ms).toBeLessThan(150);
+  await expect(label).toHaveText('Saved');
+  expect(await saved(id)()).toBe('draft!');
 });

@@ -329,6 +329,8 @@ function NoteEditor({
   draftRef.current = draft;
   const base = useRef(note.updatedAt);
   const dirty = useRef(false);
+  // edits still held by the block editor (it hands the text over after a short pause): unsaved too
+  const pending = useRef(false);
   const timer = useRef<ReturnType<typeof setTimeout>>();
   const setSource = (v: boolean) => {
     setSourceState(v);
@@ -355,7 +357,7 @@ function NoteEditor({
         assignmentIds: d.assignmentIds,
       });
       base.current = saved.updatedAt;
-      setStatus(dirty.current ? 'dirty' : 'saved');
+      setStatus(dirty.current || pending.current ? 'dirty' : 'saved');
       void qc.invalidateQueries({ queryKey: ['list', 'notes'] });
       void qc.invalidateQueries({ queryKey: ['backlinks'] });
       if (useUi.getState().modules.flashcards && d.markdown.includes('{{c'))
@@ -699,6 +701,11 @@ function NoteEditor({
                 ref={editor}
                 value={draft.markdown}
                 onChange={(v) => change({ markdown: v })}
+                onPending={(p) => {
+                  pending.current = p;
+                  if (p) setStatus((s) => (s === 'saved' ? 'dirty' : s));
+                  else if (!dirty.current) setStatus((s) => (s === 'dirty' ? 'saved' : s));
+                }}
                 getTitles={() => titles.current}
                 onOpenWiki={openWiki}
                 onOpenAttachment={openAttachment}

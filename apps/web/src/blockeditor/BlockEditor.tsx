@@ -36,6 +36,8 @@ export interface BlockEditorHandle {
 interface Props {
   value: string;
   onChange: (v: string) => void;
+  /** True while edits wait in the editor (it hands the text over after a short pause), false after. */
+  onPending?: (pending: boolean) => void;
   getTitles?: () => string[];
   onOpenWiki?: (target: string, heading?: string) => void;
   onOpenAttachment?: (hash: string, ext: string, name: string) => void;
@@ -71,7 +73,7 @@ const samePos = (a: Position, b: Position) =>
 const sameSel = (a: Selection, b: Selection) => samePos(a.start, b.start) && samePos(a.end, b.end);
 
 export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEditor(
-  { value, onChange, getTitles, onOpenWiki, onOpenAttachment },
+  { value, onChange, onPending, getTitles, onOpenWiki, onOpenAttachment },
   ref,
 ) {
   const host = useRef<HTMLDivElement>(null);
@@ -83,8 +85,8 @@ export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEd
   const composing = useRef(false);
   const settingDom = useRef(false);
   const saveTimer = useRef<number>(0);
-  const latest = useRef({ onChange, getTitles, onOpenWiki, onOpenAttachment });
-  latest.current = { onChange, getTitles, onOpenWiki, onOpenAttachment };
+  const latest = useRef({ onChange, onPending, getTitles, onOpenWiki, onOpenAttachment });
+  latest.current = { onChange, onPending, getTitles, onOpenWiki, onOpenAttachment };
 
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading');
   const [marks, setMarks] = useState<Attrs>({});
@@ -113,6 +115,7 @@ export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEd
       own.current = md;
       latest.current.onChange(md);
     }
+    latest.current.onPending?.(false);
   }, []);
 
   /** Put the DOM selection where the model says, without triggering our selectionchange handler. */
@@ -148,6 +151,7 @@ export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEd
       r.setCaret(r.idAt(res.view.selection.end.path) ?? null);
       if (!opts.keepDom) placeDom(res.view.selection);
       if (res.changed) {
+        latest.current.onPending?.(true);
         window.clearTimeout(saveTimer.current);
         saveTimer.current = window.setTimeout(flush, 350);
       }
