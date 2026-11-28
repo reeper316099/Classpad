@@ -22,7 +22,6 @@
 - A key pressed as a flashcard review opens is no longer missed.
 - Items created together (an import, the demo data) now keep the order they were made in lists sorted by creation.
 - Windows: backups failed in the new desktop app because of a lock file the system browser engine keeps in the data folder; such lock files are now left out of backups.
-
 - Settings now stick between launches: which modules are switched on, theme and accent, the chosen semester, week start, reminders, Pomodoro lengths, the export folder and Source mode. They were kept in the window's browser storage, which the desktop app lost on every launch (it opens on a new local port each time, and browser storage belongs to one address). They are now saved in the data folder (`config/settings.json`), so they are also in backups. Settings from before this fix are moved over the first time the app opens.
 
 ### Security
