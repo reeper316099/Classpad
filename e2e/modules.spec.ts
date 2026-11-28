@@ -105,6 +105,7 @@ test('flashcards: review a cloze card with the keyboard', async () => {
     .getByRole('button', { name: /^Review/ })
     .first()
     .click();
+  await expect(page.getByText('Lorem ___')).toBeVisible();
   await page.keyboard.press('Space');
   await expect(page.getByText('ipsum', { exact: true })).toBeVisible();
   await page.keyboard.press('3');

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useLayoutEffect } from 'react';
 import { Icon } from '../components/Icon.js';
 import { Markdown } from '../components/Markdown.js';
 import { Dialog, Empty, Field, PageHead, Skeleton } from '../components/ui.js';
@@ -196,7 +196,8 @@ function Review({ classId, onDone }: { classId?: string; onDone: () => void }) {
     },
     [card],
   );
-  useEffect(() => {
+  // a layout effect: listening before the screen shows, so a key pressed as it appears is not lost
+  useLayoutEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && e.target.closest('input, textarea, select')) return;
       if (e.key === 'Escape') onDone();

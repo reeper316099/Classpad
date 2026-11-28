@@ -37,8 +37,17 @@ const readSource = () => {
 export function NotesPage() {
   const { id } = useParams();
   const dialogs = useDialogs();
-  const { data: notes = [], isLoading } = useNotes();
+  const { data: notes = [], isLoading, isFetching, refetch } = useNotes();
   const note = notes.find((n) => n.id === id);
+  // A link to a note the cached list does not have yet (made a moment ago elsewhere, before a live
+  // update arrived): reload the list once before saying there is no such note.
+  const missing = !!id && !isLoading && !note;
+  const reloadedFor = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!missing || reloadedFor.current === id) return;
+    reloadedFor.current = id;
+    void refetch();
+  }, [missing, id, refetch]);
   const [focus, setFocus] = useState(false);
   useEffect(() => {
     document.documentElement.classList.toggle('focus-mode', focus);
@@ -56,7 +65,7 @@ export function NotesPage() {
     <div className={`notes-layout ${focus ? 'focus' : ''} ${note ? 'has-note' : ''}`}>
       {!focus && <NotesTree activeId={id} />}
       <section className="notes-main">
-        {isLoading ? (
+        {isLoading || (missing && (isFetching || reloadedFor.current !== id)) ? (
           <Skeleton h={300} />
         ) : note ? (
           <NoteEditor key={note.id} note={note} focus={focus} setFocus={setFocus} />

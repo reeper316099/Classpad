@@ -69,3 +69,25 @@ test('class page tabs are real, and notes get code blocks and toggles', async ()
   await page.getByRole('tab', { name: 'Notes' }).click();
   await expect(page.getByRole('link', { name: /E2E Toolbar Note/ })).toBeVisible();
 });
+
+test('a link to a note made a moment ago opens it, even before a live update arrives', async () => {
+  // no live updates: the cached list of notes cannot know about the new note
+  await page.route('**/api/v1/events*', (route) => route.abort());
+  await page.reload();
+  await page.locator('aside.sidebar').getByRole('link', { name: 'Notes', exact: true }).click();
+  await expect(page.locator('.notes-tree')).toBeVisible();
+  const id = await page.evaluate(async () => {
+    const res = await fetch('/api/v1/notes', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${window.classpad!.api.token}`,
+        'content-type': 'application/json',
+      },
+      body: JSON.stringify({ title: 'Made elsewhere', markdown: 'Fresh text' }),
+    });
+    return ((await res.json()) as { id: string }).id;
+  });
+  await page.evaluate((nid) => (location.hash = `#/notes/${nid}`), id);
+  await expect(page.locator('.be-page')).toContainText('Fresh text');
+  await page.unroute('**/api/v1/events*');
+});
