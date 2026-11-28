@@ -148,63 +148,11 @@ func (o *Obj) MarshalJSON() ([]byte, error) { return []byte(Stringify(o, "")), n
 
 // Parse reads JSON keeping object key order (numbers become float64).
 func Parse(text string) (any, error) {
-	// Strict JSON.parse rules (and its error positions) first, then a second pass for key order.
+	// Strict JSON.parse rules (and its error positions) first, then one ordered pass.
 	if _, err := jsonstore.ParseJSON(text); err != nil {
 		return nil, err
 	}
-	d := json.NewDecoder(strings.NewReader(text))
-	d.UseNumber()
-	return readOrdered(d)
-}
-
-func readOrdered(d *json.Decoder) (any, error) {
-	tok, err := d.Token()
-	if err != nil {
-		return nil, err
-	}
-	switch t := tok.(type) {
-	case json.Delim:
-		switch t {
-		case '{':
-			o := NewObj()
-			for d.More() {
-				kt, err := d.Token()
-				if err != nil {
-					return nil, err
-				}
-				v, err := readOrdered(d)
-				if err != nil {
-					return nil, err
-				}
-				o.Set(kt.(string), v) // a repeated key keeps its first place and its last value, as in JSON.parse
-			}
-			_, err := d.Token()
-			return o, err
-		case '[':
-			a := []any{}
-			for d.More() {
-				v, err := readOrdered(d)
-				if err != nil {
-					return nil, err
-				}
-				a = append(a, v)
-			}
-			_, err := d.Token()
-			return a, err
-		}
-	case json.Number:
-		f, err := strconv.ParseFloat(string(t), 64)
-		if err != nil {
-			if ne, ok := err.(*strconv.NumError); ok && ne.Err == strconv.ErrRange {
-				return f, nil
-			}
-			return nil, err
-		}
-		return f, nil
-	case string, bool, nil:
-		return t, nil
-	}
-	return nil, fmt.Errorf("jsv: unexpected token %v", tok)
+	return readValid(text)
 }
 
 // FromGo converts a Go value (structs, maps, slices) to jsv values through encoding/json,
@@ -214,7 +162,7 @@ func FromGo(v any) any {
 	if err != nil {
 		panic(err)
 	}
-	out, err := Parse(string(b))
+	out, err := readValid(string(b)) // encoding/json writes valid JSON: no need to check it again
 	if err != nil {
 		panic(err)
 	}

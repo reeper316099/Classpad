@@ -93,6 +93,9 @@ type GradingService struct {
 	// stores a new object), so the object itself is the key; each pass keeps only what is still listed.
 	mu    sync.Mutex
 	items map[*jsv.Obj]grades.GradeItem
+	// schemes caches each (stored scheme, class) pair's engine scheme, on the same grounds; bounded,
+	// since the built-in fallback scheme is a new object on every lookup
+	schemes map[[2]*jsv.Obj]grades.Scheme
 }
 
 func NewGradingService(d GradingDeps) *GradingService { return &GradingService{d: d} }
@@ -133,7 +136,25 @@ func (g *GradingService) cls(id string) (*jsv.Obj, error) {
 }
 
 func (g *GradingService) ctxFor(c *jsv.Obj, items map[string][]grades.GradeItem) gradeCtx {
-	return gradeCtx{cls: c, scheme: ToEngineScheme(g.d.Config.Scheme(c.Str("gradingSchemeId")), c), items: items[c.Str("id")]}
+	return gradeCtx{cls: c, scheme: g.scheme(g.d.Config.Scheme(c.Str("gradingSchemeId")), c), items: items[c.Str("id")]}
+}
+
+func (g *GradingService) scheme(stored, cls *jsv.Obj) grades.Scheme {
+	key := [2]*jsv.Obj{stored, cls}
+	g.mu.Lock()
+	s, ok := g.schemes[key]
+	g.mu.Unlock()
+	if ok {
+		return s
+	}
+	s = ToEngineScheme(stored, cls)
+	g.mu.Lock()
+	if g.schemes == nil || len(g.schemes) >= 512 {
+		g.schemes = map[[2]*jsv.Obj]grades.Scheme{}
+	}
+	g.schemes[key] = s
+	g.mu.Unlock()
+	return s
 }
 
 func (g *GradingService) ctx(id string) (gradeCtx, error) {

@@ -371,6 +371,15 @@ func (c *Context) GradeReportHTML(hideGrades bool) string {
 	sems := append([]*jsv.Obj(nil), c.Semesters.List()...)
 	sort.SliceStable(sems, func(i, j int) bool { return localeCompare(optStr(sems[j], "start"), optStr(sems[i], "start")) < 0 })
 	items := c.Grading.itemsByClass()
+	graded := map[*jsv.Obj]grades.GradeResult{} // each class once: its section and the GPA table
+	gradeOf := func(k *jsv.Obj) grades.GradeResult {
+		if g, ok := graded[k]; ok {
+			return g
+		}
+		g := c.gradeOf(k, items)
+		graded[k] = g
+		return g
+	}
 	var parts strings.Builder
 	for _, s := range sems {
 		parts.WriteString("<h2>" + esc(s.Get("name")) + "</h2>")
@@ -378,7 +387,7 @@ func (c *Context) GradeReportHTML(hideGrades bool) string {
 			if k.Str("semesterId") != s.Str("id") || k.Bool("archived") {
 				continue
 			}
-			g := c.gradeOf(k, items)
+			g := gradeOf(k)
 			parts.WriteString(`<section class="class"><h3>` + esc(k.Get("name")))
 			if code := optStr(k, "code"); code != "" && code != k.Str("name") {
 				parts.WriteString(" <small>" + esc(code) + "</small>")
@@ -418,7 +427,7 @@ func (c *Context) GradeReportHTML(hideGrades bool) string {
 		if k.Bool("archived") {
 			continue
 		}
-		g := c.gradeOf(k, items)
+		g := gradeOf(k)
 		var letter any = nil
 		if g.Letter != nil {
 			letter = *g.Letter
