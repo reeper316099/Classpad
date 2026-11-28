@@ -112,9 +112,11 @@ jobs:
         run: |
           npx playwright install chromium
           npx playwright test -c e2e/playwright.config.ts --project=chromium
+      # traces of failed attempts, also when a retry passed (a flaky test still left its trace)
       - uses: actions/upload-artifact@v4
-        if: failure()
+        if: ${{ !cancelled() }}
         with:
           name: e2e-traces-${{ matrix.os }}
           path: test-results/
+          if-no-files-found: ignore
           retention-days: 7

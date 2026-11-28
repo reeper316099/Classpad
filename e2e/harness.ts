@@ -95,6 +95,12 @@ export async function launch(dataDir: string): Promise<{ app: App; page: Page }>
   });
   await context.addInitScript(bridge, { token, dataDir });
   const page = await context.newPage();
+  // the page's own errors go into the test log, so a flaky failure in CI says what went wrong
+  const where = () => `${test.info().project.name} ${test.info().title}`;
+  page.on('pageerror', (e) => console.log(`[page error] ${where()}: ${e.stack ?? e.message}`));
+  page.on('console', (m) => {
+    if (m.type() === 'error') console.log(`[console error] ${where()}: ${m.text()}`);
+  });
   await page.goto(`${server.url}/`);
   await page.waitForLoadState('domcontentloaded');
   const app: App = {

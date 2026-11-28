@@ -143,10 +143,14 @@ export function FloatingMenu({ at, items, onClose, label, autoFocus = true, anch
         aria-expanded={it.children ? sub?.item.id === it.id : undefined}
         aria-checked={it.checked}
         className={`lp-menu-item${active === i ? ' active' : ''}${it.danger ? ' danger' : ''}${it.disabled ? ' disabled' : ''}`}
-        onMouseEnter={(e) => {
-          setActive(i);
-          if (it.children) choose(it, e.currentTarget);
-          else setSub(null);
+        // only a real pointer move counts: a menu that opens under a resting pointer must not pick
+        // (or open the submenu of) whatever row happens to be under it
+        onMouseMove={(e) => {
+          if (!(e.movementX || e.movementY)) return;
+          if (active !== i) setActive(i);
+          if (it.children) {
+            if (sub?.item.id !== it.id) choose(it, e.currentTarget);
+          } else if (sub) setSub(null);
         }}
         onMouseDown={(e) => e.preventDefault()}
         onClick={(e) => choose(it, e.currentTarget)}

@@ -122,8 +122,12 @@ export function loadCore(): Promise<Bridge> {
     const res = await fetch(`${base()}editor.wasm`);
     if (!res.ok) throw new Error(`editor core missing (${res.status})`);
     const { instance } = await WebAssembly.instantiate(await res.arrayBuffer(), go.importObject);
-    void go.run(instance);
-    await ready;
+    // the program signals when it is ready; if it exits first (a crash while starting), fail instead
+    // of waiting forever
+    const exited = go.run(instance).then(() => {
+      throw new Error('the editor core stopped while starting');
+    });
+    await Promise.race([ready, exited]);
     return window.classpadEditor!;
   })();
   loading.catch(() => (loading = null));

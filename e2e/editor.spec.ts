@@ -28,7 +28,12 @@ const api = (p: string, method = 'GET', body?: unknown) =>
 async function open(markdown: string, title = 'E2E note') {
   const n = await api('/notes', 'POST', { title, markdown });
   await page.evaluate((id) => (location.hash = `#/notes/${id}`), n.id);
-  await page.locator('.be-page .af-block').first().waitFor();
+  try {
+    await page.locator('.be-page .af-block').first().waitFor({ timeout: 30_000 });
+  } catch {
+    const shown = await page.locator('.be-status').allTextContents();
+    throw new Error(`the editor did not open; it shows: ${JSON.stringify(shown)}`);
+  }
   await page.waitForTimeout(200);
   return n.id as string;
 }
@@ -390,3 +395,51 @@ for (const scheme of ['light', 'dark'] as const) {
     expect(failures).toEqual([]);
   });
 }
+
+test('the editor is editable the moment a note shows (a click right away places a caret)', async () => {
+  // record the page's state when the first block appears, before anything else can happen
+  await page.evaluate(() => {
+    const w = window as unknown as { firstShow?: boolean | null };
+    w.firstShow = null;
+    const seen = new MutationObserver(() => {
+      const ed = document.querySelector<HTMLElement>('.be-page');
+      if (ed?.querySelector('.af-block') && w.firstShow === null) {
+        w.firstShow = ed.isContentEditable;
+        seen.disconnect();
+      }
+    });
+    seen.observe(document.body, { subtree: true, childList: true });
+  });
+  const n = await api('/notes', 'POST', { title: 'E2E first click', markdown: 'Hello' });
+  await page.evaluate((id) => (location.hash = `#/notes/${id}`), n.id);
+  await page.locator('.be-page .af-block').first().waitFor();
+  expect(await page.evaluate(() => (window as unknown as { firstShow?: boolean }).firstShow)).toBe(
+    true,
+  );
+  // and a click straight away is a caret you can type at
+  await content().click();
+  await page.keyboard.press('ControlOrMeta+End');
+  await page.keyboard.type(' world');
+  await expect.poll(saved(n.id)).toBe('Hello world');
+});
+
+test('a "/" menu that opens under a resting pointer keeps its first match for Enter', async () => {
+  const id = await open('');
+  await focusEnd();
+  await page.keyboard.type('/toggle h');
+  const options = page.locator('.be-slash [role=option]');
+  await expect(options).toHaveCount(3);
+  // what the browser sends when the menu appears under a pointer that has not moved: hover events
+  // without any movement
+  for (const type of ['mouseover', 'mousemove'])
+    await options.nth(1).dispatchEvent(type, { movementX: 0, movementY: 0, bubbles: true });
+  await expect(menuItem()).toContainText('Toggle heading 1');
+  // a real move does highlight
+  const box = (await options.nth(1).boundingBox())!;
+  await page.mouse.move(box.x + 10, box.y + box.height / 2, { steps: 3 });
+  await expect(menuItem()).toContainText('Toggle heading 2');
+  await page.keyboard.press('ArrowUp');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('Top');
+  await expect.poll(saved(id)).toContain('<summary><h1>Top</h1></summary>');
+});

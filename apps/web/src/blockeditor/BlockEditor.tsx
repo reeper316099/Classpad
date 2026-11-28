@@ -191,8 +191,19 @@ export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEd
         core.current = c;
         rend.current = new Renderer(root);
         own.current = value;
+        // editable in the same step the blocks appear (React would only catch up on its next render):
+        // a click right after the note shows must land in an editable page and place a caret
+        root.contentEditable = 'true';
         run({ name: 'view' }, { keepDom: true });
         setStatus('ready');
+        // clicked in while it was opening: the page has focus but no caret yet
+        const ds = document.getSelection();
+        if (
+          document.activeElement === root &&
+          !root.contains(ds?.anchorNode ?? null) &&
+          sel.current
+        )
+          placeDom(sel.current);
       })
       .catch((e) => {
         console.error(e);
@@ -1259,7 +1270,12 @@ export const BlockEditor = forwardRef<BlockEditorHandle, Props>(function BlockEd
                       aria-selected={i === slash.active}
                       className={`lp-menu-item${i === slash.active ? ' active' : ''}`}
                       onClick={() => choose(it, slash.query.length + 1)}
-                      onMouseEnter={() => setSlash({ ...slash, active: i })}
+                      // only a real pointer move highlights: a menu that opens under a resting
+                      // pointer must keep its first match highlighted for Enter
+                      onMouseMove={(e) => {
+                        if ((e.movementX || e.movementY) && slash.active !== i)
+                          setSlash({ ...slash, active: i });
+                      }}
                     >
                       <span className="lp-menu-glyph" aria-hidden="true">
                         {it.glyph}
