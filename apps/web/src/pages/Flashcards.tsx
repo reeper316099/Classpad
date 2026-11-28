@@ -312,7 +312,8 @@ function AddCard({
   const { data: classes = [] } = useClasses();
   const [f, setF] = useState({ front: '', back: '', classId: '' });
   const [err, setErr] = useState('');
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (open) {
       setF({ front: '', back: '', classId: '' });
       setErr('');

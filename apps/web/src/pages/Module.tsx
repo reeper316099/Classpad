@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useLayoutEffect } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { Icon } from '../components/Icon.js';
 import {
@@ -332,7 +332,8 @@ export function ModuleDialog({
   const qc = useQueryClient();
   const [form, setForm] = useState(() => blankForm(def.fields));
   const [err, setErr] = useState('');
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (open) {
       setForm(
         item ? toForm(def.fields, item) : { ...blankForm(def.fields), ...(initial as object) },

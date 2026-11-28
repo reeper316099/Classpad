@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { useDialogs } from '../lib/dialogs.js';
 import { useAssignments, useClasses, useSaveMutation, useTasks } from '../lib/hooks.js';
 import type { Task } from '../lib/types.js';
@@ -14,7 +14,8 @@ export function TaskDialog() {
   const [f, setF] = useState<Record<string, string | boolean>>({});
   const [err, setErr] = useState('');
 
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!st.open) return;
     const t = existing;
     const [date = '', time = ''] = (t?.date?.split('/')[0] ?? '').split('T');

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { del } from '../lib/api.js';
 import { CLASS_COLORS } from '../lib/color.js';
@@ -76,7 +76,8 @@ function AssignmentDialog() {
   const [f, setF] = useState<Record<string, string | boolean>>({});
   const [err, setErr] = useState('');
 
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!st.open) return;
     const a = existing;
     const [dDate = '', dTime = ''] = (a?.due?.split('/')[0] ?? '').split('T');
@@ -379,7 +380,8 @@ function ClassDialog() {
   const [err, setErr] = useState('');
   const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'] as const;
 
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!st.open) return;
     const c = existing;
     setErr('');
@@ -698,7 +700,8 @@ function SemesterDialog() {
   const existing = st.id ? semesters.find((s) => s.id === st.id) : undefined;
   const [f, setF] = useState({ name: '', start: '', end: '', isCurrent: true, goals: '' });
   const [err, setErr] = useState('');
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!st.open) return;
     setErr('');
     setF({

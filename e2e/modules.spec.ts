@@ -62,6 +62,13 @@ test('modules: turn on, add data, journal is private by default', async () => {
   await dlg.getByLabel('Title').fill('Lorem day');
   await dlg.getByLabel('Entry text').fill('ipsum dolor sit amet');
   await dlg.getByRole('button', { name: 'Save' }).click();
+  // checked here, where it was typed, so a lost field fails at the step that lost it
+  await expect
+    .poll(async () => {
+      const items = ((await call('GET', '/journal')).body as { items: { title: string }[] }).items;
+      return items.map((i) => i.title);
+    })
+    .toEqual(['Lorem day']);
   const text = page.locator('.sens-j').first();
   await expect(text).toBeVisible();
   expect(await text.evaluate((e) => getComputedStyle(e).filter)).toContain('blur');

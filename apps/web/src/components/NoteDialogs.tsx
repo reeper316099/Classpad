@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { get, post } from '../lib/api.js';
 import { useDialogs } from '../lib/dialogs.js';
@@ -32,7 +32,8 @@ export function NewNoteDialog() {
   const [tpl, setTpl] = useState('');
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState('');
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!st.open) return;
     setTitle('');
     setErr('');

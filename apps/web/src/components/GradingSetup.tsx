@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useLayoutEffect } from 'react';
 import { get, patch, put } from '../lib/api.js';
 import { useDialogs } from '../lib/dialogs.js';
 import { refreshAll, useAssignments, useClasses } from '../lib/hooks.js';
@@ -81,7 +81,8 @@ export function GradingSetup() {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
 
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (!grading.open || !cls) return;
     const cur = schemes.find((s) => s.id === cls.gradingSchemeId);
     const own = schemes.find((s) => s.id === `class-${cls.id}`);

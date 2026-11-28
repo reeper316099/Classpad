@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState, useLayoutEffect } from 'react';
 import { Navigate } from 'react-router-dom';
 import { Icon } from '../components/Icon.js';
 import { Markdown } from '../components/Markdown.js';
@@ -155,7 +155,8 @@ function EntryDialog({
   const [preview, setPreview] = useState(false);
   const [err, setErr] = useState('');
   const toast = useUi((s) => s.toast);
-  useEffect(() => {
+  // a layout effect: the form resets before the dialog shows, so nothing typed into it is lost
+  useLayoutEffect(() => {
     if (open) {
       setF(
         entry
